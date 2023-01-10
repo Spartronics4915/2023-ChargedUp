@@ -7,6 +7,7 @@ package com.spartronics4915.frc2023;
 import com.spartronics4915.frc2023.Constants.OperatorConstants;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ExampleCommand;
+import com.spartronics4915.frc2023.commands.PrintPos;
 import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
+    private PhotonCameraWrapper cameraWrapper = new PhotonCameraWrapper();
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController = new CommandXboxController(
             OperatorConstants.kDriverControllerPort);
@@ -60,7 +61,7 @@ public class RobotContainer {
         // Schedule `exampleMethodCommand` when the Xbox controller's B button is
         // pressed,
         // cancelling on release.
-        m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+        m_driverController.b().whileTrue(new PrintPos(cameraWrapper));
     }
 
     /**

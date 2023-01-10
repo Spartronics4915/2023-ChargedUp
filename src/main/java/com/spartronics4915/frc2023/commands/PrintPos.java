@@ -1,7 +1,7 @@
-package com.spartronics4915.frc.robot.commands;
+package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc.robot.subsystems.ExampleSubsystem;
-import com.spartronics4915.frc.robot.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
+import com.spartronics4915.frc2023.PhotonCameraWrapper;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command that uses an example subsystem. */
 public class PrintPos extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    private final ExampleSubsystem m_subsystem;
     private PhotonCameraWrapper cam;
 
     /**
@@ -18,11 +17,9 @@ public class PrintPos extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public PrintPos(ExampleSubsystem subsystem) {
-        m_subsystem = subsystem;
-        cam = new PhotonCameraWrapper();
+    public PrintPos(PhotonCameraWrapper cameraWrapper) {
+        cam = cameraWrapper;
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(subsystem);
     }
 
     // Called when the command is initially scheduled.
