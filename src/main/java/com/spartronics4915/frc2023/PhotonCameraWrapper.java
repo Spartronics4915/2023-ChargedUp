@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
- package com.spartronics4915.frc.robot;
+ package com.spartronics4915.frc2023;
 
  import edu.wpi.first.apriltag.AprilTag;
  import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -32,8 +32,8 @@
  import edu.wpi.first.math.geometry.Rotation2d;
  import edu.wpi.first.math.geometry.Transform3d;
  import edu.wpi.first.wpilibj.Timer;
- import com.spartronics4915.frc.robot.Constants.FieldConstants;
- import com.spartronics4915.frc.robot.Constants.VisionConstants;
+ import com.spartronics4915.frc2023.Constants.FieldConstants;
+ import com.spartronics4915.frc2023.Constants.VisionConstants;
  import java.util.ArrayList;
  import java.util.Optional;
  import org.photonvision.PhotonCamera;
