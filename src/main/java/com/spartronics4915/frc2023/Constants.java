@@ -7,7 +7,7 @@ package com.spartronics4915.frc2023;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax; 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
