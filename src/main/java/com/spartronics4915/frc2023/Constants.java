@@ -144,6 +144,32 @@ public final class Constants {
         }
     }
 
+    public static final class TestSubsystem{
+        
+        public static final double kMaxSpeed = Units.feetToMeters(12);
+        
+        public static final double kWheelDiameter = Units.inchesToMeters(4.0);
+        public static final double kGearRatio = 8.14 / 1.0;
+            public static final double kVelocityConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio) / 60.0;
+            public static final double kPositionConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio);
+
+            public static final IdleMode kDriveIdleMode = IdleMode.kBrake;
+            public static final IdleMode kAngleIdleMode = IdleMode.kBrake;
+
+            public static final double kSlowModeSpeedMultiplier = 0.3;
+            public static final double kSlowModeAngularSpeedMultiplier = 0.3;
+            
+        public static final class Module0 {
+            public static final int kDriveMotorID = 1;
+            public static final int kAngleMotorID = 2;
+            public static final int kEncoderID = 0;
+            public static final double kAngleOffset = 6.277663;
+        }
+    }
+            
+
+
+
     // public static final class Camera {
         // public static final String kCameraName = "photoncamera"; // TODO: rename camera to "frontcam" or similar
     // }
@@ -159,5 +185,5 @@ public final class Constants {
         public static final double kStickDeadband = 0.08;
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
+        	}   
     }
-}

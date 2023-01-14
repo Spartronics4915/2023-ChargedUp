@@ -13,10 +13,17 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+
+
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
+import static com.spartronics4915.frc2023.Constants.Swerve.Module0.*;
 
 public class TestSubsystem {
-    private final int mModuleNumber;
+    private static final Integer driveMotorID = null;
+    private static final String angleMotorID = null;
+    private static final int encoderID = 0;
+    private static final double angleOffset = 0;
+    private final int mModuleNumber = 0;
     private double mAngleOffset;
     private double mLastAngle;
 
@@ -34,22 +41,19 @@ public class TestSubsystem {
 
     private SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
-    public TestSubsystem(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double angleOffset) {
-        mModuleNumber = moduleNumber;
-
-        mAngleOffset = angleOffset;
+    public TestSubsystem() {
         
-        mDriveMotor = kMotorConstructor.apply(driveMotorID);
+        mDriveMotor = kMotorConstructor.apply(kDriveMotorID);
         mDriveEncoder = mDriveMotor.getEncoder();
         mDriveController = mDriveMotor.getPIDController();
         configureDriveMotor();
         
-        mAngleMotor = kMotorConstructor.apply(angleMotorID);
+        mAngleMotor = kMotorConstructor.apply(kAngleMotorID);
         mIntegratedAngleEncoder = mAngleMotor.getEncoder();
         mAngleController = mAngleMotor.getPIDController();
         configureAngleMotor();
 
-        mSteeringEncoder = new AnalogEncoder(new AnalogInput(encoderID));
+        mSteeringEncoder = new AnalogEncoder(new AnalogInput(kEncoderID));
         mSteeringEncoder.setPositionOffset(angleOffset);
         confugureSteeringEncoder();
 
@@ -58,9 +62,6 @@ public class TestSubsystem {
         mLastAngle = getState().angle.getRadians();
     }
 
-    public TestSubsystem(int moduleNumber, SwerveModuleConstants constants) {
-        this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.angleOffset);
-    }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);

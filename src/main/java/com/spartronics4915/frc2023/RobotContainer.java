@@ -6,14 +6,16 @@ package com.spartronics4915.frc2023;
 
 //import com.spartronics4915.frc2023.Constants.Swerve;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
+import com.spartronics4915.frc2023.commands.TestCommands;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import static com.spartronics4915.frc2023.Constants.OI.*;
-
+import com.spartronics4915.frc2023.subsystems.TestSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -29,20 +31,22 @@ public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
     // private final com.spartronics4915.frc2023.subsystems.Swerve mSwerve;
-    // private final SwerveCommands mSwerveCommands;
-
+    // private final SwerveCommands mSwerveCommands; 
     // private final Command mAutonomousCommand;
     // private final Command mTeleopInitCommand;
     // private final Command mTeleopCommand;
     // private final Command mTestingCommand;
-
+    private final TestCommands mTestCommands;
+    private final TestSubsystem mTestSubsystem;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
         mController = new XboxController(kControllerID);
 
-        // mSwerve = new Swerve();
+        mTestSubsystem = new TestSubsystem();
+
+        mTestCommands = new TestCommands(mController, mTestSubsystem);
 
         // mSwerveCommands = new SwerveCommands(mController, mSwerve);
 
@@ -76,7 +80,9 @@ public class RobotContainer {
 
         // new JoystickButton(mController, kResetOdometryButton)
             // .whenPressed(mSwerveCommands.new ResetOdometry());
-        
+
+        new JoystickButton(mController, 1)
+            .onTrue(mTestCommand);
     }
 
     /**
