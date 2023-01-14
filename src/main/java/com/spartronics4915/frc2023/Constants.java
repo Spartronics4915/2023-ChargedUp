@@ -47,7 +47,7 @@ public final class Constants {
 
             public static final int kContinuousCurrentLimit = 30; // 80
 
-            public static final double kGearRatio = 8.33 / 1.0;
+            public static final double kGearRatio = 8.14 / 1.0;
             public static final double kVelocityConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio) / 60.0; // ??? what is the 60 ?? TODO: try removing
             public static final double kPositionConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio);
         }
@@ -68,7 +68,7 @@ public final class Constants {
         public static final double kWheelBase = 0.75;
         public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
 
-        public static final double kMaxSpeed = Units.feetToMeters(11.9);
+        public static final double kMaxSpeed = Units.feetToMeters(12);
         public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius;
 
         public static final double kSlowModeSpeedMultiplier = 0.3;
@@ -95,38 +95,38 @@ public final class Constants {
                 new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
         }
 
-        public static final class Module1 {
-            public static final int kDriveMotorID = 3;
-            public static final int kAngleMotorID = 4;
-            public static final int kEncoderID = 1;
-            public static final double kAngleOffset = 3.090590;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
-        }
+        // public static final class Module1 {
+            // public static final int kDriveMotorID = 3;
+            // public static final int kAngleMotorID = 4;
+            // public static final int kEncoderID = 1;
+            // public static final double kAngleOffset = 3.090590;
+            // public static final SwerveModuleConstants kConstants = 
+                // new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
+        // }
 
-        public static final class Module2 {
-            public static final int kDriveMotorID = 5;
-            public static final int kAngleMotorID = 6;
-            public static final int kEncoderID = 2;
-            public static final double kAngleOffset = 6.111399;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
-        }
+        // public static final class Module2 {
+            // public static final int kDriveMotorID = 5;
+            // public static final int kAngleMotorID = 6;
+            // public static final int kEncoderID = 2;
+            // public static final double kAngleOffset = 6.111399;
+            // public static final SwerveModuleConstants kConstants = 
+                // new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
+        // }
 
-        public static final class Module3 {
-            public static final int kDriveMotorID = 7;
-            public static final int kAngleMotorID = 8;
-            public static final int kEncoderID = 3;
-            public static final double kAngleOffset = 1.266737;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
-        }
+        // public static final class Module3 {
+            // public static final int kDriveMotorID = 7;
+            // public static final int kAngleMotorID = 8;
+            // public static final int kEncoderID = 3;
+            // public static final double kAngleOffset = 1.266737;
+            // public static final SwerveModuleConstants kConstants = 
+                // new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset);
+        // }
 
         public static final SwerveDriveKinematics kKinematics = new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0), // front left, module 0
-            new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0), // front right, module 1
-            new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0), // back left, module 2
-            new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0) // back right, module 3
+            new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0) // front left, module 0
+            // new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0), // front right, module 1
+            // new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0), // back left, module 2
+            // new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0) // back right, module 3
         );
         
         public static class SwerveModuleConstants {
@@ -144,9 +144,9 @@ public final class Constants {
         }
     }
 
-    public static final class Camera {
-        public static final String kCameraName = "photoncamera"; // TODO: rename camera to "frontcam" or similar
-    }
+    // public static final class Camera {
+        // public static final String kCameraName = "photoncamera"; // TODO: rename camera to "frontcam" or similar
+    // }
 
     public static final class OI {
         public static final int kControllerID = 2;

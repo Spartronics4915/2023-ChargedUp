@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 
-public class SwerveModule {
+public class TestSubsystem {
     private final int mModuleNumber;
     private double mAngleOffset;
     private double mLastAngle;
@@ -34,7 +34,7 @@ public class SwerveModule {
 
     private SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
-    public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double angleOffset) {
+    public TestSubsystem(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double angleOffset) {
         mModuleNumber = moduleNumber;
 
         mAngleOffset = angleOffset;
@@ -58,7 +58,7 @@ public class SwerveModule {
         mLastAngle = getState().angle.getRadians();
     }
 
-    public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
+    public TestSubsystem(int moduleNumber, SwerveModuleConstants constants) {
         this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.angleOffset);
     }
 

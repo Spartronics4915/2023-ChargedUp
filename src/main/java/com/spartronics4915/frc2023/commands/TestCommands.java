@@ -16,14 +16,14 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import static com.spartronics4915.frc2023.Constants.OI.*;
 
-public class SwerveCommands {
+public class TestCommands {
     private final XboxController mController;
 
     private final Swerve mSwerve;
     private boolean mIsFieldRelative = true;
     private boolean mIsSlowMode = false;
 
-    public SwerveCommands(XboxController controller, Swerve swerve) {
+    public TestCommands(XboxController controller, Swerve swerve) {
         mController = controller;
         mSwerve = swerve;
     }

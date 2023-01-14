@@ -7,9 +7,9 @@ import java.util.Arrays;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.spartronics4915.frc2023.Constants.Swerve.Module0;
-import com.spartronics4915.frc2023.Constants.Swerve.Module1;
-import com.spartronics4915.frc2023.Constants.Swerve.Module2;
-import com.spartronics4915.frc2023.Constants.Swerve.Module3;
+// import com.spartronics4915.frc2023.Constants.Swerve.Module1;
+// import com.spartronics4915.frc2023.Constants.Swerve.Module2;
+// import com.spartronics4915.frc2023.Constants.Swerve.Module3;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,9 +37,9 @@ public class Swerve extends SubsystemBase {
 
         mModules = new SwerveModule[] {
             new SwerveModule(0, Module0.kConstants),
-            new SwerveModule(1, Module1.kConstants),
-            new SwerveModule(2, Module2.kConstants),
-            new SwerveModule(3, Module3.kConstants)
+            // new SwerveModule(1, Module1.kConstants),
+            // new SwerveModule(2, Module2.kConstants),
+            // new SwerveModule(3, Module3.kConstants)
         };
     }
 

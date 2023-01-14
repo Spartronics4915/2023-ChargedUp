@@ -28,13 +28,13 @@ public class RobotContainer {
     private final XboxController mController;
 
     // The robot's subsystems and commands are defined here...
-    private final com.spartronics4915.frc2023.subsystems.Swerve mSwerve;
-    private final SwerveCommands mSwerveCommands;
+    // private final com.spartronics4915.frc2023.subsystems.Swerve mSwerve;
+    // private final SwerveCommands mSwerveCommands;
 
-    private final Command mAutonomousCommand;
-    private final Command mTeleopInitCommand;
-    private final Command mTeleopCommand;
-    private final Command mTestingCommand;
+    // private final Command mAutonomousCommand;
+    // private final Command mTeleopInitCommand;
+    // private final Command mTeleopCommand;
+    // private final Command mTestingCommand;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -42,14 +42,18 @@ public class RobotContainer {
     public RobotContainer() {
         mController = new XboxController(kControllerID);
 
-        mSwerve = new Swerve();
+        // mSwerve = new Swerve();
 
-        mSwerveCommands = new SwerveCommands(mController, mSwerve);
+        // mSwerveCommands = new SwerveCommands(mController, mSwerve);
 
-        mAutonomousCommand = null;
-        mTeleopInitCommand = mSwerveCommands.new TeleopInitCommand();
-        mTeleopCommand = mSwerveCommands.new TeleopCommand();
-        mTestingCommand = mSwerveCommands.new TestCommand();
+        
+
+        // mAutonomousCommand = null;
+        // mTeleopInitCommand = mSwerveCommand.new TeleopInitCommand();
+        // mTeleopCommand = mSwerveCommands.new TeleopCommand();
+        // mTestingCommand = mSwerveCommands.new TestCommand();
+
+        
 
         // Configure the button bindings
         configureButtonBindings();
@@ -64,14 +68,15 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        new JoystickButton(mController, kToggleFieldRelativeButton)
-            .whenPressed(mSwerveCommands.new ToggleFieldRelative());
+        // new JoystickButton(mController, kToggleFieldRelativeButton)
+            // .whenPressed(mSwerveCommands.new ToggleFieldRelative());
 
-        new JoystickButton(mController, kResetYawButton)
-            .whenPressed(mSwerveCommands.new ResetYaw());
+        // new JoystickButton(mController, kResetYawButton)
+            // .whenPressed(mSwerveCommands.new ResetYaw());
 
-        new JoystickButton(mController, kResetOdometryButton)
-            .whenPressed(mSwerveCommands.new ResetOdometry());
+        // new JoystickButton(mController, kResetOdometryButton)
+            // .whenPressed(mSwerveCommands.new ResetOdometry());
+        
     }
 
     /**
@@ -79,19 +84,19 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    public Command getAutonomousCommand() {
-        return mAutonomousCommand;
+    // public Command getAutonomousCommand() {
+        // return mAutonomousCommand;
+    // }
+
+    // public Command getTeleopInitCommand() {
+        // return mTeleopInitCommand;
+    // }
+
+    // public Command getTeleopCommand() {
+        // return mTeleopCommand;
     }
 
-    public Command getTeleopInitCommand() {
-        return mTeleopInitCommand;
-    }
-
-    public Command getTeleopCommand() {
-        return mTeleopCommand;
-    }
-
-    public Command getTestingCommand() {
-        return mTestingCommand;
-    }
-}
+    // public Command getTestingCommand() {
+        // return mTestingCommand;
+    // }
+// }
