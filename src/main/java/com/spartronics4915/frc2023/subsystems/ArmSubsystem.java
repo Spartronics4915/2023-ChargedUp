@@ -30,15 +30,15 @@ public class ArmSubsystem extends SubsystemBase {
         mWristMotor.setIdleMode(IdleMode.kBrake);
 
         //PID setup
-        mShoulderPIDContoller = initinalizePIDController(mShoulderMotor, ArmConstants.kShoulderPID);
+        mShoulderPIDContoller = initializePIDController(mShoulderMotor, ArmConstants.kShoulderPID);
 
-        mWristPIDContoller = initinalizePIDController(mWristMotor, ArmConstants.kWristPID);
+        mWristPIDContoller = initializePIDController(mWristMotor, ArmConstants.kWristPID);
         //TODO make sure to add absolute encoders
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
         
     }
 
-    private SparkMaxPIDController initinalizePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
+    private SparkMaxPIDController initializePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
         SparkMaxPIDController targPidController = mMotor.getPIDController();
         mWristPIDContoller.setP(kPIDConstants.kP);
         mWristPIDContoller.setI(kPIDConstants.kI);
