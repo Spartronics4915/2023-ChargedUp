@@ -16,8 +16,27 @@ package com.spartronics4915.frc2023;
  * wherever the
  * constants are needed, to reduce verbosity.
  */
+
+    
 public final class Constants {
     public static class OperatorConstants {
         public static final int kDriverControllerPort = 0;
+    }
+    public static class ArmConstants{
+        public static class PIDConstants {
+            public final double kP;
+            public final double kI;
+            public final double kD;
+            public PIDConstants(double kP, double kI, double kD) {
+                super();
+                this.kP = kP;
+                this.kI = kI;
+                this.kD = kD;
+            } 
+        }
+        public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0);
+        public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0);
+        public static final int kShoulderMotorId = 0;
+        public static final int kWristMotorId = 1;
     }
 }
