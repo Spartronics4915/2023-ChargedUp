@@ -9,14 +9,19 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.spartronics4915.frc2023.Constants.ArmConstants;
+import com.spartronics4915.frc2023.Constants.ArmConstants.AbsoluteEncoderConstants;
 import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax mWristMotor;
     private CANSparkMax mShoulderMotor;
+    private AnalogEncoder mWristAbsEncoder;
+    private AnalogEncoder mShoulderAbsEncoder;
     private SparkMaxPIDController mShoulderPIDContoller;
     private SparkMaxPIDController mWristPIDContoller;
     private double StartAngle = 20;
@@ -26,25 +31,41 @@ public class ArmSubsystem extends SubsystemBase {
         mShoulderMotor = new CANSparkMax(ArmConstants.kShoulderMotorId,MotorType.kBrushed);
         mWristMotor = new CANSparkMax(ArmConstants.kWristMotorId,MotorType.kBrushed);
         //TODO check if motors are brushed or brushless, if brushed check if Idle Mode Setting is needed
+        //note: seems there are going to be two motors for the shoulder maybe use the follow method
         mShoulderMotor.setIdleMode(IdleMode.kBrake); 
-        mWristMotor.setIdleMode(IdleMode.kBrake);
+        mWristMotor.setIdleMode(IdleMode.kBrake); 
+        // mWristAbsEncoder = new AnalogEncoder()
+       
 
+        mWristAbsEncoder = initializeAbsEncoder(ArmConstants.kWristAbsEncoder);
+        mShoulderAbsEncoder = initializeAbsEncoder(ArmConstants.kShoulderAbsEncoder);
+
+        
         //PID setup
         mShoulderPIDContoller = initializePIDController(mShoulderMotor, ArmConstants.kShoulderPID);
-
         mWristPIDContoller = initializePIDController(mWristMotor, ArmConstants.kWristPID);
         //TODO make sure to add absolute encoders
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
+        //TODO calculate gear ratios since the shoulder motors attach to a chain system to rotate the actual arm, because of this you can't use the follow method
         
     }
 
     private SparkMaxPIDController initializePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
-        SparkMaxPIDController targPidController = mMotor.getPIDController();
-        mWristPIDContoller.setP(kPIDConstants.kP);
-        mWristPIDContoller.setI(kPIDConstants.kI);
-        mWristPIDContoller.setD(kPIDConstants.kD);
-        mWristPIDContoller.setReference(StartAngle, CANSparkMax.ControlType.kPosition, 0);
-        return targPidController;
+        SparkMaxPIDController PIDController = mMotor.getPIDController();
+        PIDController.setP(kPIDConstants.kP);
+        PIDController.setI(kPIDConstants.kI);
+        PIDController.setD(kPIDConstants.kD);
+        PIDController.setReference(StartAngle, CANSparkMax.ControlType.kPosition, 0);
+        return PIDController;
+    }
+    private AnalogEncoder initializeAbsEncoder(AbsoluteEncoderConstants kAbsoluteEncoderConstants) {
+        AnalogEncoder absoluteEncoder = new AnalogEncoder(new AnalogInput(kAbsoluteEncoderConstants.channel));
+        absoluteEncoder.setPositionOffset(kAbsoluteEncoderConstants.angleOffset);
+        absoluteEncoder.setDistancePerRotation(2*Math.PI);
+        return absoluteEncoder;
+    }
+    private void levelWrist(){
+        //TODO add method which uses the shoulders setpoint to make the wrist stay level
     }
     
     public void setShoulderSetpoint(double value) {
@@ -82,6 +103,7 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        //TODO maybe have the wrist encoder be offset to be an absolute value so you dont have to constantly re calculate it
     }
 
     @Override

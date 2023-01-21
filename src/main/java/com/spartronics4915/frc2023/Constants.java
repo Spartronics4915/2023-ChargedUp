@@ -22,6 +22,7 @@ public final class Constants {
     public static class OperatorConstants {
         public static final int kDriverControllerPort = 0;
     }
+    
     public static class ArmConstants{
         public static class PIDConstants {
             public final double kP;
@@ -34,9 +35,26 @@ public final class Constants {
                 this.kD = kD;
             } 
         }
-        public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0);
-        public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0);
-        public static final int kShoulderMotorId = 0;
-        public static final int kWristMotorId = 1;
+        public static class AbsoluteEncoderConstants{
+            public final int channel; 
+            public final double angleOffset;
+            public AbsoluteEncoderConstants(int channel, double angleOffset) {
+                this.channel = channel;
+                this.angleOffset = angleOffset;
+            }
+        }
+        public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
+        public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
+        public static final AbsoluteEncoderConstants kShoulderAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
+        public static final AbsoluteEncoderConstants kWristAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
+        public static final int kShoulderMotorId = 0; //PlaceHolder Value
+        public static final int kWristMotorId = 1; //PlaceHolder Value
+        public static class ClawConstants{
+            public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
+            public static final int klimitSwitchID = 0; //PlaceHolder Value
+            public static final int kClawMotorID = 0; //PlaceHolder Value
+            public static final double kDefaultSpeed = 0.25; //PlaceHolder Value
+        }
     }
+    
 }
