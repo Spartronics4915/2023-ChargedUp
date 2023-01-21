@@ -4,6 +4,8 @@
 
 package com.spartronics4915.frc2023;
 
+import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,9 +20,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-    private Command m_autonomousCommand;
+    private RobotContainer mRobotContainer;
 
-    private RobotContainer m_robotContainer;
+    private Command mAutonomousCommand;
+    private Command mTeleopCommand;
+    private Command mTestingCommand;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -32,7 +36,13 @@ public class Robot extends TimedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our
         // autonomous chooser on the dashboard.
-        m_robotContainer = new RobotContainer();
+        mRobotContainer = new RobotContainer();
+
+        mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+        mTeleopCommand = mRobotContainer.getTeleopCommand();
+        mTestingCommand = mRobotContainer.getTestingCommand();
+
+        mRobotContainer.initRobot();
     }
 
     /**
@@ -72,11 +82,11 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
+        if (mAutonomousCommand != null) {
+            mAutonomousCommand.schedule();
         }
     }
 
@@ -91,8 +101,14 @@ public class Robot extends TimedRobot {
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.cancel();
+        if (mAutonomousCommand != null) {
+            mAutonomousCommand.cancel();
+        }
+
+        mRobotContainer.initTeleop();
+        
+        if (mTeleopCommand != null) {
+            mTeleopCommand.schedule();
         }
     }
 
@@ -105,6 +121,10 @@ public class Robot extends TimedRobot {
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
+
+        if (mTestingCommand != null) {
+            mTestingCommand.schedule();
+        }
     }
 
     /** This function is called periodically during test mode. */
