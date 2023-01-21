@@ -34,6 +34,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * rotation is positive, and the angle measure 0 is directly away from the alliance wall.
  */
 public final class Constants {
+    public static final class Autos {
+        public static final double duration_seconds = 1.0;
+    }
+
     public static final class Swerve {
         public static final class Drive {
             public static final double kP = 0.0;

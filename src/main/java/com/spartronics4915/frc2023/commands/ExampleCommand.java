@@ -5,6 +5,7 @@
 package com.spartronics4915.frc2023.commands;
 
 import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
+import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -22,6 +23,9 @@ public class ExampleCommand extends CommandBase {
         m_subsystem = subsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
+    }
+
+    public ExampleCommand(Swerve subsystem) {
     }
 
     // Called when the command is initially scheduled.

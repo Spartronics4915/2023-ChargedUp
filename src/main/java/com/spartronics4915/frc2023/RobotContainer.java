@@ -4,9 +4,9 @@
 
 package com.spartronics4915.frc2023;
 
+import com.spartronics4915.frc2023.commands.Autos;
 //import com.spartronics4915.frc2023.Constants.Swerve;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
-import com.spartronics4915.frc2023.commands.TestCommands;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import static com.spartronics4915.frc2023.Constants.OI.*;
-import com.spartronics4915.frc2023.subsystems.TestSubsystem;
+import static com.spartronics4915.frc2023.Constants.Autos.*;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -32,27 +33,28 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     // private final com.spartronics4915.frc2023.subsystems.Swerve mSwerve;
     // private final SwerveCommands mSwerveCommands; 
-    // private final Command mAutonomousCommand;
+    private final Command mAutonomousCommand;
     // private final Command mTeleopInitCommand;
     // private final Command mTeleopCommand;
     // private final Command mTestingCommand;
-    private final TestCommands mTestCommand;
-    private final TestSubsystem mTestSubsystem;
+        private final Command mAutos;
+        private final Swerve mSwerve;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
         mController = new XboxController(kControllerID);
 
-        mTestSubsystem = new TestSubsystem();
+        // mTestSubsystem = new TestSubsystem();
 
-        mTestCommand = new TestCommands(mController, mTestSubsystem);
+        mSwerve = new Swerve();
+
+        // mTestCommand = new TestCommands(mController, mTestSubsystem);
 
         // mSwerveCommands = new SwerveCommands(mController, mSwerve);
 
-        
+        mAutonomousCommand = Autos.driveStraight(mSwerve, 1.0);
 
-        // mAutonomousCommand = null;
         // mTeleopInitCommand = mSwerveCommand.new TeleopInitCommand();
         // mTeleopCommand = mSwerveCommands.new TeleopCommand();
         // mTestingCommand = mSwerveCommands.new TestCommand();
@@ -82,7 +84,7 @@ public class RobotContainer {
             // .whenPressed(mSwerveCommands.new ResetOdometry());
 
         new JoystickButton(mController, 1)
-            .onTrue(mTestCommand); //why not work???
+            .onTrue(mAutonomousCommand); //why not work???
     }
 
     /**
@@ -90,9 +92,9 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    // public Command getAutonomousCommand() {
-        // return mAutonomousCommand;
-    // }
+    public Command getAutonomousCommand() {
+        return mAutonomousCommand;
+    }
 
     // public Command getTeleopInitCommand() {
         // return mTeleopInitCommand;

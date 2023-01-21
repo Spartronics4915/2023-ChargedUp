@@ -4,18 +4,28 @@
 
 package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
+import com.spartronics4915.frc2023.subsystems.Swerve;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class Autos {
-    /** Example static factory for an autonomous command. */
-    public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
-        return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
+    
+    public static CommandBase driveStraight(Swerve swerve, double kSpeedMPerS){
+        Translation2d straightVelocity = new Translation2d(kSpeedMPerS,0);
+        return Commands.runOnce(() -> swerve.drive(straightVelocity, 0.0, true), swerve);
     }
 
-    private Autos() {
-        throw new UnsupportedOperationException("This is a utility class!");
+    public static CommandBase stop(Swerve swerve) {
+        return Commands.runOnce(() -> swerve.drive(new Translation2d(0.0, 0.0), 
+          0.0, true), swerve);
     }
+    public static CommandBase leaveCommunity(Swerve swerve, double duration_seconds, double kSpeedMPerS){
+    return Commands.sequence(
+      driveStraight(swerve, kSpeedMPerS),
+      Commands.waitSeconds(duration_seconds),
+      stop(swerve));
+
+  }
 }
