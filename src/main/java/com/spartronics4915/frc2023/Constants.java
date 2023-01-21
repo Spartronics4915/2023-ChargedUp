@@ -43,12 +43,22 @@ public final class Constants {
                 this.angleOffset = angleOffset;
             }
         }
-        public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-        public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-        public static final AbsoluteEncoderConstants kShoulderAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
-        public static final AbsoluteEncoderConstants kWristAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
-        public static final int kShoulderMotorId = 0; //PlaceHolder Value
-        public static final int kWristMotorId = 1; //PlaceHolder Value
+        public static class MotorSetupConstants{
+            public static final int kShoulderMotorId = 0; //PlaceHolder Value
+            public static final int kWristMotorId = 1; //PlaceHolder Value
+            public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
+            public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
+            public static final AbsoluteEncoderConstants kShoulderAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
+            public static final AbsoluteEncoderConstants kWristAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
+        }
+        public static class LinearActuatorConstants{
+            public static final int kLinearActuatorMotorId = 0; //PlaceHolder Value
+            public static final PIDConstants kLinearActuatorPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
+            public static final double kSprocketRadius = 0;
+            public static final double kPedalGearRadius = 0;
+
+        }
+        
         public static class ClawConstants{
             public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
             public static final int klimitSwitchID = 0; //PlaceHolder Value

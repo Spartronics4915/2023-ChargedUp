@@ -33,15 +33,9 @@ public class ClawSubsystem extends SubsystemBase {
    
 
     public void motorIn() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.        mClawMotor.set(mDefaultSpeed);
-        //TODO should make a command that will run motor until # of seconds have passed or the limit switch was triggered
         mClawPID.setReference(ClawConstants.kInSpeed, ControlType.kVelocity);
     }
     public void motorOut() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.        mClawMotor.set(mDefaultSpeed);
-        //TODO should make a command that will run motor until # of seconds have passed or the limit switch was triggered
         mClawPID.setReference(-ClawConstants.kOutSpeed, ControlType.kVelocity);
     }
     public void motorOff() {

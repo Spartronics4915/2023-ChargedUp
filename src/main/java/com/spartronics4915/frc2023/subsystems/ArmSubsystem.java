@@ -6,6 +6,7 @@ package com.spartronics4915.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -13,41 +14,49 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.spartronics4915.frc2023.Constants.ArmConstants;
+import com.spartronics4915.frc2023.Constants.ArmConstants.MotorSetupConstants;
+import com.spartronics4915.frc2023.Constants.ArmConstants.LinearActuatorConstants;
+
 import com.spartronics4915.frc2023.Constants.ArmConstants.AbsoluteEncoderConstants;
 import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax mWristMotor;
     private CANSparkMax mShoulderMotor;
+    private CANSparkMax mLinActuatorMotor;
+
     private AnalogEncoder mWristAbsEncoder;
     private AnalogEncoder mShoulderAbsEncoder;
     private SparkMaxPIDController mShoulderPIDContoller;
     private SparkMaxPIDController mWristPIDContoller;
-    private double StartAngle = 20;
+    private SparkMaxPIDController mLinActuatorPIDController;
+    private double mShoulderGearRatio;
     /** Creates a new ExampleSubsystem. */
     public ArmSubsystem() {
         //motor setup
-        mShoulderMotor = new CANSparkMax(ArmConstants.kShoulderMotorId,MotorType.kBrushed);
-        mWristMotor = new CANSparkMax(ArmConstants.kWristMotorId,MotorType.kBrushed);
         //TODO check if motors are brushed or brushless, if brushed check if Idle Mode Setting is needed
-        //note: seems there are going to be two motors for the shoulder maybe use the follow method
+        mShoulderMotor = new CANSparkMax(MotorSetupConstants.kShoulderMotorId,MotorType.kBrushed);
         mShoulderMotor.setIdleMode(IdleMode.kBrake); 
+        mWristMotor = new CANSparkMax(MotorSetupConstants.kWristMotorId,MotorType.kBrushed);
         mWristMotor.setIdleMode(IdleMode.kBrake); 
-        // mWristAbsEncoder = new AnalogEncoder()
-       
-
-        mWristAbsEncoder = initializeAbsEncoder(ArmConstants.kWristAbsEncoder);
-        mShoulderAbsEncoder = initializeAbsEncoder(ArmConstants.kShoulderAbsEncoder);
-
+        mLinActuatorMotor = new CANSparkMax(LinearActuatorConstants.kLinearActuatorMotorId, MotorType.kBrushless);
+        mLinActuatorMotor.setIdleMode(IdleMode.kBrake);
         
         //PID setup
-        mShoulderPIDContoller = initializePIDController(mShoulderMotor, ArmConstants.kShoulderPID);
-        mWristPIDContoller = initializePIDController(mWristMotor, ArmConstants.kWristPID);
-        //TODO make sure to add absolute encoders
-        //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
-        //TODO calculate gear ratios since the shoulder motors attach to a chain system to rotate the actual arm, because of this you can't use the follow method
+        mShoulderPIDContoller = initializePIDController(mShoulderMotor, MotorSetupConstants.kShoulderPID);
+        mWristPIDContoller = initializePIDController(mWristMotor, MotorSetupConstants.kWristPID);
+        mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
+
+        //note: seems there are going to be two motors for the shoulder maybe use the follow method       
         
+        //encoder setup
+        mWristAbsEncoder = initializeAbsEncoder(MotorSetupConstants.kWristAbsEncoder);
+        mShoulderAbsEncoder = initializeAbsEncoder(MotorSetupConstants.kShoulderAbsEncoder);
+
+        //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
+        //TODO (If Needed) calculate gear ratios since the shoulder motors attach to a chain system to rotate the actual arm, because of this you can't use the follow method
+        //TODO add limit switch IDs for linear actualor
+        mShoulderGearRatio = LinearActuatorConstants.kSprocketRadius/ LinearActuatorConstants.kPedalGearRadius;
     }
 
     private SparkMaxPIDController initializePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
@@ -55,19 +64,26 @@ public class ArmSubsystem extends SubsystemBase {
         PIDController.setP(kPIDConstants.kP);
         PIDController.setI(kPIDConstants.kI);
         PIDController.setD(kPIDConstants.kD);
-        PIDController.setReference(StartAngle, CANSparkMax.ControlType.kPosition, 0);
+        PIDController.setPositionPIDWrappingEnabled(true);
+        PIDController.setPositionPIDWrappingMaxInput(2*Math.PI);
+        PIDController.setPositionPIDWrappingMinInput(0);
         return PIDController;
     }
+    
     private AnalogEncoder initializeAbsEncoder(AbsoluteEncoderConstants kAbsoluteEncoderConstants) {
         AnalogEncoder absoluteEncoder = new AnalogEncoder(new AnalogInput(kAbsoluteEncoderConstants.channel));
         absoluteEncoder.setPositionOffset(kAbsoluteEncoderConstants.angleOffset);
         absoluteEncoder.setDistancePerRotation(2*Math.PI);
         return absoluteEncoder;
     }
-    private void levelWrist(){
-        //TODO add method which uses the shoulders setpoint to make the wrist stay level
+    private void levelWrist(){ //TODO should run these periodically
+        mWristPIDContoller.setReference(-getShoulderAngle(), ControlType.kPosition);
     }
     
+    private double getShoulderAngle() {
+        return mShoulderAbsEncoder.get() * (mShoulderGearRatio); //converts the the absolute encoders values IF it is on the shaft with the sprocket TODO confirm if this is the case.
+    }
+
     public void setShoulderSetpoint(double value) {
         mShoulderPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
     }
