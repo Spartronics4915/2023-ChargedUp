@@ -53,7 +53,10 @@ public final class Constants {
             public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
             public static final int klimitSwitchID = 0; //PlaceHolder Value
             public static final int kClawMotorID = 0; //PlaceHolder Value
-            public static final double kDefaultSpeed = 0.25; //PlaceHolder Value
+            public static final double kInSpeed = 0.25; //PlaceHolder Value
+            public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
+            public static final double kGrabTimerLength = 1; //seconds
+            public static final double kReleaseTimerLength = 1; //seconds
         }
     }
     

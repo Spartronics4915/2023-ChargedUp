@@ -19,15 +19,11 @@ public class ClawSubsystem extends SubsystemBase {
     private CANSparkMax mClawMotor;
     private SparkMaxPIDController mClawPID;
     private DigitalInput mLimitSwitch;
-    private double mDefaultSpeed;
     /** Creates a new ExampleSubsystem. */
     public ClawSubsystem() {
         mClawMotor = new CANSparkMax(ClawConstants.kClawMotorID, MotorType.kBrushless);
         
         mLimitSwitch = new DigitalInput(ClawConstants.klimitSwitchID);
-
-        mDefaultSpeed = ClawConstants.kDefaultSpeed;
-
         mClawPID = mClawMotor.getPIDController();
         mClawPID.setP(ClawConstants.kClawMotorPID.kP);
         mClawPID.setI(ClawConstants.kClawMotorPID.kI);
@@ -36,11 +32,17 @@ public class ClawSubsystem extends SubsystemBase {
     }
    
 
-    public void motorOn() {
+    public void motorIn() {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.        mClawMotor.set(mDefaultSpeed);
         //TODO should make a command that will run motor until # of seconds have passed or the limit switch was triggered
-        mClawPID.setReference(mDefaultSpeed, ControlType.kVelocity);
+        mClawPID.setReference(ClawConstants.kInSpeed, ControlType.kVelocity);
+    }
+    public void motorOut() {
+        // Inline construction of command goes here.
+        // Subsystem::RunOnce implicitly requires `this` subsystem.        mClawMotor.set(mDefaultSpeed);
+        //TODO should make a command that will run motor until # of seconds have passed or the limit switch was triggered
+        mClawPID.setReference(-ClawConstants.kOutSpeed, ControlType.kVelocity);
     }
     public void motorOff() {
         // Inline construction of command goes here.
