@@ -89,6 +89,8 @@ public class ArmSubsystem extends SubsystemBase {
                 });
     }
 
+    //TODO should make a command that will pass it a class with the settings for the actuator and the shoulder motor angle
+
     /**
      * An example method querying a boolean state of the subsystem (for example, a
      * digital sensor).
