@@ -56,7 +56,7 @@
                                          Rotation2d.fromDegrees(180))));
          final AprilTag tag01 =
                  new AprilTag(
-                         01,
+                         02,
                          new Pose3d(new Pose2d(0.0, FieldConstants.width / 2.0, Rotation2d.fromDegrees(0.0))));
          ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
          atList.add(tag18);
@@ -80,7 +80,7 @@
          camList.add(new Pair<PhotonCamera, Transform3d>(photonCamera, VisionConstants.robotToCam));
  
          robotPoseEstimator =
-                 new RobotPoseEstimator(atfl, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camList);
+                 new RobotPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, camList);
      }
  
      /**
@@ -88,8 +88,8 @@
       * @return A pair of the fused camera observations to a single Pose2d on the field, and the time
       *     of the observation. Assumes a planar field and the robot is always firmly on the ground
       */
-     public Pair<Pose2d, Double> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-         robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+     public Pair<Pose2d, Double> getEstimatedGlobalPose() {
+         //robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
  
          double currentTime = Timer.getFPGATimestamp();
          Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();

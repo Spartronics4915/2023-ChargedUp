@@ -4,15 +4,17 @@
 
 package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
+import com.spartronics4915.frc2023.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.commands.PrintPos;
+
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class Autos {
     /** Example static factory for an autonomous command. */
-    public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
-        return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
+    public static CommandBase exampleAuto(PhotonCameraWrapper camera) {
+        return Commands.sequence(new PrintPos(camera));
     }
 
     private Autos() {
