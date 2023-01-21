@@ -74,8 +74,8 @@ public class SwerveCommands {
 		}
     }
 
-    public class TeleopInitCommand extends InstantCommand {
-        public TeleopInitCommand() {
+    public class ResetCommand extends InstantCommand {
+        public ResetCommand() {
             addRequirements(mSwerve);
         }
 		

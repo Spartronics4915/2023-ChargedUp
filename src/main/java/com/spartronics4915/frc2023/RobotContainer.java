@@ -58,8 +58,14 @@ public class RobotContainer {
         
         mAutos = new Autos(mSwerve, mSwerveTrajectoryFollowerCommands);
         
-        mAutonomousCommand = mAutos.new MoveForwardCommandFancy();
-        mTeleopCommand = mSwerveCommands.new TeleopCommand();
+        mAutonomousCommand = new SequentialCommandGroup(
+            mSwerveCommands.new ResetCommand(),
+            mAutos.new MoveForwardCommandFancy()
+        );
+        mTeleopCommand = new SequentialCommandGroup(
+            mSwerveCommands.new ResetCommand(),    
+            mSwerveCommands.new TeleopCommand()
+        );
         
         // Configure the button bindings
         configureButtonBindings();
@@ -108,10 +114,6 @@ public class RobotContainer {
                 shuffleboard_update_command.schedule();
 
                 mSwerve.resetToAbsolute();
-            }
-
-            public void initTeleop() {
-                DebugTeleopCommands.teleopInit(mSwerve);
             }
         }
         
