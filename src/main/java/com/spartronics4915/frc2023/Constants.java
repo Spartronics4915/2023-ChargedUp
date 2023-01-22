@@ -54,9 +54,6 @@ public final class Constants {
         public static class LinearActuatorConstants{
             public static final int kLinearActuatorMotorId = 0; //PlaceHolder Value
             public static final PIDConstants kLinearActuatorPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-            public static final double kSprocketRadius = 0;
-            public static final double kPedalGearRadius = 0;
-
         }
         
         public static class ClawConstants{

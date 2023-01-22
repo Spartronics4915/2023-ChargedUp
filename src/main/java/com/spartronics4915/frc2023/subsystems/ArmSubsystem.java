@@ -10,6 +10,9 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -30,11 +33,11 @@ public class ArmSubsystem extends SubsystemBase {
     private SparkMaxPIDController mShoulderPIDContoller;
     private SparkMaxPIDController mWristPIDContoller;
     private SparkMaxPIDController mLinActuatorPIDController;
-    private double mShoulderGearRatio;
     /** Creates a new ExampleSubsystem. */
     public ArmSubsystem() {
         //motor setup
         //TODO check if motors are brushed or brushless, if brushed check if Idle Mode Setting is needed
+        //TODO there is a secondary motor connected to the sprocket shaft, see if you can set one up to follow the other
         mShoulderMotor = new CANSparkMax(MotorSetupConstants.kShoulderMotorId,MotorType.kBrushed);
         mShoulderMotor.setIdleMode(IdleMode.kBrake); 
         mWristMotor = new CANSparkMax(MotorSetupConstants.kWristMotorId,MotorType.kBrushed);
@@ -54,9 +57,9 @@ public class ArmSubsystem extends SubsystemBase {
         mShoulderAbsEncoder = initializeAbsEncoder(MotorSetupConstants.kShoulderAbsEncoder);
 
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
-        //TODO (If Needed) calculate gear ratios since the shoulder motors attach to a chain system to rotate the actual arm, because of this you can't use the follow method
         //TODO add limit switch IDs for linear actualor
-        mShoulderGearRatio = LinearActuatorConstants.kSprocketRadius/ LinearActuatorConstants.kPedalGearRadius;
+
+        
     }
 
     private SparkMaxPIDController initializePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
@@ -77,11 +80,8 @@ public class ArmSubsystem extends SubsystemBase {
         return absoluteEncoder;
     }
     private void levelWrist(){ //TODO should run these periodically
-        mWristPIDContoller.setReference(-getShoulderAngle(), ControlType.kPosition);
-    }
-    
-    private double getShoulderAngle() {
-        return mShoulderAbsEncoder.get() * (mShoulderGearRatio); //converts the the absolute encoders values IF it is on the shaft with the sprocket TODO confirm if this is the case.
+        mWristPIDContoller.setReference(-mShoulderAbsEncoder.get(), ControlType.kPosition);
+        
     }
 
     public void setShoulderSetpoint(double value) {
