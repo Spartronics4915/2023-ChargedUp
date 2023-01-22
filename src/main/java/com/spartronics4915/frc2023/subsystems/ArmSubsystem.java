@@ -10,8 +10,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -49,7 +48,8 @@ public class ArmSubsystem extends SubsystemBase {
         mShoulderPIDContoller = initializePIDController(mShoulderMotor, MotorSetupConstants.kShoulderPID);
         mWristPIDContoller = initializePIDController(mWristMotor, MotorSetupConstants.kWristPID);
         mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
-
+        mLinActuatorPIDController.setPositionPIDWrappingEnabled(false); //this way it can go over 1 rotation
+        
         //note: seems there are going to be two motors for the shoulder maybe use the follow method       
         
         //encoder setup
@@ -58,8 +58,6 @@ public class ArmSubsystem extends SubsystemBase {
 
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
         //TODO add limit switch IDs for linear actualor
-
-        
     }
 
     private SparkMaxPIDController initializePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
@@ -91,6 +89,16 @@ public class ArmSubsystem extends SubsystemBase {
         mWristPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
     }
     
+
+    private void setLinActuatorDistance(double value){
+        double result = value; //TODO INSERT CONVERSION CALCULATIONS HERE
+        mLinActuatorPIDController.setReference(result, ControlType.kPosition);
+    }
+
+    public void setArmState(Translation2d vector) {
+        setShoulderSetpoint(vector.getAngle().getRadians()); //TODO add limits to this asap so the arm wont hit the robot or go overhead
+        setLinActuatorDistance(vector.getNorm()); //TODO at "0" the linear actuator is actually already out at some distance x so make sure to subtract that value
+    }
     /**
      * Example command factory method.
      *

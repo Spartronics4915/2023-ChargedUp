@@ -6,9 +6,7 @@ package com.spartronics4915.frc2023.commands;
 
 import com.spartronics4915.frc2023.Constants.ArmConstants.ClawConstants;
 import com.spartronics4915.frc2023.subsystems.ClawSubsystem;
-import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;

@@ -10,10 +10,8 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.spartronics4915.frc2023.Constants.ArmConstants.ClawConstants;
-import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 public class ClawSubsystem extends SubsystemBase {
     private CANSparkMax mClawMotor;
@@ -28,7 +26,6 @@ public class ClawSubsystem extends SubsystemBase {
         mClawPID.setP(ClawConstants.kClawMotorPID.kP);
         mClawPID.setI(ClawConstants.kClawMotorPID.kI);
         mClawPID.setD(ClawConstants.kClawMotorPID.kD);
-        //TODO setup the encoders for this PID and maybe make the on-off transition more smooth
     }
    
 
