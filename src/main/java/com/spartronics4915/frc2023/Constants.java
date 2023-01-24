@@ -72,6 +72,10 @@ public final class Constants {
         }
 
         public static final int kPigeonID = 9;
+
+        public static final double kPigeonMountPoseYaw = 0;
+        public static final double kPigeonMountPosePitch = 0;
+        public static final double kPigeonMountPoseRoll = 180;
         
         public static final double kTrackWidth = Units.inchesToMeters(18.75);
         public static final double kWheelBase = Units.inchesToMeters(23.75);

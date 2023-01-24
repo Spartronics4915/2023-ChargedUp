@@ -49,6 +49,7 @@ public class Swerve extends SubsystemBase {
 
     private Swerve() {
         mIMU = new Pigeon2(kPigeonID);
+        configurePigeon(mIMU);
 
         // mFrontCamera = new PhotonCamera(NetworkTableInstance.getDefault(), kFrontCameraName);
 
@@ -71,6 +72,10 @@ public class Swerve extends SubsystemBase {
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9)
         );
+    }
+
+    private void configurePigeon(Pigeon2 pigeon2) {
+        pigeon2.configMountPose(kPigeonMountPoseYaw, kPigeonMountPosePitch, kPigeonMountPoseRoll);
     }
 
 	public int getModuleCount() {
