@@ -108,8 +108,6 @@ public class SwerveModule {
         return mDesiredState;
     }
 
-
-
     public void putSmartDashboardValues() {
         // SmartDashboard.putNumber("mod " + mModuleNumber + " encoder", mSteeringEncoder.getDistance());
         
@@ -173,13 +171,14 @@ public class SwerveModule {
         mAngleController.setI(Angle.kI);
         mAngleController.setD(Angle.kD);
         mAngleController.setFF(Angle.kFF);
+        mAngleController.setPositionPIDWrappingEnabled(true);
         mAngleMotor.enableVoltageCompensation(kVoltageCompensation);
         mAngleMotor.burnFlash();
     }
 
     public SwerveModuleState getState() {
         double velocity = mDriveEncoder.getVelocity();
-        Rotation2d angle = Rotation2d.fromRadians(mIntegratedAngleEncoder.getPosition()); // TODO: why isnt this using the analog encoder
+        Rotation2d angle = Rotation2d.fromDegrees(mAngleEncoder.getPosition());
         return new SwerveModuleState(velocity, angle);
     }
 
