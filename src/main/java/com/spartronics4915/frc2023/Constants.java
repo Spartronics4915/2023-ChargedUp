@@ -4,6 +4,8 @@
 
 package com.spartronics4915.frc2023;
 
+import com.revrobotics.SparkMaxAbsoluteEncoder;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -35,21 +37,31 @@ public final class Constants {
                 this.kD = kD;
             } 
         }
-        public static class AbsoluteEncoderConstants{
-            public final int channel; 
-            public final double angleOffset;
-            public AbsoluteEncoderConstants(int channel, double angleOffset) {
-                this.channel = channel;
-                this.angleOffset = angleOffset;
-            }
+        // public static class AnologAbsEncoderConstants{
+        //     public final int channel; 
+        //     public final double angleOffset;
+        //     public AnologAbsEncoderConstants(int channel, double angleOffset) {
+        //         this.channel = channel;
+        //         this.angleOffset = angleOffset;
+        //     }
+        // }
+        public static class SparkMaxAbsoluteEncoderConstants{
+            public final double offset;
+
+            public SparkMaxAbsoluteEncoderConstants(double offset) {
+                this.offset = offset;
+            } 
         }
         public static class MotorSetupConstants{
             public static final int kShoulderMotorId = 0; //PlaceHolder Value
             public static final int kWristMotorId = 1; //PlaceHolder Value
             public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
             public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-            public static final AbsoluteEncoderConstants kShoulderAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
-            public static final AbsoluteEncoderConstants kWristAbsEncoder = new AbsoluteEncoderConstants(0, 0.0); //PlaceHolder Value
+            public static final SparkMaxAbsoluteEncoderConstants kShoulderAbsEncoder = new SparkMaxAbsoluteEncoderConstants(0); //PlaceHolder Value
+            public static final SparkMaxAbsoluteEncoderConstants kWristAbsEncoder = new SparkMaxAbsoluteEncoderConstants(0); //PlaceHolder Value
+
+
+            
         }
         public static class LinearActuatorConstants{
             public static final int kLinearActuatorMotorId = 0; //PlaceHolder Value

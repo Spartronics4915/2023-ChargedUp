@@ -5,6 +5,7 @@
 package com.spartronics4915.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -19,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.spartronics4915.frc2023.Constants.ArmConstants.MotorSetupConstants;
 import com.spartronics4915.frc2023.Constants.ArmConstants.LinearActuatorConstants;
 
-import com.spartronics4915.frc2023.Constants.ArmConstants.AbsoluteEncoderConstants;
+import com.spartronics4915.frc2023.Constants.ArmConstants.SparkMaxAbsoluteEncoderConstants;
 import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -27,8 +28,8 @@ public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax mShoulderMotor;
     private CANSparkMax mLinActuatorMotor;
 
-    private AnalogEncoder mWristAbsEncoder;
-    private AnalogEncoder mShoulderAbsEncoder;
+    private SparkMaxAbsoluteEncoder mWristAbsEncoder;
+    private SparkMaxAbsoluteEncoder mShoulderAbsEncoder;
     private SparkMaxPIDController mShoulderPIDContoller;
     private SparkMaxPIDController mWristPIDContoller;
     private SparkMaxPIDController mLinActuatorPIDController;
@@ -46,15 +47,17 @@ public class ArmSubsystem extends SubsystemBase {
         
         //PID setup
         mShoulderPIDContoller = initializePIDController(mShoulderMotor, MotorSetupConstants.kShoulderPID);
+
         mWristPIDContoller = initializePIDController(mWristMotor, MotorSetupConstants.kWristPID);
+
         mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
         mLinActuatorPIDController.setPositionPIDWrappingEnabled(false); //this way it can go over 1 rotation
         
-        //note: seems there are going to be two motors for the shoulder maybe use the follow method       
+        //TODO: seems there are going to be two motors for the shoulder maybe use the follow method       
         
-        //encoder setup
-        mWristAbsEncoder = initializeAbsEncoder(MotorSetupConstants.kWristAbsEncoder);
-        mShoulderAbsEncoder = initializeAbsEncoder(MotorSetupConstants.kShoulderAbsEncoder);
+        // encoder setup
+        mWristAbsEncoder = initializeAbsEncoder(mWristMotor, MotorSetupConstants.kShoulderAbsEncoder);
+        mShoulderAbsEncoder = initializeAbsEncoder(mShoulderMotor, MotorSetupConstants.kWristAbsEncoder);
 
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
         //TODO add limit switch IDs for linear actualor
@@ -71,17 +74,23 @@ public class ArmSubsystem extends SubsystemBase {
         return PIDController;
     }
     
-    private AnalogEncoder initializeAbsEncoder(AbsoluteEncoderConstants kAbsoluteEncoderConstants) {
-        AnalogEncoder absoluteEncoder = new AnalogEncoder(new AnalogInput(kAbsoluteEncoderConstants.channel));
-        absoluteEncoder.setPositionOffset(kAbsoluteEncoderConstants.angleOffset);
-        absoluteEncoder.setDistancePerRotation(2*Math.PI);
-        return absoluteEncoder;
+    // private AnalogEncoder initializeAbsEncoder(AnologAbsEncoderConstants kAbsoluteEncoderConstants) {
+    //     AnalogEncoder absoluteEncoder = new AnalogEncoder(new AnalogInput(kAbsoluteEncoderConstants.channel));
+    //     absoluteEncoder.setPositionOffset(kAbsoluteEncoderConstants.angleOffset);
+    //     absoluteEncoder.setDistancePerRotation(2*Math.PI);
+    //     return absoluteEncoder;
+    // }
+    private SparkMaxAbsoluteEncoder initializeAbsEncoder(CANSparkMax motorController, SparkMaxAbsoluteEncoderConstants constants){
+        SparkMaxAbsoluteEncoder x = motorController.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        x.setPositionConversionFactor(2*Math.PI);
+        x.setZeroOffset(constants.offset);
+        return x;
     }
 
     //setup above this lines, actual commands and other methods below
 
     private void levelWrist(){ //TODO should run these periodically 
-        mWristPIDContoller.setReference(-mShoulderAbsEncoder.get(), ControlType.kPosition);
+        mWristPIDContoller.setReference(-mShoulderAbsEncoder.getPosition(), ControlType.kPosition);
     }
 
     public void setShoulderSetpoint(double value) {
