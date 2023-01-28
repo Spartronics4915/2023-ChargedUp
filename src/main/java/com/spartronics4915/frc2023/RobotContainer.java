@@ -110,7 +110,8 @@ public class RobotContainer {
             }
 
             public void initRobot() {
-                Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mSwerve);
+                Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mSwerve,
+                mSwerveCommands);
                 shuffleboard_update_command.schedule();
 
                 mSwerve.resetToAbsolute();
