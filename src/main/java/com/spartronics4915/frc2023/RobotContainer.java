@@ -37,7 +37,6 @@ public class RobotContainer {
     // private final Command mTeleopInitCommand;
     // private final Command mTeleopCommand;
     // private final Command mTestingCommand;
-        private final Command mAutos;
         private final Swerve mSwerve;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -48,7 +47,6 @@ public class RobotContainer {
         // mTestSubsystem = new TestSubsystem();
 
         mSwerve = new Swerve();
-
         // mTestCommand = new TestCommands(mController, mTestSubsystem);
 
         // mSwerveCommands = new SwerveCommands(mController, mSwerve);
@@ -84,7 +82,7 @@ public class RobotContainer {
             // .whenPressed(mSwerveCommands.new ResetOdometry());
 
         new JoystickButton(mController, 1)
-            .onTrue(mAutonomousCommand); //why not work???
+            .onTrue(mAutonomousCommand); 
     }
 
     /**
@@ -102,9 +100,9 @@ public class RobotContainer {
 
     // public Command getTeleopCommand() {
         // return mTeleopCommand;
-    }
+    // }
 
     // public Command getTestingCommand() {
         // return mTestingCommand;
     // }
-// }
+}
