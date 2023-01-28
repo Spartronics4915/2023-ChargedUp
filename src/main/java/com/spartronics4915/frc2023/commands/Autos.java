@@ -6,6 +6,8 @@ package com.spartronics4915.frc2023.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.spartronics4915.frc2023.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.commands.PrintPos;
 
 import javax.sound.midi.Sequence;
 
@@ -34,6 +36,7 @@ public final class Autos {
 	private final double maxAngularVelocity = 0.8;
 	private final double maxAngularAcceleration = 0.2;
 			
+
 
     public Autos(Swerve swerve, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
 		mSwerve = swerve;

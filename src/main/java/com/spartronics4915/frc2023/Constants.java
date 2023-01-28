@@ -16,6 +16,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -35,6 +38,8 @@ import edu.wpi.first.math.util.Units;
  * <p>FIELD ORIENTED: Away from alliance wall is positive x, left relative to driver station is y, CCW 
  * rotation is positive, and the angle measure 0 is directly away from the alliance wall.
  */
+
+ 
 public final class Constants {
 	public static final class Trajectory {
 		public static final double kLinearP = 1.0;
@@ -194,5 +199,21 @@ public final class Constants {
         public static final double kStickDeadband = 0.08;
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
+    }
+
+    static class FieldConstants {
+        static final double length = Units.feetToMeters(54);
+        static final double width = Units.feetToMeters(27);
+    }
+
+    static class VisionConstants {
+        static final Transform3d robotToCam =
+                new Transform3d(
+                        new Translation3d(0.5, 0.0, 0.5),
+                        new Rotation3d(
+                                0, 0,
+                                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+        // from center.
+        static final String cameraName = "Arducam_OV9281_USB_Camera";
     }
 }

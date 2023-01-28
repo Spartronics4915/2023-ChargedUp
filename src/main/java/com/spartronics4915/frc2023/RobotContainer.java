@@ -10,6 +10,9 @@ import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
 import com.spartronics4915.frc2023.subsystems.Swerve;
+import com.spartronics4915.frc2023.commands.ExampleCommand;
+import com.spartronics4915.frc2023.commands.PrintPos;
+import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -45,6 +48,8 @@ public class RobotContainer {
     private final boolean useJoystick = true;
     // private final Command mTestingCommand;
     
+    private PhotonCameraWrapper cameraWrapper = new PhotonCameraWrapper();
+
     /**
     * The container for the robot. Contains subsystems, OI devices, and commands.
     */
@@ -69,6 +74,7 @@ public class RobotContainer {
         
         // Configure the button bindings
         configureButtonBindings();
+
     }
     
     /**
@@ -117,4 +123,4 @@ public class RobotContainer {
                 mSwerve.resetToAbsolute();
             }
         }
-        
+}
