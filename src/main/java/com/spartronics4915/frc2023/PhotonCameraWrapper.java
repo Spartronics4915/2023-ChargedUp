@@ -26,6 +26,7 @@
 
  import edu.wpi.first.apriltag.AprilTag;
  import edu.wpi.first.apriltag.AprilTagFieldLayout;
+ import edu.wpi.first.apriltag.AprilTagFields;
  import edu.wpi.first.math.Pair;
  import edu.wpi.first.math.geometry.Pose2d;
  import edu.wpi.first.math.geometry.Pose3d;
@@ -34,7 +35,9 @@
  import edu.wpi.first.wpilibj.Timer;
  import com.spartronics4915.frc2023.Constants.FieldConstants;
  import com.spartronics4915.frc2023.Constants.VisionConstants;
- import java.util.ArrayList;
+
+import java.io.IOException;
+import java.util.ArrayList;
  import java.util.Optional;
  import org.photonvision.PhotonCamera;
  import org.photonvision.RobotPoseEstimator;
@@ -45,26 +48,12 @@
      public RobotPoseEstimator robotPoseEstimator;
  
      public PhotonCameraWrapper() {
-         // Set up a test arena of two apriltags at the center of each driver station set
-         final AprilTag tag18 =
-                 new AprilTag(
-                         18,
-                         new Pose3d(
-                                 new Pose2d(
-                                         FieldConstants.length,
-                                         FieldConstants.width / 2.0,
-                                         Rotation2d.fromDegrees(180))));
-         final AprilTag tag01 =
-                 new AprilTag(
-                         02,
-                         new Pose3d(new Pose2d(0.0, FieldConstants.width / 2.0, Rotation2d.fromDegrees(0.0))));
-         ArrayList<AprilTag> atList = new ArrayList<AprilTag>();
-         atList.add(tag18);
-         atList.add(tag01);
- 
-         // TODO - once 2023 happens, replace this with just loading the 2023 field arrangement
-         AprilTagFieldLayout atfl =
-                 new AprilTagFieldLayout(atList, FieldConstants.length, FieldConstants.width);
+         AprilTagFieldLayout atfl;
+        try {
+            atfl = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+        } catch (IOException e) {
+            atfl = null;
+        }
  
          // Forward Camera
          photonCamera =
