@@ -55,7 +55,6 @@ public final class Constants {
             public static final int kLinearActuatorMotorId = 0; //PlaceHolder Value
             public static final PIDConstants kLinearActuatorPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
         }
-        
         public static class ClawConstants{
             public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
             public static final int klimitSwitchID = 0; //PlaceHolder Value
@@ -64,6 +63,14 @@ public final class Constants {
             public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
             public static final double kGrabTimerLength = 1; //seconds
             public static final double kReleaseTimerLength = 1; //seconds
+        }
+        public static class ArmDesiredStates{
+            public static class RelativePos{
+                //insert relative translations 2ds here for movments like going .5 feet down or .5 feet back
+            }
+            public static class AbsolutePos{
+                //insert absolute translations 2ds here for movments like going to above the 1st layer of cones
+            }
         }
     }
     

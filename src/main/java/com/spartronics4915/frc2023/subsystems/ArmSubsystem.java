@@ -77,9 +77,11 @@ public class ArmSubsystem extends SubsystemBase {
         absoluteEncoder.setDistancePerRotation(2*Math.PI);
         return absoluteEncoder;
     }
-    private void levelWrist(){ //TODO should run these periodically
+
+    //setup above this lines, actual commands and other methods below
+
+    private void levelWrist(){ //TODO should run these periodically 
         mWristPIDContoller.setReference(-mShoulderAbsEncoder.get(), ControlType.kPosition);
-        
     }
 
     public void setShoulderSetpoint(double value) {
@@ -95,9 +97,13 @@ public class ArmSubsystem extends SubsystemBase {
         mLinActuatorPIDController.setReference(result, ControlType.kPosition);
     }
 
-    public void setArmState(Translation2d vector) {
+    public void setAbsoluteArmState(Translation2d vector) {  //either have two translation 2ds reperesenting the wrist's length or just repersent the wrist joint via the translation 2d
         setShoulderSetpoint(vector.getAngle().getRadians()); //TODO add limits to this asap so the arm wont hit the robot or go overhead
         setLinActuatorDistance(vector.getNorm()); //TODO at "0" the linear actuator is actually already out at some distance x so make sure to subtract that value
+    }
+    public void changeArmState(Translation2d vector){
+        Translation2d currentArmState = null; //TODO need a way to convert encoders to Translation2d
+        setAbsoluteArmState(currentArmState.plus(vector));        
     }
     /**
      * Example command factory method.
