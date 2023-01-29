@@ -172,6 +172,8 @@ public class SwerveModule {
         mAngleController.setD(Angle.kD);
         mAngleController.setFF(Angle.kFF);
         mAngleController.setPositionPIDWrappingEnabled(true);
+        mAngleController.setPositionPIDWrappingMaxInput(Math.PI);
+        mAngleController.setPositionPIDWrappingMinInput(-Math.PI);
         mAngleMotor.enableVoltageCompensation(kVoltageCompensation);
         mAngleMotor.burnFlash();
     }
