@@ -178,7 +178,7 @@ public class SwerveModule {
 
     public SwerveModuleState getState() {
         double velocity = mDriveEncoder.getVelocity();
-        Rotation2d angle = Rotation2d.fromDegrees(mAngleEncoder.getPosition());
+        Rotation2d angle = Rotation2d.fromDegrees(mIntegratedAngleEncoder.getPosition());
         return new SwerveModuleState(velocity, angle);
     }
 
