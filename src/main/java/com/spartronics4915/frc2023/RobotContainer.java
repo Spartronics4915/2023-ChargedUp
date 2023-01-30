@@ -40,7 +40,7 @@ public class RobotContainer {
     private final Autos mAutos;
     
     private final Command mAutonomousCommand;
-	private final Command mTeleopCommand;
+	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
     // private final Command mTestingCommand;
@@ -53,6 +53,7 @@ public class RobotContainer {
         
         mSwerve = Swerve.getInstance();
         mSwerveCommands = new SwerveCommands(mController, mSwerve);
+        mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
         
         mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands(mSwerve);
         
@@ -62,10 +63,8 @@ public class RobotContainer {
             mSwerveCommands.new ResetCommand(),
             mAutos.new MoveForwardCommandFancy()
         );
-        mTeleopCommand = new SequentialCommandGroup(
-            mSwerveCommands.new ResetCommand(),    
-            mSwerveCommands.new TeleopCommand()
-        );
+        
+        mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         
         // Configure the button bindings
         configureButtonBindings();
@@ -101,8 +100,8 @@ public class RobotContainer {
                 return mAutonomousCommand;
             }
             
-            public Command getTeleopCommand() {
-                return mTeleopCommand;
+            public Command getTeleopInitCommand() {
+                return mTeleopInitCommand;
             }
             
             public Command getTestingCommand() {
