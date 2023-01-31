@@ -102,7 +102,7 @@ public final class Autos {
         public leaveCommunity() {
             addRequirements(mSwerve);
             addCommands(
-                new InstantCommand(() -> mSwerve.drive(new Translation2d(0, 0.1), 0, mIsOpenLoop)),
+                new InstantCommand(() -> mSwerve.drive(new Translation2d(3, 0), 0, mIsOpenLoop)),
 				new WaitCommand(1),
 				new InstantCommand(() -> mSwerve.drive(new Translation2d(), 0, mIsOpenLoop))
             );
