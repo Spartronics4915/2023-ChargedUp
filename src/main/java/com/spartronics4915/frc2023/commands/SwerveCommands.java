@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -175,4 +176,66 @@ public class SwerveCommands {
     private double applyResponseCurve(double c) {
         return Math.signum(c) * Math.pow(Math.abs(c), kResponseCurveExponent);
     }
+
+    public class RotateDegrees extends CommandBase {
+
+        private double mDegreeRotate;
+        public RotateDegrees(double degrees) {
+            mDegreeRotate = degrees;
+        }
+
+        @Override
+        public void initialize() {
+            var yaw = mSwerve.getYaw();
+
+            Rotation2d newYaw = yaw.plus(Rotation2d.fromDegrees(mDegreeRotate));
+            var newCommand = new RotateToYaw(newYaw);
+            newCommand.schedule();
+        }
+    }
+    public class RotateToYaw extends CommandBase {
+
+        private final double kMaxSpeedDegreesSec = 15;
+        private final double mYawToleranceDegrees = 2;
+        private final double ticDuration = 1.0 / 20;
+        private Rotation2d mDestinationYaw;
+        private Swerve mSwerveSubsystem;
+
+        public RotateToYaw(Rotation2d destinationYaw) {
+
+            
+            mDestinationYaw = destinationYaw;
+        }
+
+        private double getYawToGo() {
+            var currYaw = mSwerve.getYaw();
+
+            return currYaw.minus(mDestinationYaw).getDegrees();
+        }
+
+        @Override
+        public void execute() {
+
+            var yawToGo = getYawToGo();
+            double timeToFinish = Math.abs(yawToGo) / ticDuration;
+            double currRotationSpeed = yawToGo / timeToFinish;
+
+            if(currRotationSpeed > kMaxSpeedDegreesSec) {
+                currRotationSpeed = kMaxSpeedDegreesSec;
+            }
+
+            Translation2d zeroTranslation = new Translation2d();
+            double currRotationSpeedRadians = currRotationSpeed / 180 * Math.PI;
+
+            mSwerve.drive(zeroTranslation, currRotationSpeedRadians, true);
+        }
+
+        @Override
+        public boolean isFinished() {
+
+            return (Math.abs(getYawToGo()) < mYawToleranceDegrees);
+        }
+
+    }
+
 }

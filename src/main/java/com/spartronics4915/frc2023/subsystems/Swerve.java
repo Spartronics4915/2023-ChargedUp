@@ -102,19 +102,24 @@ public class Swerve extends SubsystemBase {
 
         SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(chassisSpeeds);
         
-        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, kMaxSpeed);
+        setModuleStates(moduleStates, isOpenLoop);
+    }
+
+    public void drive(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
+        SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(chassisSpeeds);
+        setModuleStates(moduleStates, isOpenLoop);
+    }
+
+    public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kMaxSpeed);
 
         for (SwerveModule mod : mModules) {
-            mod.setDesiredState(moduleStates[mod.getModuleNumber()], isOpenLoop);
+            mod.setDesiredState(desiredStates[mod.getModuleNumber()], isOpenLoop);
         }
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kMaxSpeed);
-
-        for (SwerveModule mod : mModules) {
-            mod.setDesiredState(desiredStates[mod.getModuleNumber()], true);
-        }
+        setModuleStates(desiredStates, true);
     }
 
     public void forceModuleOrientations(Rotation2d orientation, boolean isOpenLoop) {

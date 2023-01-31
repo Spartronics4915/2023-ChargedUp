@@ -35,8 +35,8 @@ public final class SimpleAutos {
       driveStraightIndefinite(swerve_subsystem, speed_m_per_s),
       Commands.waitSeconds(duration_seconds),
       stop(swerve_subsystem));
-
   }
+  
   private SimpleAutos() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
