@@ -60,7 +60,7 @@ public class RobotContainer {
         
         mAutonomousCommand = new SequentialCommandGroup(
             mSwerveCommands.new ResetCommand(),
-            mAutos.new leaveCommunity()
+            mAutos.new LeaveCommunity()
         );
         mTeleopCommand = new SequentialCommandGroup(
             mSwerveCommands.new ResetCommand(),    

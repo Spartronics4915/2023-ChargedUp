@@ -98,8 +98,8 @@ public final class Autos {
 	}
 
 
-    public class leaveCommunity extends SequentialCommandGroup {
-        public leaveCommunity() {
+    public class LeaveCommunity extends SequentialCommandGroup {
+        public LeaveCommunity() {
             addRequirements(mSwerve);
             addCommands(
                 new InstantCommand(() -> mSwerve.drive(new Translation2d(3, 0), 0, mIsOpenLoop)),
