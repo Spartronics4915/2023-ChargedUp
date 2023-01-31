@@ -171,16 +171,16 @@ public class SwerveModule {
         mAngleController.setI(Angle.kI);
         mAngleController.setD(Angle.kD);
         mAngleController.setFF(Angle.kFF);
-        mAngleController.setPositionPIDWrappingEnabled(true);
         mAngleController.setPositionPIDWrappingMaxInput(Math.PI);
         mAngleController.setPositionPIDWrappingMinInput(-Math.PI);
+        mAngleController.setPositionPIDWrappingEnabled(true);
         mAngleMotor.enableVoltageCompensation(kVoltageCompensation);
         mAngleMotor.burnFlash();
     }
 
     public SwerveModuleState getState() {
         double velocity = mDriveEncoder.getVelocity();
-        Rotation2d angle = Rotation2d.fromDegrees(mIntegratedAngleEncoder.getPosition());
+        Rotation2d angle = Rotation2d.fromRadians(mIntegratedAngleEncoder.getPosition());
         return new SwerveModuleState(velocity, angle);
     }
 
