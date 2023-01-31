@@ -39,13 +39,15 @@
 import java.io.IOException;
 import java.util.ArrayList;
  import java.util.Optional;
- import org.photonvision.PhotonCamera;
- import org.photonvision.RobotPoseEstimator;
- import org.photonvision.RobotPoseEstimator.PoseStrategy;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+ import org.photonvision.PhotonPoseEstimator;
+ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
  
  public class PhotonCameraWrapper {
      public PhotonCamera photonCamera;
-     public RobotPoseEstimator robotPoseEstimator;
+     public PhotonPoseEstimator robotPoseEstimator;
  
      public PhotonCameraWrapper() {
          AprilTagFieldLayout atfl;
@@ -69,7 +71,7 @@ import java.util.ArrayList;
          camList.add(new Pair<PhotonCamera, Transform3d>(photonCamera, VisionConstants.robotToCam));
  
          robotPoseEstimator =
-                 new RobotPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, camList);
+                 new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, photonCamera, VisionConstants.robotToCam);
      }
  
      /**
@@ -78,13 +80,12 @@ import java.util.ArrayList;
       *     of the observation. Assumes a planar field and the robot is always firmly on the ground
       */
      public Pair<Pose2d, Double> getEstimatedGlobalPose() {
-         //robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
  
          double currentTime = Timer.getFPGATimestamp();
-         Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();
+         Optional<EstimatedRobotPose> result = robotPoseEstimator.update();
          if (result.isPresent()) {
              return new Pair<Pose2d, Double>(
-                     result.get().getFirst().toPose2d(), currentTime - result.get().getSecond());
+                     result.get().estimatedPose.toPose2d(), currentTime - result.get().timestampSeconds);
          } else {
              return new Pair<Pose2d, Double>(null, 0.0);
          }

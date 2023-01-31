@@ -10,10 +10,9 @@ import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
 import com.spartronics4915.frc2023.subsystems.Swerve;
-import com.spartronics4915.frc2023.commands.ExampleCommand;
 import com.spartronics4915.frc2023.commands.PrintPos;
-import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -95,6 +94,9 @@ public class RobotContainer {
                     
                     new JoystickButton(mController, kResetOdometryButton)
                     .onTrue(mSwerveCommands.new ResetOdometry());
+
+                    new JoystickButton(mController, kAimButton)
+                    .onTrue(mSwerveCommands.new RotateDegrees(cameraWrapper.photonCamera.getLatestResult().getBestTarget().getYaw()));
                 }
             }
             
@@ -112,7 +114,7 @@ public class RobotContainer {
             }
             
             public Command getTestingCommand() {
-                return null;
+                return new PrintPos(cameraWrapper);
             }
 
             public void initRobot() {
@@ -122,5 +124,4 @@ public class RobotContainer {
 
                 mSwerve.resetToAbsolute();
             }
-        }
 }

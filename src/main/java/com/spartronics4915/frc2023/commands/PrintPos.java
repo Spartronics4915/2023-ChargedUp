@@ -1,6 +1,5 @@
 package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc2023.subsystems.ExampleSubsystem;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,11 +30,14 @@ public class PrintPos extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        Pose2d result = cam.getEstimatedGlobalPose().getFirst();
-        if(result != null) {
-            SmartDashboard.putNumber("Pose2D X", result.getX());
-            SmartDashboard.putNumber("Pose2D Y", result.getY());
+        while(true) {
+            Pose2d result = cam.getEstimatedGlobalPose().getFirst();
+            if(result != null) {
+                SmartDashboard.putNumber("Pose2D X", result.getX());
+                SmartDashboard.putNumber("Pose2D Y", result.getY());
         }
+        }
+        
     }
 
     // Called once the command ends or is interrupted.

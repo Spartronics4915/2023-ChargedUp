@@ -195,18 +195,19 @@ public final class Constants {
         public static final int kResetYawButton = 8;
         public static final int kResetOdometryButton = 3;
         public static final int kSlowModeAxis = 3;
+        public static final int kAimButton = 4;
 
         public static final double kStickDeadband = 0.08;
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
     }
 
-    static class FieldConstants {
+    public static final class FieldConstants {
         static final double length = Units.feetToMeters(54);
         static final double width = Units.feetToMeters(27);
     }
 
-    static class VisionConstants {
+    public static final class VisionConstants {
         static final Transform3d robotToCam =
                 new Transform3d(
                         new Translation3d(0.5, 0.0, 0.5),
