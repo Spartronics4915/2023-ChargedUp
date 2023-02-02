@@ -50,11 +50,11 @@ public class RobotContainer {
     private final Swerve mSwerve;
     private final SwerveCommands mSwerveCommands;
 
-    private final Arm mArm;
-    private final ArmCommands mArmCommands;
+    // private final Arm mArm;
+    // private final ArmCommands mArmCommands;
 
-    private final Intake mIntake;
-    private final IntakeCommands mIntakeCommands;
+    // private final Intake mIntake;
+    // private final IntakeCommands mIntakeCommands;
     
     private final Autos mAutos;
     
@@ -77,11 +77,11 @@ public class RobotContainer {
         
         mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands(mSwerve);
 
-        mArm = Arm.getInstance();
-        mArmCommands = new ArmCommands(mArm);
+        // mArm = Arm.getInstance();
+        // mArmCommands = new ArmCommands(mArm);
 
-        mIntake = Intake.getInstance();
-        mIntakeCommands = new IntakeCommands(mIntake);
+        // mIntake = Intake.getInstance();
+        // mIntakeCommands = new IntakeCommands(mIntake);
         
         mAutos = new Autos(mSwerve, mSwerveTrajectoryFollowerCommands);
         
@@ -118,41 +118,31 @@ public class RobotContainer {
 
 
                     // OPERATOR CONTROLS
-                    mOperatorController.povUp()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
+                    // mOperatorController.povUp()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
 
-                    mOperatorController.povDown()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
+                    // mOperatorController.povDown()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
 
-                    mOperatorController.b()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.RETRACTED));
+                    // mOperatorController.b()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.RETRACTED));
 
-                    mOperatorController.a()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_1));
+                    // mOperatorController.a()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_1));
 
-                    mOperatorController.x()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_2));
+                    // mOperatorController.x()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_2));
 
-                    mOperatorController.y()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_3));
+                    // mOperatorController.y()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_3));
 
-                    mOperatorController.rightTrigger(kTriggerDeadband)
-                        .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
-                        .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-
-                    mOperatorController.leftTrigger(kTriggerDeadband)
-                        .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
-                        .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-
-                    // mOperatorController.povUp().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.GRAB_UPRIGHT, IntakeState.IN));
-                    // mOperatorController.povDown().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.GRAB_FALLEN, IntakeState.IN));
-                    // mOperatorController.leftTrigger(kTriggerDeadband).onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.RETRACTED, IntakeState.OFF));
-                    // mOperatorController.a().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.LEVEL_1, IntakeState.OFF));
-                    // mOperatorController.x().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.LEVEL_2, IntakeState.OFF));
-                    // mOperatorController.y().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.LEVEL_3, IntakeState.OFF));
                     // mOperatorController.rightTrigger(kTriggerDeadband)
-                    //     .and(() -> mArm.getArmState() != ArmState.RETRACTED)
-                    //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT));
+                    //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
+                    //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+
+                    // mOperatorController.leftTrigger(kTriggerDeadband)
+                    //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
+                    //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
                 }
             }
             
