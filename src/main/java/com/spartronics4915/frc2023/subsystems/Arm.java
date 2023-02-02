@@ -82,6 +82,7 @@ public class Arm extends SubsystemBase {
         
         mPivotMotor = configurePivotMotor(kNeoConstructor.apply(kPivotMotorID));
         mPivotPIDController = mPivotMotor.getPIDController();
+        mPivotPIDController.setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
 
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.follow(mPivotMotor);
@@ -92,6 +93,7 @@ public class Arm extends SubsystemBase {
 
         mWristMotor = configureWristMotor(kNeoConstructor.apply(kWristMotorID));
         mWristPIDController = mWristMotor.getPIDController();
+        mWristPIDController.setFeedbackDevice(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle));
     }
 
     public static Arm getInstance() {
@@ -131,7 +133,7 @@ public class Arm extends SubsystemBase {
     public CANSparkMax configurePivotMotor(CANSparkMax motor) {
         motor.setIdleMode(IdleMode.kBrake);
         
-        motor.getEncoder().setPositionConversionFactor(kPivotPositionConversionFactor);
+        motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kPivotPositionConversionFactor);
         
         motor.getPIDController().setP(kPivotP);
         motor.getPIDController().setI(kPivotI);
@@ -155,7 +157,7 @@ public class Arm extends SubsystemBase {
     public CANSparkMax configureWristMotor(CANSparkMax motor) {
         motor.setIdleMode(IdleMode.kBrake);
         
-        motor.getEncoder().setPositionConversionFactor(kWristPositionConversionFactor);
+        motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kWristPositionConversionFactor);
 
         motor.getPIDController().setP(kWristP);
         motor.getPIDController().setI(kWristI);
