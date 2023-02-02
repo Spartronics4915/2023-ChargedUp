@@ -101,15 +101,15 @@ public class SwerveCommands {
 
         @Override
         public void execute() {
-            double x1 = -mController.getLeftX();
+            double x1 = mController.getLeftX();
             double y1 = mController.getLeftY();
-            double x2 = -mController.getRightX();
+            double x2 = mController.getRightX();
 
             x1 = applyTransformations(x1);
             y1 = applyTransformations(y1);
             x2 = applyTransformations(x2);
 
-            Translation2d translation = new Translation2d(-y1, -x1).times(kMaxSpeed);
+            Translation2d translation = new Translation2d(y1, -x1).times(kMaxSpeed);
             double rotation = -x2 * kMaxAngularSpeed;
 
             if (Math.abs(mController.getRawAxis(kSlowModeAxis)) <= kTriggerDeadband) { // <= for slow mode default
@@ -202,8 +202,7 @@ public class SwerveCommands {
         private Swerve mSwerveSubsystem;
 
         public RotateToYaw(Rotation2d destinationYaw) {
-
-            
+            addRequirements(mSwerve);
             mDestinationYaw = destinationYaw;
         }
 

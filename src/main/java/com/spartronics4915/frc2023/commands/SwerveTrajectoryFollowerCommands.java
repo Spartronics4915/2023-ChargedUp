@@ -49,7 +49,7 @@ public class SwerveTrajectoryFollowerCommands {
 			double maxAngularVelocity, double maxAngularAcceleration // radians per second
 		) {
 			super(
-				TrajectoryGenerator.generateTrajectory(
+				TrajectoryGenerator.generateTrajectory( // FIXME: will possibly take longer than 1 cycle
 					waypoints,
 					new TrajectoryConfig(maxVelocity, maxAccel)
 						.setStartVelocity(startVelocity)
