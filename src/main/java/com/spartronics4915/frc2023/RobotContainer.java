@@ -116,6 +116,9 @@ public class RobotContainer {
                     mDriverController.y()
                         .onTrue(mSwerveCommands.new ResetOdometry());
 
+                    mDriverController.rightTrigger(kTriggerDeadband)
+                        .onTrue(mSwerveCommands.new EnableSprintMode())
+                        .onFalse(mSwerveCommands.new DisableSprintMode());
 
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
