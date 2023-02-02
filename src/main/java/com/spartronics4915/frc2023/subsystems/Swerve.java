@@ -82,6 +82,12 @@ public class Swerve extends SubsystemBase {
 		return mModuleCount;
 	}
 
+    /**
+     * This overload should only be used for controller input.
+     * @param translation
+     * @param rotation
+     * @param isOpenLoop
+     */
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
         ChassisSpeeds chassisSpeeds;
         SmartDashboard.putBoolean("field relative", mIsFieldRelative);
