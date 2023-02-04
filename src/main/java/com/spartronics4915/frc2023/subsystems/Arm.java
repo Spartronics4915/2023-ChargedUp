@@ -112,12 +112,19 @@ public class Arm extends SubsystemBase {
         mExtenderPIDController.setReference(rotations, ControlType.kPosition);
     }
 
-    //TODO make wrist's angle based on ground angle
+    //TODO confirm that the +s and -s are correct for the conversions
+    private Rotation2d getLeveledWristAngle() {
+        return new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition() - mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    }
+    private void setLeveledWristAngle(Rotation2d rotation) {
+       mWristPIDController.setReference(rotation.getRadians() + mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(), ControlType.kPosition);
+    }
+
     public ArmPosition getPosition() {
         return new ArmPosition(
             getArmRadius(),
             new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
-            new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())
+            getLeveledWristAngle()
         );
     }
 
@@ -130,7 +137,7 @@ public class Arm extends SubsystemBase {
     //TODO add calculations to make 0 on wrist level with the ground (same with the arm pivot)
     private void setDesiredState(ArmState state) {
         mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
-        mWristPIDController.setReference(state.wristTheta.getRadians(), ControlType.kPosition);
+        setLeveledWristAngle(state.armTheta);
         setArmRadius(state.armRadius);
     }
 
