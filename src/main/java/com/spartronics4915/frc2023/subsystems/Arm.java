@@ -103,10 +103,19 @@ public class Arm extends SubsystemBase {
         return mInstance;
     }
 
-    //TODO do calculations here to convert rotations to distance and making the rotations relative to the ground 
-        public ArmPosition getPosition() {
+    private double getArmRadius() {
+        double rotations = (mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())/(2*Math.PI);
+        return rotations * kNumOfArmSegments*(1/(kThreadsPerInch));
+    }
+    private void setArmRadius(double meters){
+        double rotations = (meters)/(kNumOfArmSegments*(1/(kThreadsPerInch)));
+        mExtenderPIDController.setReference(rotations, ControlType.kPosition);
+    }
+
+    //TODO make wrist's angle based on ground angle
+    public ArmPosition getPosition() {
         return new ArmPosition(
-            mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(),
+            getArmRadius(),
             new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
             new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())
         );
@@ -122,7 +131,7 @@ public class Arm extends SubsystemBase {
     private void setDesiredState(ArmState state) {
         mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
         mWristPIDController.setReference(state.wristTheta.getRadians(), ControlType.kPosition);
-        mExtenderPIDController.setReference(state.armRadius, ControlType.kPosition);
+        setArmRadius(state.armRadius);
     }
 
     public void setState(ArmState state) {

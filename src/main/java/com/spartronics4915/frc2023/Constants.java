@@ -181,9 +181,9 @@ public final class Constants {
         public static final int kExtenderMotorID = -1;
         public static final int kWristMotorID = -1;
 
-        public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
+        public static final double kPivotPositionConversionFactor = 2 * Math.PI; // placeholder
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
-        public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
+        public static final double kWristPositionConversionFactor = 2 * Math.PI; // placeholder
 
         public static final double kPivotP = 0.0;
         public static final double kPivotI = 0.0;
