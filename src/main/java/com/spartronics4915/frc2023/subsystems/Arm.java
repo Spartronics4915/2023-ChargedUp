@@ -77,7 +77,7 @@ public class Arm extends SubsystemBase {
     private final CANSparkMax mWristMotor;
     private final SparkMaxPIDController mWristPIDController;
 
-    private Arm() { // TODO: config motors
+    private Arm() {
         mState = ArmState.RETRACTED;
         
         mPivotMotor = configurePivotMotor(kNeoConstructor.apply(kPivotMotorID));
@@ -85,7 +85,7 @@ public class Arm extends SubsystemBase {
         mPivotPIDController.setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
 
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
-        mPivotFollower.follow(mPivotMotor);
+        mPivotFollower.follow(mPivotMotor); //TODO check if this needs to be reversed
 
         mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
         mExtenderPIDController = mExtenderMotor.getPIDController();
@@ -132,9 +132,7 @@ public class Arm extends SubsystemBase {
         return mState; //This will get the desired state
     }
 
-    //FIXME need to convert distance to rotations, there are no conversions currently
-    //TODO check if encoders need to be offset, (in rotation2d 0 is level with ground)
-    //TODO add calculations to make 0 on wrist level with the ground (same with the arm pivot)
+    //TODO determine offsets for absolute encoders
     private void setDesiredState(ArmState state) {
         mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
         setLeveledWristAngle(state.armTheta);
@@ -158,6 +156,8 @@ public class Arm extends SubsystemBase {
         motor.getPIDController().setP(kPivotP);
         motor.getPIDController().setI(kPivotI);
         motor.getPIDController().setD(kPivotD);
+        motor.getPIDController().setPositionPIDWrappingEnabled(true);
+
         
         return motor;
     }
@@ -170,6 +170,8 @@ public class Arm extends SubsystemBase {
         motor.getPIDController().setP(kExtenderP);
         motor.getPIDController().setI(kExtenderI);
         motor.getPIDController().setD(kExtenderD);
+        motor.getPIDController().setPositionPIDWrappingEnabled(false);
+
         
         return motor;
     }
@@ -182,6 +184,7 @@ public class Arm extends SubsystemBase {
         motor.getPIDController().setP(kWristP);
         motor.getPIDController().setI(kWristI);
         motor.getPIDController().setD(kWristD);
+        motor.getPIDController().setPositionPIDWrappingEnabled(true);
 
         return motor;
     }
