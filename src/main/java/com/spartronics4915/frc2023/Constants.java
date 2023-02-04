@@ -197,6 +197,8 @@ public final class Constants {
         public static final double kWristI = 0.0;
         public static final double kWristD = 0.0;
         
+        //here 0 degrees mean level with the carpet for both wrist and shoulder
+        //Meters for distance, radians for rotation
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             -1,
             new Rotation2d(),
@@ -232,6 +234,9 @@ public final class Constants {
             new Rotation2d(),
             new Rotation2d()
         );
+
+        public static final double kThreadsPerInch = 12; //actual value should be 12, testing value 1;
+        public static final int kNumOfArmSegments = 3; //actual value should be 12, testing value 1;
 
         // used to store target measurements for different arm states
         // arm constants assume pivot axle is origin and wrist axle is point

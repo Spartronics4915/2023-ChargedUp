@@ -103,7 +103,8 @@ public class Arm extends SubsystemBase {
         return mInstance;
     }
 
-    public ArmPosition getPosition() {
+    //TODO do calculations here to convert rotations to distance and making the rotations relative to the ground 
+        public ArmPosition getPosition() {
         return new ArmPosition(
             mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(),
             new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
@@ -112,13 +113,16 @@ public class Arm extends SubsystemBase {
     }
 
     public ArmState getState() {
-        return mState;
+        return mState; //This will get the desired state
     }
 
+    //FIXME need to convert distance to rotations, there are no conversions currently
+    //TODO check if encoders need to be offset, (in rotation2d 0 is level with ground)
+    //TODO add calculations to make 0 on wrist level with the ground (same with the arm pivot)
     private void setDesiredState(ArmState state) {
         mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
-        mExtenderPIDController.setReference(state.armRadius, ControlType.kPosition);
         mWristPIDController.setReference(state.wristTheta.getRadians(), ControlType.kPosition);
+        mExtenderPIDController.setReference(state.armRadius, ControlType.kPosition);
     }
 
     public void setState(ArmState state) {

@@ -46,6 +46,8 @@ public class Intake extends SubsystemBase {
         return mState;
     }
 
+
+    //TODO add timer so motor won't be constantly running when it already has a cube or cone
     @Override
     public void periodic() {
         switch(mState) {
