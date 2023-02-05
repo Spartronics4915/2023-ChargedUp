@@ -94,20 +94,6 @@ public class Swerve extends SubsystemBase {
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         SmartDashboard.putBoolean("field relative", mIsFieldRelative);
-        if (mIsFieldRelative) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.getX(),
-                translation.getY(),
-                rotation,
-                getYaw()
-            );
-        } else {
-            chassisSpeeds = new ChassisSpeeds(
-                translation.getX(),
-                translation.getY(),
-                rotation
-            );
-        }
 
         drive(chassisSpeeds, isOpenLoop);
     }
