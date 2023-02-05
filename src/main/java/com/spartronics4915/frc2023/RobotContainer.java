@@ -110,7 +110,7 @@ public class RobotContainer {
                     mDriverController.a()
                         .onTrue(mSwerveCommands.new ToggleFieldRelative());
 
-                    mDriverController.start()
+                    mDriverController.b()
                         .onTrue(mSwerveCommands.new ResetYaw());
 
                     mDriverController.y()

@@ -76,9 +76,9 @@ public final class Constants {
 
         public static final int kPigeonID = 9;
 
-        public static final double kPigeonMountPoseYaw = 0;
-        public static final double kPigeonMountPosePitch = 0;
-        public static final double kPigeonMountPoseRoll = 180;
+        public static final double kPigeonMountPoseYaw = 90;
+        public static final double kPigeonMountPosePitch = 180;
+        public static final double kPigeonMountPoseRoll = 0;
         
         public static final double kTrackWidth = Units.inchesToMeters(18.75);
         public static final double kWheelBase = Units.inchesToMeters(23.75);
@@ -146,6 +146,26 @@ public final class Constants {
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
                 new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kRawAngleOffsetRotations);
+        }
+
+        public static final class BalanceConstants {
+            public static final class XVelocityPID {
+                public static final double kP = 0.0;
+                public static final double kI = 0.0;
+                public static final double kD = 0.0;
+            }
+
+            public static final class YVelocityPID {
+                public static final double kP = 0.0;
+                public static final double kI = 0.0;
+                public static final double kD = 0.0;
+            }
+
+            public static final class RotationPID {
+                public static final double kP = 0.0;
+                public static final double kI = 0.0;
+                public static final double kD = 0.0;
+            }
         }
 
         public static final SwerveDriveKinematics kKinematics = new SwerveDriveKinematics( // FIXME: dont know if module numbers in comments below are correct

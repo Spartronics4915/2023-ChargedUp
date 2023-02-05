@@ -33,6 +33,9 @@ public class Swerve extends SubsystemBase {
     private SwerveModule[] mModules;
 
     private Pigeon2 mIMU;
+    private Rotation2d mLastPitch;
+    private Rotation2d mLastLastPitch;
+
 	private final int mModuleCount;
     // private PhotonCamera mFrontCamera;
 
@@ -89,7 +92,7 @@ public class Swerve extends SubsystemBase {
      * @param isOpenLoop
      */
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
-        ChassisSpeeds chassisSpeeds;
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         SmartDashboard.putBoolean("field relative", mIsFieldRelative);
         if (mIsFieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -106,13 +109,25 @@ public class Swerve extends SubsystemBase {
             );
         }
 
-        SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(chassisSpeeds);
-        
-        setModuleStates(moduleStates, isOpenLoop);
+        drive(chassisSpeeds, isOpenLoop);
     }
 
+    /**
+     * Uses subsystem's current field relative setting
+     * @param chassisSpeeds
+     * @param isOpenLoop
+     */
     public void drive(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
+        drive(chassisSpeeds, mIsFieldRelative, isOpenLoop);
+    }
+
+    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative, boolean isOpenLoop) {
+        if (fieldRelative) {
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getYaw());
+        }
+
         SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, kMaxSpeed);
         setModuleStates(moduleStates, isOpenLoop);
     }
 
@@ -156,7 +171,19 @@ public class Swerve extends SubsystemBase {
     }
 
     public Rotation2d getYaw() {
-        return Rotation2d.fromDegrees(-mIMU.getYaw());
+        return Rotation2d.fromDegrees(mIMU.getYaw());
+    }
+
+    public Rotation2d getPitch() {
+        return Rotation2d.fromDegrees(mIMU.getPitch());
+    }
+
+    public double getPitchOmega() {
+        return (mLastPitch.minus(mLastLastPitch)).getRadians() / 0.02;
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return kKinematics.toChassisSpeeds(getStates());
     }
 
     public void resetYaw() {
@@ -267,5 +294,10 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber("pose x", getPose().getX());
         SmartDashboard.putNumber("pose y", getPose().getY());
         SmartDashboard.putNumber("pose rotation degrees", getPose().getRotation().getDegrees());
+
+        SmartDashboard.putBoolean("field relative", mIsFieldRelative);
+
+        mLastLastPitch = mLastPitch;
+        mLastPitch = getPitch();
     }
 }

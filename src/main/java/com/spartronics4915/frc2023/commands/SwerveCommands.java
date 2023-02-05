@@ -9,9 +9,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import static com.spartronics4915.frc2023.Constants.OI.*;
 
@@ -127,7 +130,7 @@ public class SwerveCommands {
             x2 = applyTransformations(x2);
 
             Translation2d translation = new Translation2d(y1, -x1).times(kMaxSpeed);
-            double rotation = -x2 * kMaxAngularSpeed;
+            double rotation = x2 * kMaxAngularSpeed;
 
             if (!mIsSprintMode) {
                 translation = translation.times(kSlowModeSpeedMultiplier);
@@ -135,6 +138,9 @@ public class SwerveCommands {
             }
             
             mSwerve.drive(translation, rotation, true);
+
+            // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(y1 * kMaxSpeed, -x1 * kMaxSpeed, x2 * kMaxAngularSpeed);
+            // mSwerve.drive(chassisSpeeds, false);
         }
 
         @Override
@@ -143,6 +149,52 @@ public class SwerveCommands {
         @Override
         public boolean isFinished() {
             return false;
+        }
+    }
+
+    public class Balance extends CommandBase {
+        private final PIDController mXVelocityPIDController;
+        private final PIDController mRotationPIDController;
+        
+        public Balance() {
+            addRequirements(mSwerve);
+            mXVelocityPIDController = new PIDController(
+                BalanceConstants.XVelocityPID.kP,
+                BalanceConstants.XVelocityPID.kI,
+                BalanceConstants.XVelocityPID.kD
+            );
+            mRotationPIDController = new PIDController(
+                BalanceConstants.RotationPID.kP,
+                BalanceConstants.RotationPID.kI,
+                BalanceConstants.RotationPID.kD
+            );
+        }
+
+        @Override
+        public void initialize() {
+            mXVelocityPIDController.setSetpoint(0);
+        }
+
+        @Override
+        public void execute() {
+            // double 
+            
+            double vx = mXVelocityPIDController.calculate(mSwerve.getPitch().getRadians());
+            double omega = mRotationPIDController.calculate(mSwerve.getYaw().getRadians());
+
+            ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
+            
+            mSwerve.drive(chassisSpeeds, true, false);
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+
+        }
+
+        @Override
+        public boolean isFinished() {
+            return mXVelocityPIDController.atSetpoint() && mSwerve.getPitchOmega() <= 0.1;
         }
     }
 
