@@ -44,6 +44,25 @@ public final class DebugTeleopCommands {
             yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
         }
     }
+
+    public static class ChargeWidget {
+
+        private GenericEntry rollEntry;
+        public ChargeWidget(ShuffleboardTab tab) {
+
+        
+            ShuffleboardLayout layout = tab.getLayout("ChargeStation", BuiltInLayouts.kList)
+            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
+            
+            rollEntry = layout.add("Roll (Degrees)", 0).getEntry();
+        }
+
+        public void update(Swerve swerveSubsystem) {
+            rollEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
+        }
+
+    }
+
     public static class SwerveModuleWidget {
         private GenericEntry angleEntry;
         private GenericEntry state_angle, abs_encoder, rel_encoder, rel_encoder_deg, shifted_abs_encoder;
