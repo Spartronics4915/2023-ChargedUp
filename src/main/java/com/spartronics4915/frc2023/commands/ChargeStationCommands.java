@@ -37,6 +37,10 @@ public final class ChargeStationCommands {
         @Override
         public void end(boolean interrupted) {
             mSwerveSubsystem.stop();
+            if(interrupted) {
+                mLastState = mCurrState;
+                mLogString = "Interrupted";
+            }
         }
 
         @Override
@@ -48,15 +52,16 @@ public final class ChargeStationCommands {
 
         @Override
         public void execute() {
+            final double climb_to_grip_speed_m_s = 0.25;
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP:
-                final double climb_to_grip_speed_m_s = 0.25;
                 final double climb_to_grip_target_roll_deg = 25;
-                final double climb_to_grip_time_allowed = 10;
+                final double climb_to_grip_time_allowed = 5;
 
                 if(mCurrStateTimer.hasElapsed(climb_to_grip_time_allowed)) {
                     mSwerveSubsystem.stop();
+                    mLastState = mCurrState;
                     mCurrState = ClimbState.ERROR;
                     mLogString = "Climb_To_Grip Timeout";
                 }
@@ -68,10 +73,27 @@ public final class ChargeStationCommands {
                 }
 
                 case GRIP_TO_PLATFORM:
+                final double grip_to_platform_speed_m_s = climb_to_grip_speed_m_s;
+                final double grip_to_platform_target_roll_deg = 15;
+                final double grip_to_platform_time_allowed = 5;
+                if(mCurrStateTimer.hasElapsed(grip_to_platform_time_allowed)) {
+                    mSwerveSubsystem.stop();
+                    mLastState = mCurrState;
+                    mCurrState = ClimbState.ERROR;
+                    mLogString = "grip_to_platform Timeout";
+                }
+                mSwerveSubsystem.setModuleStates(new SwerveModuleState(grip_to_platform_speed_m_s, Rotation2d.fromDegrees(0)));
+                if (mSwerveSubsystem.getRoll().getDegrees() < grip_to_platform_target_roll_deg) {
+                    mLastState = mCurrState;
+                    mCurrState = ClimbState.STOP;
+                    mCurrStateTimer = null;
+                }
 
                 default:
                 mSwerveSubsystem.stop();
                 mLogString = "Got to Default";
+                mLastState = mCurrState;
+                mCurrStateTimer = null;
                 mCurrState = ClimbState.ERROR;
 
             }
