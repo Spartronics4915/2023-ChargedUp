@@ -159,6 +159,10 @@ public class Swerve extends SubsystemBase {
         return mIsFieldRelative;
     }
 
+    public Pigeon2 getIMU() {
+        return mIMU;
+    }
+
     public Pose2d getPose() {
         return mPoseEstimator.getEstimatedPosition();
     }

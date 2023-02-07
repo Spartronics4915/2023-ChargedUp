@@ -6,6 +6,7 @@ package com.spartronics4915.frc2023;
 
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
@@ -120,6 +121,9 @@ public class RobotContainer {
                         .onTrue(mSwerveCommands.new EnableSprintMode())
                         .onFalse(mSwerveCommands.new DisableSprintMode());
 
+                    mDriverController.rightBumper()
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
                     //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
@@ -172,6 +176,7 @@ public class RobotContainer {
                 shuffleboard_update_command.schedule();
 
                 mSwerve.resetToAbsolute();
+                mSwerve.setFieldRelative(true);
             }
         }
         

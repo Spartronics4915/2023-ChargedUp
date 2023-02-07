@@ -32,16 +32,19 @@ public final class DebugTeleopCommands {
     
     public static class ChassisWidget {
         private GenericEntry yawEntry;
+        private GenericEntry pitchEntry;
 
         ChassisWidget(ShuffleboardTab tab) {
             ShuffleboardLayout yawLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
             
             yawEntry = yawLayout.add("Yaw (Degrees)", 0).getEntry();
+            pitchEntry = yawLayout.add("Pitch (Degrees)", 0).getEntry();
         }
 
         public void update(Swerve swerveSubsystem) {
             yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
+            pitchEntry.setDouble(swerveSubsystem.getPitch().getDegrees());
         }
     }
 

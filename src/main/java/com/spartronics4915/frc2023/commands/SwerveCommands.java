@@ -194,7 +194,7 @@ public class SwerveCommands {
 
         @Override
         public boolean isFinished() {
-            return mXVelocityPIDController.atSetpoint() && mSwerve.getPitchOmega() <= 0.1;
+            return mXVelocityPIDController.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1;
         }
     }
 
