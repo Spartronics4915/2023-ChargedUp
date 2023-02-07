@@ -11,6 +11,7 @@ import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
 import com.spartronics4915.frc2023.subsystems.Arm;
 import com.spartronics4915.frc2023.subsystems.Intake;
@@ -123,6 +124,9 @@ public class RobotContainer {
 
                     mDriverController.rightBumper()
                         .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+
+                    mDriverController.leftBumper()
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
 
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()

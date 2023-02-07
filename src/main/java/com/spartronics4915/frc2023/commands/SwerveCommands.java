@@ -129,7 +129,7 @@ public class SwerveCommands {
             y1 = applyTransformations(y1);
             x2 = applyTransformations(x2);
 
-            Translation2d translation = new Translation2d(y1, -x1).times(kMaxSpeed);
+            Translation2d translation = new Translation2d(-y1, x1).times(kMaxSpeed);
             double rotation = x2 * kMaxAngularSpeed;
 
             if (!mIsSprintMode) {
@@ -139,8 +139,14 @@ public class SwerveCommands {
             
             mSwerve.drive(translation, rotation, true);
 
-            // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(y1 * kMaxSpeed, -x1 * kMaxSpeed, x2 * kMaxAngularSpeed);
-            // mSwerve.drive(chassisSpeeds, false);
+            // if (!mIsSprintMode) {
+            //     x1 *= kSlowModeSpeedMultiplier;
+            //     y1 *= kSlowModeSpeedMultiplier;
+            //     x2 *= kSlowModeAngularSpeedMultiplier;
+            // }
+
+            // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(-y1 * kMaxSpeed, -x1 * kMaxSpeed, x2 * kMaxAngularSpeed);
+            // mSwerve.drive(chassisSpeeds, true);
         }
 
         @Override
@@ -164,15 +170,16 @@ public class SwerveCommands {
                 BalanceConstants.XVelocityPID.kD
             );
             mRotationPIDController = new PIDController(
-                BalanceConstants.RotationPID.kP,
-                BalanceConstants.RotationPID.kI,
-                BalanceConstants.RotationPID.kD
+                BalanceConstants.ThetaPID.kP,
+                BalanceConstants.ThetaPID.kI,
+                BalanceConstants.ThetaPID.kD
             );
         }
 
         @Override
         public void initialize() {
             mXVelocityPIDController.setSetpoint(0);
+            mRotationPIDController.setSetpoint(0);
         }
 
         @Override
