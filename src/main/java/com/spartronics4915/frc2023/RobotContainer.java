@@ -96,7 +96,7 @@ public class RobotContainer {
                     .onTrue(mSwerveCommands.new ResetOdometry());
 
                     new JoystickButton(mController, kAimButton)
-                    .onTrue(mSwerveCommands.new RotateDegrees(cameraWrapper.photonCamera.getLatestResult().getBestTarget().getYaw()));
+                    .onTrue(mSwerveCommands.new RotateToTarget(cameraWrapper));
                 }
             }
             
