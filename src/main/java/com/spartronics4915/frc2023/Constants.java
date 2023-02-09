@@ -40,8 +40,8 @@ import static com.spartronics4915.frc2023.subsystems.Arm.ArmPosition;
  */
 public final class Constants {
 	public static final class Trajectory {
-		public static final double kLinearP = 1.0;
-		public static final double kThetaP = 1.0;
+		public static final double kLinearP = 0.01;
+		public static final double kThetaP = 0.01;
 	}
 
     public static final class Swerve {

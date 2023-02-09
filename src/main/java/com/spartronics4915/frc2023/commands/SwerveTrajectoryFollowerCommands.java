@@ -38,6 +38,7 @@ public class SwerveTrajectoryFollowerCommands {
 		mThetaPID.setConstraints(new TrapezoidProfile.Constraints(
 			maxAngularVelocity, maxAngularAcceleration
 		));
+		mThetaPID.reset(mSwerve.getYaw().getRadians());
 		return mThetaPID;
 	}
 
