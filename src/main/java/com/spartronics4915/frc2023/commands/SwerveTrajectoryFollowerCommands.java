@@ -61,6 +61,7 @@ public class SwerveTrajectoryFollowerCommands {
 		public void initialize() {
 			mThetaPID.setConstraints(mConstraints);
 			mThetaPID.reset(mSwerve.getYaw().getRadians());
+			super.initialize();
 		}
 
 		@Override
