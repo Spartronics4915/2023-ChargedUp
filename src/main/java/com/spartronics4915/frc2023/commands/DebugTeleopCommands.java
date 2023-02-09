@@ -20,7 +20,8 @@ import java.util.Map;
 
 public final class DebugTeleopCommands {
     
-    public static void teleopInit(Swerve swerve_subsystem) {
+    public static void teleopInit() {
+		Swerve swerve_subsystem = Swerve.getInstance();
         swerve_subsystem.resetToAbsolute();
         swerve_subsystem.resetYaw();
         swerve_subsystem.resetOdometry(new Pose2d(0, 0, new Rotation2d(0))); // for odometry testing
@@ -40,7 +41,8 @@ public final class DebugTeleopCommands {
             yawEntry = yawLayout.add("Yaw (Degrees)", 0).getEntry();
         }
 
-        public void update(Swerve swerveSubsystem) {
+        public void update() {
+			Swerve swerveSubsystem = Swerve.getInstance();
             yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
         }
     }
@@ -79,7 +81,7 @@ public final class DebugTeleopCommands {
         Swerve swerve_subsystem;
         SwerveCommands mSwerveCommands;
 
-        SwerveTab(Swerve swerve, SwerveCommands swerveCommands) {
+        SwerveTab(SwerveCommands swerveCommands) {
             mSwerveCommands = swerveCommands;
             tab = Shuffleboard.getTab("Swerve");
             // module0 = new SwerveModuleWidget(tab, "Module 0");
@@ -88,7 +90,7 @@ public final class DebugTeleopCommands {
             // module3 = new SwerveModuleWidget(tab, "Module 3");
             chassisWidget = new ChassisWidget(tab);
 
-            swerve_subsystem = swerve;
+            swerve_subsystem = Swerve.getInstance();
             ShuffleboardLayout elevatorCommands = 
             tab.getLayout("Orientation", BuiltInLayouts.kList)
             .withSize(2, 3)
@@ -116,7 +118,7 @@ public final class DebugTeleopCommands {
             // module2.update(swerve_modules[2]);
             // module3.update(swerve_modules[3]);
 
-            chassisWidget.update(swerve_subsystem);
+            chassisWidget.update();
         }
     }
     
@@ -126,8 +128,8 @@ public final class DebugTeleopCommands {
         SwerveTab m_swerve_tab;
         SwerveCommands mSwerveCommands;
 
-        public ShuffleboardUpdateCommand(Swerve swerve_subsystem, SwerveCommands swerveCommands) {
-            m_swerve_subsystem = swerve_subsystem;
+        public ShuffleboardUpdateCommand(SwerveCommands swerveCommands) {
+            m_swerve_subsystem = Swerve.getInstance();
             mSwerveCommands = swerveCommands;
         }
         // Called when the command is initially scheduled.
@@ -135,7 +137,7 @@ public final class DebugTeleopCommands {
         @Override
         public void initialize() {
             
-            m_swerve_tab = new SwerveTab(m_swerve_subsystem, mSwerveCommands);
+            m_swerve_tab = new SwerveTab(mSwerveCommands);
         }
         
         // Called every time the scheduler runs while the command is scheduled.

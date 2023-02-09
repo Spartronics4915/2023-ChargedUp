@@ -14,8 +14,8 @@ public class VisionNavigation {
         @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
         private final Swerve m_Swerve;
         
-        public AlignToTag(Swerve swerve) {
-            m_Swerve = swerve;
+        public AlignToTag() {
+            m_Swerve = Swerve.getInstance();
             // Use addRequirements() here to declare subsystem dependencies.
             addRequirements(m_Swerve);
         }
