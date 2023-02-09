@@ -241,7 +241,7 @@ public class SwerveCommands {
         public RotateToYaw(Rotation2d destinationYaw) {
             pid = new ProfiledPIDController(kP, 0, 0, new TrapezoidProfile.Constraints(
                 kMaxAngularSpeed,
-                0.1
+                kMaxAcceleration
             ));
             pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
 
