@@ -24,9 +24,9 @@ public class SwerveCommands {
     private final Swerve mSwerve;
     private boolean mIsSprintMode = false;
 
-    public SwerveCommands(CommandXboxController controller, Swerve swerve) {
+    public SwerveCommands(CommandXboxController controller) {
         mDriverController = controller;
-        mSwerve = swerve;
+        mSwerve = Swerve.getInstance();
     }
 
     public class SetFieldRelative extends InstantCommand {

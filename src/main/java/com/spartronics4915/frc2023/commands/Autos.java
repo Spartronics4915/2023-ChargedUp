@@ -35,8 +35,8 @@ public final class Autos {
 	private final double maxAngularAcceleration = 0.2;
 			
 
-    public Autos(Swerve swerve, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
-		mSwerve = swerve;
+    public Autos(SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
+		mSwerve = Swerve.getInstance();
 		mSwerveTrajectoryFollowerCommands = swerveTrajectoryFollowerCommands;
     }
 
@@ -58,9 +58,7 @@ public final class Autos {
 				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
 					new ArrayList<>(List.of(
 						new Pose2d(0, 0, new Rotation2d(0)),
-						new Pose2d(1, 0.1, Rotation2d.fromDegrees(90)),
-						new Pose2d(1.2, -0.2, Rotation2d.fromDegrees(180)),
-						new Pose2d(0.5, 0.1, Rotation2d.fromDegrees(180))
+						new Pose2d(1, 0, new Rotation2d(Math.PI / 2))
 					)),
 					0, 0,
 					maxVelocity, maxAccel,
