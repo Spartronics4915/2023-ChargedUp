@@ -27,7 +27,7 @@ public class SwerveTrajectoryFollowerCommands {
 		mXPID = new PIDController(kLinearP, 0, 0);
 		mYPID = new PIDController(kLinearP, 0, 0);
 		mThetaPID = new ProfiledPIDController(
-			kThetaP, 0, 0, new TrapezoidProfile.Constraints(0, 0)
+			kThetaP, 0, 0, new TrapezoidProfile.Constraints(kMaxAngularSpeed, 1) // FIXME: 1 is a placeholder
 		);
 		mThetaPID.enableContinuousInput(-Math.PI, Math.PI);
 	}
@@ -73,7 +73,7 @@ public class SwerveTrajectoryFollowerCommands {
 			SmartDashboard.putNumber("Swerve yPID Setpoint", mYPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve yPID Position Error", mYPID.getPositionError());
 			
-			// SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
+			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint().velocity);
 			SmartDashboard.putNumber("Swerve thetaPID Position Error", mThetaPID.getPositionError());
 		}
 	}
