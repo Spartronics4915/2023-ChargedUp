@@ -129,6 +129,13 @@ public class Swerve extends SubsystemBase {
         setModuleStates(desiredStates, true);
     }
 
+    public void setModuleStates(SwerveModuleState desiredState) {
+        for (SwerveModule mod : mModules) {
+            mod.setDesiredState(
+                desiredState, true);
+        }
+    }
+
     public void forceModuleOrientations(Rotation2d orientation, boolean isOpenLoop) {
         // Forces all of the modules to one orientation
         // Mainly for testing - be careful if you use it
@@ -152,6 +159,10 @@ public class Swerve extends SubsystemBase {
         return mIsFieldRelative;
     }
 
+    public Pigeon2 getIMU() {
+        return mIMU;
+    }
+
     public Pose2d getPose() {
         return mPoseEstimator.getEstimatedPosition();
     }
@@ -162,6 +173,10 @@ public class Swerve extends SubsystemBase {
 
     public Rotation2d getPitch() {
         return Rotation2d.fromDegrees(mIMU.getPitch());
+    }
+
+    public Rotation2d getRoll() {
+        return Rotation2d.fromDegrees(mIMU.getRoll());
     }
 
     public double getPitchOmega() {

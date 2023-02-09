@@ -6,10 +6,12 @@ package com.spartronics4915.frc2023;
 
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
 import com.spartronics4915.frc2023.subsystems.Arm;
 import com.spartronics4915.frc2023.subsystems.Intake;
@@ -120,6 +122,12 @@ public class RobotContainer {
                         .onTrue(mSwerveCommands.new EnableSprintMode())
                         .onFalse(mSwerveCommands.new DisableSprintMode());
 
+                    mDriverController.rightBumper()
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+
+                    mDriverController.leftBumper()
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
+
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
                     //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
@@ -171,6 +179,7 @@ public class RobotContainer {
                 shuffleboard_update_command.schedule();
 
                 mSwerve.resetToAbsolute();
+                mSwerve.setFieldRelative(true);
             }
         }
         
