@@ -106,10 +106,10 @@ public final class DebugTeleopCommands {
         SwerveTab(SwerveCommands swerveCommands) {
             mSwerveCommands = swerveCommands;
             tab = Shuffleboard.getTab("Swerve");
-            // module0 = new SwerveModuleWidget(tab, "Module 0");
-            // module1 = new SwerveModuleWidget(tab, "Module 1");
-            // module2 = new SwerveModuleWidget(tab, "Module 2");
-            // module3 = new SwerveModuleWidget(tab, "Module 3");
+            module0 = new SwerveModuleWidget(tab, "Module 0");
+            module1 = new SwerveModuleWidget(tab, "Module 1");
+            module2 = new SwerveModuleWidget(tab, "Module 2");
+            module3 = new SwerveModuleWidget(tab, "Module 3");
             chassisWidget = new ChassisWidget(tab);
 
             swerve_subsystem = Swerve.getInstance();
@@ -133,12 +133,12 @@ public final class DebugTeleopCommands {
         
         public void update(){
             
-            // var swerve_modules = swerve_subsystem.getSwerveModules();
+            var swerve_modules = swerve_subsystem.getSwerveModules();
             
-            // module0.update(swerve_modules[0]);
-            // module1.update(swerve_modules[1]);
-            // module2.update(swerve_modules[2]);
-            // module3.update(swerve_modules[3]);
+            module0.update(swerve_modules[0]);
+            module1.update(swerve_modules[1]);
+            module2.update(swerve_modules[2]);
+            module3.update(swerve_modules[3]);
 
             chassisWidget.update();
         }
