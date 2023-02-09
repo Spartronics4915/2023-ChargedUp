@@ -32,6 +32,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static com.spartronics4915.frc2023.Constants.OI.*;
 
+import org.opencv.photo.Photo;
+
 /**
 * This class is where the bulk of the robot should be declared. Since
 * Command-based is a
@@ -47,6 +49,8 @@ public class RobotContainer {
 
     private final CommandXboxController mDriverController;
     private final CommandXboxController mOperatorController;
+
+    private final PhotonCameraWrapper mCameraWrapper;
     
     private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     
@@ -96,6 +100,7 @@ public class RobotContainer {
         
         mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         
+        mCameraWrapper = new PhotonCameraWrapper();
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -130,6 +135,9 @@ public class RobotContainer {
                     mDriverController.leftBumper()
                         .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
 
+                    mDriverController.x()
+                        // .onTrue(mSwerveCommands.new RotateToTarget(mCameraWrapper));
+                        .onTrue(mSwerveCommands.new RotateYaw(Rotation2d.fromRadians(Math.PI/4)));
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
                     //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
@@ -157,8 +165,7 @@ public class RobotContainer {
                     //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
                     //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
 
-                    new JoystickButton(mController, kAimButton)
-                    .onTrue(mSwerveCommands.new RotateToTarget(cameraWrapper));
+                    
                 }
             }
             
@@ -176,7 +183,7 @@ public class RobotContainer {
             }
             
             public Command getTestingCommand() {
-                return new PrintPos(cameraWrapper);
+                return new PrintPos(mCameraWrapper);
             }
 
             public void initRobot() {
