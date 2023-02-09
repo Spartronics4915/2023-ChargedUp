@@ -129,8 +129,8 @@ public class SwerveCommands {
             y1 = applyTransformations(y1);
             x2 = applyTransformations(x2);
 
-            Translation2d translation = new Translation2d(-y1, x1).times(kMaxSpeed);
-            double rotation = x2 * kMaxAngularSpeed;
+            Translation2d translation = new Translation2d(-y1, -x1).times(kMaxSpeed);
+            double rotation = -x2 * kMaxAngularSpeed;
 
             if (!mIsSprintMode) {
                 translation = translation.times(kSlowModeSpeedMultiplier);

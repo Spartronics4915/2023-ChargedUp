@@ -169,10 +169,10 @@ public final class Constants {
         }
 
         public static final SwerveDriveKinematics kKinematics = new SwerveDriveKinematics( // FIXME: dont know if module numbers in comments below are correct
-            new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0), // front right, module 1
-            new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0), // front left, module 0
-            new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0), // back right, module 3
-            new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0) // back left, module 2
+        new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0), // front left, module 0
+        new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0), // front right, module 1
+        new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0), // back left, module 2
+        new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0) // back right, module 3
         );
         
         public static class SwerveModuleConstants {
