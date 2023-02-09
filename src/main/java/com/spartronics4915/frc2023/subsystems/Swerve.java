@@ -41,7 +41,7 @@ public class Swerve extends SubsystemBase {
 
     private boolean mIsFieldRelative = true;
 
-    public static Swerve mInstance = null;
+    private static Swerve mInstance = null;
 
     public static Swerve getInstance() {
         if (mInstance == null) {
