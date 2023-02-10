@@ -33,10 +33,6 @@ public final class DebugTeleopCommands {
     }
     
     public static class ChassisWidget {
-        private GenericEntry yawEntry;
-        private GenericEntry pitchEntry;
-        private GenericEntry rollEntry;
-
         private GenericEntry vxEntry;
         private GenericEntry vyEntry;
         private GenericEntry omegaEntry;
@@ -45,9 +41,7 @@ public final class DebugTeleopCommands {
             ShuffleboardLayout yawLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
             
-            yawEntry = yawLayout.add("Yaw (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-            pitchEntry = yawLayout.add("Pitch (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
-            rollEntry = yawLayout.add("Roll (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+            yawLayout.add(Swerve.getInstance().getIMU()).withWidget(BuiltInWidgets.kGyro);
 
             vxEntry = yawLayout.add("vx (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
             vyEntry = yawLayout.add("vy (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
@@ -56,9 +50,7 @@ public final class DebugTeleopCommands {
 
         public void update() {
 			Swerve swerveSubsystem = Swerve.getInstance();
-            yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
-            pitchEntry.setDouble(swerveSubsystem.getPitch().getDegrees());
-            rollEntry.setDouble(swerveSubsystem.getRoll().getDegrees());
+            
             vxEntry.setDouble(swerveSubsystem.getChassisSpeeds().vxMetersPerSecond);
             vyEntry.setDouble(swerveSubsystem.getChassisSpeeds().vyMetersPerSecond);
             omegaEntry.setDouble(swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
