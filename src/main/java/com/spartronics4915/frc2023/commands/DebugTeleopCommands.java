@@ -103,6 +103,11 @@ public final class DebugTeleopCommands {
 
         }
     }
+    
+    public static class ArmTab {
+
+    }
+
     public static class SwerveTab {
         SwerveModuleWidget module0, module1, module2, module3;
         ChassisWidget chassisWidget;
@@ -158,15 +163,24 @@ public final class DebugTeleopCommands {
         SwerveCommands mSwerveCommands;
 
         public ShuffleboardUpdateCommand(SwerveCommands swerveCommands) {
-            m_swerve_subsystem = Swerve.getInstance();
             mSwerveCommands = swerveCommands;
+            if(mSwerveCommands != null) {
+                m_swerve_subsystem = Swerve.getInstance();
+            }
+            else {
+                m_swerve_subsystem = null;
+            }
         }
         // Called when the command is initially scheduled.
         
         @Override
         public void initialize() {
-            
+            if (m_swerve_tab != null) {
             m_swerve_tab = new SwerveTab(mSwerveCommands);
+            }
+            else {
+                m_swerve_tab = null;
+            }
         }
         
         // Called every time the scheduler runs while the command is scheduled.

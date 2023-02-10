@@ -33,30 +33,39 @@ public class ArmSubsystem extends SubsystemBase {
     private SparkMaxPIDController mShoulderPIDContoller;
     private SparkMaxPIDController mWristPIDContoller;
     private SparkMaxPIDController mLinActuatorPIDController;
+
+    private final boolean mHasWrist;
+    private final boolean mHasExtender;
     /** Creates a new ExampleSubsystem. */
     public ArmSubsystem() {
         //motor setup
         //TODO check if motors are brushed or brushless, if brushed check if Idle Mode Setting is needed
         //TODO there is a secondary motor connected to the sprocket shaft, see if you can set one up to follow the other
+        mHasWrist = false;
+        mHasExtender = false;
         mShoulderMotor = new CANSparkMax(MotorSetupConstants.kShoulderMotorId,MotorType.kBrushed);
         mShoulderMotor.setIdleMode(IdleMode.kBrake); 
+        if(mHasWrist) {
         mWristMotor = new CANSparkMax(MotorSetupConstants.kWristMotorId,MotorType.kBrushed);
         mWristMotor.setIdleMode(IdleMode.kBrake); 
+        mWristPIDContoller = initializePIDController(mWristMotor, MotorSetupConstants.kWristPID);
+        mWristAbsEncoder = initializeAbsEncoder(mWristMotor, MotorSetupConstants.kShoulderAbsEncoder);
+        }
+        
+        if(mHasExtender) {
         mLinActuatorMotor = new CANSparkMax(LinearActuatorConstants.kLinearActuatorMotorId, MotorType.kBrushless);
         mLinActuatorMotor.setIdleMode(IdleMode.kBrake);
-        
+        mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
+        mLinActuatorPIDController.setPositionPIDWrappingEnabled(false); //this way it can go over 1 rotation
+        }
         //PID setup
         mShoulderPIDContoller = initializePIDController(mShoulderMotor, MotorSetupConstants.kShoulderPID);
 
-        mWristPIDContoller = initializePIDController(mWristMotor, MotorSetupConstants.kWristPID);
 
-        mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
-        mLinActuatorPIDController.setPositionPIDWrappingEnabled(false); //this way it can go over 1 rotation
         
         //TODO: seems there are going to be two motors for the shoulder maybe use the follow method       
         
         // encoder setup
-        mWristAbsEncoder = initializeAbsEncoder(mWristMotor, MotorSetupConstants.kShoulderAbsEncoder);
         mShoulderAbsEncoder = initializeAbsEncoder(mShoulderMotor, MotorSetupConstants.kWristAbsEncoder);
 
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
