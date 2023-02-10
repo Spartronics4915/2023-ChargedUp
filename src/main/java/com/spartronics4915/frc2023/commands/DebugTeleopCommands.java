@@ -1,5 +1,6 @@
 package com.spartronics4915.frc2023.commands;
 
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import com.spartronics4915.frc2023.subsystems.SwerveModule;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
@@ -103,8 +104,44 @@ public final class DebugTeleopCommands {
 
         }
     }
-    
+
+    public static class ArmMotorWidget {
+        private GenericEntry angleEntry;
+        private GenericEntry state_angle, abs_encoder, rel_encoder, rel_encoder_deg, shifted_abs_encoder;
+        SwerveModuleWidget(ShuffleboardTab tab, String name) {
+            ShuffleboardLayout swerve_module = tab.getLayout(name, BuiltInLayouts.kList)
+            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
+
+            angleEntry = swerve_module.add("desired.angle", 0).getEntry();
+            state_angle = swerve_module.add("current.angle", 0).getEntry();
+            abs_encoder = swerve_module.add("abs_encoder", 0).getEntry();
+            rel_encoder = swerve_module.add("rel_encoder", 0).getEntry();
+            rel_encoder_deg = swerve_module.add("rel_encoder (degrees)", 0).getEntry();
+            shifted_abs_encoder = swerve_module.add("shifted abs_encoder", 0).getEntry();
+        }
+        
+        public void update(SwerveModule module) {
+            SwerveModuleState current = module.getState();
+            SwerveModuleState desired = module.getDesiredState();
+            
+            angleEntry.setDouble(desired.angle.getDegrees()); 
+            state_angle.setDouble(current.angle.getDegrees());
+            abs_encoder.setDouble(module.getAbsoluteEncoderValue()); 
+            rel_encoder.setDouble(module.getRelativeEncoderValue());
+            rel_encoder_deg.setDouble(Rotation2d.fromRadians(module.getRelativeEncoderValue()).getDegrees());
+            shifted_abs_encoder.setDouble(module.getShiftedAbsoluteEncoderRotations());
+
+        }
+    }
+
     public static class ArmTab {
+        ShuffleboardTab mTab;
+
+        ArmSubsystem mArmSubsystem;
+
+        ArmTab(ArmSubsystem armSubsystem) {
+            mArmSubsystem = armSubsystem;
+        }
 
     }
 

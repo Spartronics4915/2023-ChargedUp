@@ -25,15 +25,13 @@ import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax mWristMotor;
-    private CANSparkMax mShoulderMotor;
     private CANSparkMax mLinActuatorMotor;
 
     private SparkMaxAbsoluteEncoder mWristAbsEncoder;
-    private SparkMaxAbsoluteEncoder mShoulderAbsEncoder;
-    private SparkMaxPIDController mShoulderPIDContoller;
     private SparkMaxPIDController mWristPIDContoller;
     private SparkMaxPIDController mLinActuatorPIDController;
 
+    private MotorAbsEncoderComboSubsystem mShoulderSubsystem;
     private final boolean mHasWrist;
     private final boolean mHasExtender;
     /** Creates a new ExampleSubsystem. */
@@ -43,8 +41,8 @@ public class ArmSubsystem extends SubsystemBase {
         //TODO there is a secondary motor connected to the sprocket shaft, see if you can set one up to follow the other
         mHasWrist = false;
         mHasExtender = false;
-        mShoulderMotor = new CANSparkMax(MotorSetupConstants.kShoulderMotorId,MotorType.kBrushed);
-        mShoulderMotor.setIdleMode(IdleMode.kBrake); 
+
+        mShoulderSubsystem = new MotorAbsEncoderComboSubsystem(MotorSetupConstants.kShoulderMotorId);
         if(mHasWrist) {
         mWristMotor = new CANSparkMax(MotorSetupConstants.kWristMotorId,MotorType.kBrushed);
         mWristMotor.setIdleMode(IdleMode.kBrake); 
@@ -58,15 +56,9 @@ public class ArmSubsystem extends SubsystemBase {
         mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
         mLinActuatorPIDController.setPositionPIDWrappingEnabled(false); //this way it can go over 1 rotation
         }
-        //PID setup
-        mShoulderPIDContoller = initializePIDController(mShoulderMotor, MotorSetupConstants.kShoulderPID);
-
-
         
         //TODO: seems there are going to be two motors for the shoulder maybe use the follow method       
         
-        // encoder setup
-        mShoulderAbsEncoder = initializeAbsEncoder(mShoulderMotor, MotorSetupConstants.kWristAbsEncoder);
 
         //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
         //TODO add limit switch IDs for linear actualor
@@ -96,15 +88,18 @@ public class ArmSubsystem extends SubsystemBase {
         return x;
     }
 
+    public MotorAbsEncoderComboSubsystem getShoulder() {
+        return mShoulderSubsystem;
+    }
     //setup above this lines, actual commands and other methods below
 
-    private void levelWrist(){ //TODO should run these periodically 
-        mWristPIDContoller.setReference(-mShoulderAbsEncoder.getPosition(), ControlType.kPosition);
-    }
+    // private void levelWrist(){ //TODO should run these periodically 
+    //     mWristPIDContoller.setReference(-mShoulderAbsEncoder.getPosition(), ControlType.kPosition);
+    // }
 
-    public void setShoulderSetpoint(double value) {
-        mShoulderPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
-    }
+    // public void setShoulderSetpoint(double value) {
+    //     mShoulderPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
+    // }
     public void setWristSetpoint(double value) {
         mWristPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
     }
@@ -115,14 +110,14 @@ public class ArmSubsystem extends SubsystemBase {
         mLinActuatorPIDController.setReference(result, ControlType.kPosition);
     }
 
-    public void setAbsoluteArmState(Translation2d vector) {  //either have two translation 2ds reperesenting the wrist's length or just repersent the wrist joint via the translation 2d
-        setShoulderSetpoint(vector.getAngle().getRadians()); //TODO add limits to this asap so the arm wont hit the robot or go overhead
-        setLinActuatorDistance(vector.getNorm()); //TODO at "0" the linear actuator is actually already out at some distance x so make sure to subtract that value
-    }
-    public void changeArmState(Translation2d vector){
-        Translation2d currentArmState = null; //TODO need a way to convert encoders to Translation2d
-        setAbsoluteArmState(currentArmState.plus(vector));        
-    }
+    // public void setAbsoluteArmState(Translation2d vector) {  //either have two translation 2ds reperesenting the wrist's length or just repersent the wrist joint via the translation 2d
+    //     setShoulderSetpoint(vector.getAngle().getRadians()); //TODO add limits to this asap so the arm wont hit the robot or go overhead
+    //     setLinActuatorDistance(vector.getNorm()); //TODO at "0" the linear actuator is actually already out at some distance x so make sure to subtract that value
+    // }
+    // public void changeArmState(Translation2d vector){
+    //     Translation2d currentArmState = null; //TODO need a way to convert encoders to Translation2d
+    //     setAbsoluteArmState(currentArmState.plus(vector));        
+    // }
     /**
      * Example command factory method.
      *
