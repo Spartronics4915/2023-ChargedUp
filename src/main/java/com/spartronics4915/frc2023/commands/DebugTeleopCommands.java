@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -34,19 +35,33 @@ public final class DebugTeleopCommands {
     public static class ChassisWidget {
         private GenericEntry yawEntry;
         private GenericEntry pitchEntry;
+        private GenericEntry rollEntry;
+
+        private GenericEntry vxEntry;
+        private GenericEntry vyEntry;
+        private GenericEntry omegaEntry;
 
         ChassisWidget(ShuffleboardTab tab) {
             ShuffleboardLayout yawLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
             
-            yawEntry = yawLayout.add("Yaw (Degrees)", 0).getEntry();
-            pitchEntry = yawLayout.add("Pitch (Degrees)", 0).getEntry();
+            yawEntry = yawLayout.add("Yaw (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+            pitchEntry = yawLayout.add("Pitch (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+            rollEntry = yawLayout.add("Roll (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
+
+            vxEntry = yawLayout.add("vx (m/s)", 0).getEntry();
+            vyEntry = yawLayout.add("vy (m/s)", 0).getEntry();
+            omegaEntry = yawLayout.add("omega (rad/s)", 0).getEntry();
         }
 
         public void update() {
 			Swerve swerveSubsystem = Swerve.getInstance();
             yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
             pitchEntry.setDouble(swerveSubsystem.getPitch().getDegrees());
+            rollEntry.setDouble(swerveSubsystem.getRoll().getDegrees());
+            vxEntry.setDouble(swerveSubsystem.getChassisSpeeds().vxMetersPerSecond);
+            vyEntry.setDouble(swerveSubsystem.getChassisSpeeds().vyMetersPerSecond);
+            omegaEntry.setDouble(swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
         }
     }
 
