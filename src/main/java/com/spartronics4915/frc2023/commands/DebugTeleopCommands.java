@@ -49,9 +49,9 @@ public final class DebugTeleopCommands {
             pitchEntry = yawLayout.add("Pitch (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
             rollEntry = yawLayout.add("Roll (Degrees)", 0).withWidget(BuiltInWidgets.kGyro).getEntry();
 
-            vxEntry = yawLayout.add("vx (m/s)", 0).getEntry();
-            vyEntry = yawLayout.add("vy (m/s)", 0).getEntry();
-            omegaEntry = yawLayout.add("omega (rad/s)", 0).getEntry();
+            vxEntry = yawLayout.add("vx (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            vyEntry = yawLayout.add("vy (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            omegaEntry = yawLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
         }
 
         public void update() {

@@ -86,7 +86,7 @@ public final class Constants {
 		public static final Pose2d kInitialPose = new Pose2d();
 
         public static final double kMaxSpeed = Units.feetToMeters(14.5);
-        public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius;
+        public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s
         public static final double kMaxAcceleration = Units.feetToMeters(14.5); // TODO: get an actual value because this should be higher
 
         public static final double kSlowModeSpeedMultiplier = 0.3;
