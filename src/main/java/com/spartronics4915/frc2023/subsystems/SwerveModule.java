@@ -130,7 +130,7 @@ public class SwerveModule {
     }
 
     public double getAbsoluteEncoderValue() {
-        return mAngleEncoder.getAbsolutePosition();
+        return -mAngleEncoder.getAbsolutePosition();
     }
 
     public Rotation2d getShiftedAbsoluteEncoderRotation() {
