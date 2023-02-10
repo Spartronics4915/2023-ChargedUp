@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.spartronics4915.frc2023.Constants.Arm.*;
 
-public class Arm extends SubsystemBase {
+public class ArmSubsystem extends SubsystemBase {
     /**
      * Represents the position of the arm and wrist.
      */
@@ -62,69 +62,70 @@ public class Arm extends SubsystemBase {
     //     }
     // }
 
-    private static Arm mInstance;
+    private static ArmSubsystem mInstance;
     
     private ArmState mState;
 
     private final CANSparkMax mPivotMotor;
     private final SparkMaxPIDController mPivotPIDController;
 
-    private final CANSparkMax mPivotFollower;
+    // private final CANSparkMax mPivotFollower;
 
-    private final CANSparkMax mExtenderMotor;
-    private final SparkMaxPIDController mExtenderPIDController;
+    // private final CANSparkMax mExtenderMotor;
+    // private final SparkMaxPIDController mExtenderPIDController;
 
-    private final CANSparkMax mWristMotor;
-    private final SparkMaxPIDController mWristPIDController;
+    // private final CANSparkMax mWristMotor;
+    // private final SparkMaxPIDController mWristPIDController;
 
-    private Arm() {
+    public ArmSubsystem() {
         mState = ArmState.RETRACTED;
         
         mPivotMotor = configurePivotMotor(kNeoConstructor.apply(kPivotMotorID));
         mPivotPIDController = mPivotMotor.getPIDController();
         mPivotPIDController.setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        System.out.println(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        
+    //     mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
+    //     mPivotFollower.follow(mPivotMotor); //TODO check if this needs to be reversed
 
-        mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
-        mPivotFollower.follow(mPivotMotor); //TODO check if this needs to be reversed
+    //     mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
+    //     mExtenderPIDController = mExtenderMotor.getPIDController();
+    //     mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
 
-        mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
-        mExtenderPIDController = mExtenderMotor.getPIDController();
-        mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
-
-        mWristMotor = configureWristMotor(kNeoConstructor.apply(kWristMotorID));
-        mWristPIDController = mWristMotor.getPIDController();
-        mWristPIDController.setFeedbackDevice(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle));
+    //     mWristMotor = configureWristMotor(kNeoConstructor.apply(kWristMotorID));
+    //     mWristPIDController = mWristMotor.getPIDController();
+    //     mWristPIDController.setFeedbackDevice(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle));
     }
 
-    public static Arm getInstance() {
+    public static ArmSubsystem getInstance() {
         if (mInstance == null) {
-            mInstance = new Arm();
+            mInstance = new ArmSubsystem();
         }
         return mInstance;
     }
 
-    private double getArmRadius() {
-        double rotations = (mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())/(2*Math.PI);
-        return rotations * kNumOfArmSegments*(1/(kThreadsPerInch));
-    }
-    private void setArmRadius(double meters){
-        double rotations = (meters)/(kNumOfArmSegments*(1/(kThreadsPerInch)));
-        mExtenderPIDController.setReference(rotations, ControlType.kPosition);
-    }
+    // private double getArmRadius() {
+    //     double rotations = (mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())/(2*Math.PI);
+    //     return rotations * kNumOfArmSegments*(1/(kThreadsPerInch));
+    // }
+    // private void setArmRadius(double meters){
+    //     double rotations = (meters)/(kNumOfArmSegments*(1/(kThreadsPerInch)));
+    //     mExtenderPIDController.setReference(rotations, ControlType.kPosition);
+    // }
 
-    //TODO confirm that the +s and -s are correct for the conversions
-    private Rotation2d getLeveledWristAngle() {
-        return new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition() - mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
-    }
-    private void setLeveledWristAngle(Rotation2d rotation) {
-       mWristPIDController.setReference(rotation.getRadians() + mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(), ControlType.kPosition);
-    }
+    //TODO confirm that the +s and -s are correct for the conversions (as in whether or not they should be reversed)
+    // private Rotation2d getLeveledWristAngle() {
+    //     return new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition() - mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    // }
+    // private void setLeveledWristAngle(Rotation2d rotation) {
+    //    mWristPIDController.setReference(rotation.getRadians() + mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(), ControlType.kPosition);
+    // }
 
     public ArmPosition getPosition() {
         return new ArmPosition(
-            getArmRadius(),
+            0,
             new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
-            getLeveledWristAngle()
+            new Rotation2d(0)
         );
     }
 
@@ -135,8 +136,10 @@ public class Arm extends SubsystemBase {
     //TODO determine offsets for absolute encoders
     private void setDesiredState(ArmState state) {
         mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
-        setLeveledWristAngle(state.armTheta);
-        setArmRadius(state.armRadius);
+        System.out.println("testing123123");
+        // System.out.println();
+        // setLeveledWristAngle(state.wristTheta);
+        // setArmRadius(state.armRadius);
     }
 
     public void setState(ArmState state) {
@@ -152,13 +155,16 @@ public class Arm extends SubsystemBase {
         motor.setIdleMode(IdleMode.kBrake);
         
         motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kPivotPositionConversionFactor);
-        
+        System.out.println("okay setting up PID");
         motor.getPIDController().setP(kPivotP);
         motor.getPIDController().setI(kPivotI);
         motor.getPIDController().setD(kPivotD);
+        System.out.println("PID values:\n"+motor.getPIDController().getP()+"\n"+motor.getPIDController().getI()+"\n"+motor.getPIDController().getD());
+        motor.getPIDController().setPositionPIDWrappingMaxInput(Math.PI*2);
+        motor.getPIDController().setPositionPIDWrappingMinInput(0);
         motor.getPIDController().setPositionPIDWrappingEnabled(true);
-
         
+
         return motor;
     }
 
@@ -191,6 +197,8 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        System.out.println("testing testing testing");
         setDesiredState(mState);
+        System.out.println(mState.armTheta);
     }
 }

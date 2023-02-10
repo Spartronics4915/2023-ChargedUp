@@ -2,6 +2,9 @@ package com.spartronics4915.frc2023.commands;
 
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import com.spartronics4915.frc2023.subsystems.SwerveModule;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -119,29 +122,103 @@ public final class DebugTeleopCommands {
             chassisWidget.update(swerve_subsystem);
         }
     }
-    
+
+    public static class ArmWidget {
+        private GenericEntry linActDistance,stateRadius;
+        private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
+        private GenericEntry shoulderRotation, stateShoulderRotation;
+        ArmWidget(ShuffleboardTab tab, String name) {
+            ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList);
+
+            linActDistance = armModule.add("current radius", 0).getEntry();
+            stateRadius = armModule.add("desired radius",0).getEntry();
+            wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
+            stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
+            shoulderRotation = armModule.add("current shoulder angle", 0).getEntry();
+            stateShoulderRotation = armModule.add("desired shoulder angle",0).getEntry();
+        }
+
+        public void update(ArmSubsystem module) {
+            ArmPosition current = module.getPosition();
+            ArmState desired = module.getState();
+            linActDistance.setDouble(current.armRadius);
+            stateRadius.setDouble(desired.armRadius);
+            wristLeveledRotation.setDouble(current.wristTheta.getDegrees());
+            stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
+            shoulderRotation.setDouble(current.armTheta.getDegrees());
+            stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
+        }
+    }
+    public static class ArmTab {
+        ArmWidget widget0;
+        ShuffleboardTab tab;
+        ArmSubsystem mArmSubsystem;
+        ArmCommands mArmCommands;
+
+        ArmTab(ArmSubsystem armSubsystem, ArmCommands armCommands) {
+            mArmCommands = armCommands;
+            tab = Shuffleboard.getTab("Swerve");
+            // module0 = new SwerveModuleWidget(tab, "Module 0");
+            // module1 = new SwerveModuleWidget(tab, "Module 1");
+            // module2 = new SwerveModuleWidget(tab, "Module 2");
+            // module3 = new SwerveModuleWidget(tab, "Module 3");
+            widget0 = new ArmWidget(tab, "arm widget");
+
+            mArmSubsystem = armSubsystem;
+            ShuffleboardLayout elevatorCommands = 
+            tab.getLayout("Orientation", BuiltInLayouts.kList)
+            .withSize(2, 3)
+            .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
+            
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(0)).withName("Orientation 0"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(90)).withName("Orientation 90"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(180)).withName("Orientation 180"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(270)).withName("Orientation 270"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(360)).withName("Orientation 360"));
+            
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.RETRACTED)).withName("retract"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT)).withName("90"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_FALLEN)).withName("180"));
+        }
+        
+        public void update(){
+            
+            // var swerve_modules = swerve_subsystem.getSwerveModules();
+            
+            // module0.update(swerve_modules[0]);
+            // module1.update(swerve_modules[1]);
+            // module2.update(swerve_modules[2]);
+            // module3.update(swerve_modules[3]);
+
+            widget0.update(mArmSubsystem);
+        }
+    }
+  
     public static class ShuffleboardUpdateCommand extends CommandBase {
         
-        Swerve m_swerve_subsystem;
-        SwerveTab m_swerve_tab;
-        SwerveCommands mSwerveCommands;
+        ArmSubsystem mArmSubsystem;
+        ArmTab mArmTab;
+        ArmCommands mArmCommands;
 
-        public ShuffleboardUpdateCommand(Swerve swerve_subsystem, SwerveCommands swerveCommands) {
-            m_swerve_subsystem = swerve_subsystem;
-            mSwerveCommands = swerveCommands;
+        public ShuffleboardUpdateCommand(ArmSubsystem ArmSubsystem, ArmCommands ArmCommands) {
+            mArmSubsystem = ArmSubsystem;
+            mArmCommands = ArmCommands;
         }
         // Called when the command is initially scheduled.
         
         @Override
         public void initialize() {
             
-            m_swerve_tab = new SwerveTab(m_swerve_subsystem, mSwerveCommands);
+            mArmTab = new ArmTab(mArmSubsystem, mArmCommands);
         }
         
         // Called every time the scheduler runs while the command is scheduled.
         @Override
         public void execute() {
-            m_swerve_tab.update();
+            mArmTab.update();
         }
 
         // Lets this command run even when disabled

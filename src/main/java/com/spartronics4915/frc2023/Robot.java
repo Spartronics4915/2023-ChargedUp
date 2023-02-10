@@ -38,9 +38,9 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         mRobotContainer = new RobotContainer();
 
-        mAutonomousCommand = mRobotContainer.getAutonomousCommand();
-        mTeleopInitCommand = mRobotContainer.getTeleopInitCommand();
-        mTestingCommand = mRobotContainer.getTestingCommand();
+        // mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+        // mTeleopInitCommand = mRobotContainer.getTeleopInitCommand();
+        // mTestingCommand = mRobotContainer.getTestingCommand();
 
         mRobotContainer.initRobot();
     }
@@ -65,6 +65,7 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        System.out.println("robo periodic");
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -80,15 +81,15 @@ public class Robot extends TimedRobot {
      * This autonomous runs the autonomous command selected by your
      * {@link RobotContainer} class.
      */
-    @Override
-    public void autonomousInit() {
-        mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+    // @Override
+    // public void autonomousInit() {
+    //     mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 
-        // schedule the autonomous command (example)
-        if (mAutonomousCommand != null) {
-            mAutonomousCommand.schedule();
-        }
-    }
+    //     // schedule the autonomous command (example)
+    //     if (mAutonomousCommand != null) {
+    //         mAutonomousCommand.schedule();
+    //     }
+    // }
 
     /** This function is called periodically during autonomous. */
     @Override

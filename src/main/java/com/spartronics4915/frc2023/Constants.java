@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
-import static com.spartronics4915.frc2023.subsystems.Arm.ArmPosition;
+import static com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -176,7 +176,7 @@ public final class Constants {
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
         public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
 
-        public static final int kPivotMotorID = -1;
+        public static final int kPivotMotorID = 1;
         public static final int kPivotFollowerID = -1;
         public static final int kExtenderMotorID = -1;
         public static final int kWristMotorID = -1;
@@ -185,7 +185,7 @@ public final class Constants {
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
         public static final double kWristPositionConversionFactor = 2 * Math.PI; // placeholder
 
-        public static final double kPivotP = 0.0;
+        public static final double kPivotP = 0.05;
         public static final double kPivotI = 0.0;
         public static final double kPivotD = 0.0;
 
@@ -200,20 +200,20 @@ public final class Constants {
         //here 0 degrees mean level with the carpet for both wrist and shoulder
         //Meters for distance, radians for rotation
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(0),
             new Rotation2d()
         );
 
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(Math.PI/2),
             new Rotation2d()
         );
 
         public static final ArmPositionConstants kGrabFallenConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(Math.PI),
             new Rotation2d()
         );
 

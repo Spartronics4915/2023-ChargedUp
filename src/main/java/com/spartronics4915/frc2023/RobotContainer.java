@@ -5,28 +5,28 @@
 package com.spartronics4915.frc2023;
 
 import com.spartronics4915.frc2023.commands.ArmCommands;
-import com.spartronics4915.frc2023.commands.Autos;
+// import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
-import com.spartronics4915.frc2023.commands.IntakeCommands;
-import com.spartronics4915.frc2023.commands.SwerveCommands;
-import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
-import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
-import com.spartronics4915.frc2023.subsystems.Arm;
-import com.spartronics4915.frc2023.subsystems.Intake;
-import com.spartronics4915.frc2023.subsystems.Swerve;
-import com.spartronics4915.frc2023.subsystems.Arm.ArmState;
-import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
+// import com.spartronics4915.frc2023.commands.IntakeCommands;
+// import com.spartronics4915.frc2023.commands.SwerveCommands;
+// import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
+// import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+// import com.spartronics4915.frc2023.subsystems.Intake;
+// import com.spartronics4915.frc2023.subsystems.Swerve;
+// import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
+// import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
+//import edu.wpi.first.wpilibj.GenericHID;
+// import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+// import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+// import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+// import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+// import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+// import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import static com.spartronics4915.frc2023.Constants.OI.*;
+// import static com.spartronics4915.frc2023.Constants.OI.*;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -41,59 +41,59 @@ public class RobotContainer {
     // private final XboxController mDriverController;
     // private final XboxController mOperatorController;
 
-    private final CommandXboxController mDriverController;
-    private final CommandXboxController mOperatorController;
+    // private final CommandXboxController mDriverController;
+    // private final CommandXboxController mOperatorController;
     
-    private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
+    // private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     
-    // The robot's subsystems and commands are defined here...
-    private final Swerve mSwerve;
-    private final SwerveCommands mSwerveCommands;
+    // // The robot's subsystems and commands are defined here...
+    // private final Swerve mSwerve;
+    // private final SwerveCommands mSwerveCommands;
 
-    private final Arm mArm;
+    private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
 
-    private final Intake mIntake;
-    private final IntakeCommands mIntakeCommands;
+    // private final Intake mIntake;
+    // private final IntakeCommands mIntakeCommands;
     
-    private final Autos mAutos;
+    // private final Autos mAutos;
     
-    private final Command mAutonomousCommand;
-	private final Command mTeleopInitCommand;
+    // private final Command mAutonomousCommand;
+	// private final Command mTeleopInitCommand;
     
-    private final boolean useJoystick = true;
-    // private final Command mTestingCommand;
+    private final boolean useJoystick = false;
+    // // private final Command mTestingCommand;
     
     /**
     * The container for the robot. Contains subsystems, OI devices, and commands.
     */
     public RobotContainer() {
-        mDriverController = useJoystick ? new CommandXboxController(kDriverControllerID) : null;
-        mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
+        // mDriverController = useJoystick ? new CommandXboxController(kDriverControllerID) : null;
+        // mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
         
-        mSwerve = Swerve.getInstance();
-        mSwerveCommands = new SwerveCommands(mDriverController, mSwerve);
-        mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
+        // mSwerve = Swerve.getInstance();
+        // mSwerveCommands = new SwerveCommands(mDriverController, mSwerve);
+        // mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
         
-        mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands(mSwerve);
+        // mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands(mSwerve);
 
-        mArm = Arm.getInstance();
+        mArm = ArmSubsystem.getInstance();
         mArmCommands = new ArmCommands(mArm);
 
-        mIntake = Intake.getInstance();
-        mIntakeCommands = new IntakeCommands(mIntake);
+        // mIntake = Intake.getInstance();
+        // mIntakeCommands = new IntakeCommands(mIntake);
         
-        mAutos = new Autos(mSwerve, mSwerveTrajectoryFollowerCommands);
+        // mAutos = new Autos(mSwerve, mSwerveTrajectoryFollowerCommands);
         
-        mAutonomousCommand = new SequentialCommandGroup(
-            mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardCommandFancy()
-        );
+        // mAutonomousCommand = new SequentialCommandGroup(
+        //     mSwerveCommands.new ResetCommand(),
+        //     mAutos.new MoveForwardCommandFancy()
+        // );
         
-        mTeleopInitCommand = mSwerveCommands.new ResetCommand();
+        // mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         
         // Configure the button bindings
-        configureButtonBindings();
+        // configureButtonBindings();
     }
     
     /**
@@ -107,42 +107,42 @@ public class RobotContainer {
             private void configureButtonBindings() {
                 if (useJoystick) {
                     // DRIVER CONTROLS
-                    mDriverController.a()
-                        .onTrue(mSwerveCommands.new ToggleFieldRelative());
+                    // mDriverController.a()
+                    //     .onTrue(mSwerveCommands.new ToggleFieldRelative());
 
-                    mDriverController.start()
-                        .onTrue(mSwerveCommands.new ResetYaw());
+                    // mDriverController.start()
+                    //     .onTrue(mSwerveCommands.new ResetYaw());
 
-                    mDriverController.y()
-                        .onTrue(mSwerveCommands.new ResetOdometry());
+                    // mDriverController.y()
+                    //     .onTrue(mSwerveCommands.new ResetOdometry());
 
 
-                    // OPERATOR CONTROLS
-                    mOperatorController.povUp()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
+                    // // OPERATOR CONTROLS
+                    // mOperatorController.povUp()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
 
-                    mOperatorController.povDown()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
+                    // mOperatorController.povDown()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
 
-                    mOperatorController.b()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.RETRACTED));
+                    // mOperatorController.b()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.RETRACTED));
 
-                    mOperatorController.a()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_1));
+                    // mOperatorController.a()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_1));
 
-                    mOperatorController.x()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_2));
+                    // mOperatorController.x()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_2));
 
-                    mOperatorController.y()
-                        .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_3));
+                    // mOperatorController.y()
+                    //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_3));
 
-                    mOperatorController.rightTrigger(kTriggerDeadband)
-                        .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
-                        .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+                    // mOperatorController.rightTrigger(kTriggerDeadband)
+                    //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
+                    //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
 
-                    mOperatorController.leftTrigger(kTriggerDeadband)
-                        .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
-                        .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+                    // mOperatorController.leftTrigger(kTriggerDeadband)
+                    //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
+                    //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
 
                     // mOperatorController.povUp().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.GRAB_UPRIGHT, IntakeState.IN));
                     // mOperatorController.povDown().onTrue(mArmCommands.new SetArmAndIntakeState(ArmState.GRAB_FALLEN, IntakeState.IN));
@@ -161,24 +161,24 @@ public class RobotContainer {
             *
             * @return the command to run in autonomous
             */
-            public Command getAutonomousCommand() {
-                return mAutonomousCommand;
-            }
+            // public Command getAutonomousCommand() {
+            //     return mAutonomousCommand;
+            // }
             
-            public Command getTeleopInitCommand() {
-                return mTeleopInitCommand;
-            }
+            // public Command getTeleopInitCommand() {
+            //     return mTeleopInitCommand;
+            // }
             
             public Command getTestingCommand() {
                 return null;
             }
 
             public void initRobot() {
-                Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mSwerve,
-                mSwerveCommands);
+                Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mArm,mArmCommands);
                 shuffleboard_update_command.schedule();
-
-                mSwerve.resetToAbsolute();
+                mArm.register();
+                System.out.println("init robot called");
+                // mSwerve.resetToAbsolute();
             }
         }
         
