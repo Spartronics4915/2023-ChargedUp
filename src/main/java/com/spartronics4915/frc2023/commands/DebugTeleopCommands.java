@@ -186,6 +186,8 @@ public final class DebugTeleopCommands {
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.RETRACTED)).withName("0"));
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT)).withName("45"));
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_FALLEN)).withName("90"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.LEVEL_1)).withName("180"));
+
         }
         
         public void update(){

@@ -1,8 +1,10 @@
 package com.spartronics4915.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -15,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     
     private CANSparkMax mMotor;
-    private SparkMaxAbsoluteEncoder mAbsEncoder;
+    private RelativeEncoder mAbsEncoder;
     private SparkMaxPIDController mPIDController;
     private Rotation2d mLastReference = new Rotation2d(Math.PI*10);
 
@@ -23,10 +25,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         mMotor = new CANSparkMax(motorId, MotorType.kBrushless);
         mMotor.setIdleMode(IdleMode.kCoast);
 
-        mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        mAbsEncoder.setPositionConversionFactor(Math.PI*2);    
+        mAbsEncoder = mMotor.getEncoder();
+        mAbsEncoder.setPositionConversionFactor((Math.PI*2)/36);    
         
-        mPIDController = initializePIDController(kP);
+        mPIDController = initializePIDController(0.01);
     }
 
     private SparkMaxPIDController initializePIDController(double kP) {
@@ -34,7 +36,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         PIDController.setP(kP);
         PIDController.setI(0);
         PIDController.setD(0);
-        
+        // PIDController.setPo
         PIDController.setPositionPIDWrappingEnabled(true);
         PIDController.setPositionPIDWrappingMaxInput(2*Math.PI);
         PIDController.setPositionPIDWrappingMinInput(0);

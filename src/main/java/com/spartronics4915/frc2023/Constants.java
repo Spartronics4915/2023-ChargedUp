@@ -198,7 +198,7 @@ public final class Constants {
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
         public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
 
-        public static final int kPivotMotorID = 1;
+        public static final int kPivotMotorID = 2;
         public static final int kPivotFollowerID = -1;
         public static final int kExtenderMotorID = -1;
         public static final int kWristMotorID = -1;
@@ -238,8 +238,8 @@ public final class Constants {
         );
 
         public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(Math.PI),
             new Rotation2d()
         );
 
