@@ -198,7 +198,7 @@ public final class Constants {
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
         public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
 
-        public static final int kPivotMotorID = -1;
+        public static final int kPivotMotorID = 1;
         public static final int kPivotFollowerID = -1;
         public static final int kExtenderMotorID = -1;
         public static final int kWristMotorID = -1;
@@ -207,7 +207,7 @@ public final class Constants {
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
         public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
 
-        public static final double kPivotP = 0.0;
+        public static final double kPivotP = 0.1;
         public static final double kPivotI = 0.0;
         public static final double kPivotD = 0.0;
 
@@ -220,20 +220,20 @@ public final class Constants {
         public static final double kWristD = 0.0;
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(0), //0
             new Rotation2d()
         );
 
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(Math.PI/4), //45
             new Rotation2d()
         );
 
         public static final ArmPositionConstants kGrabFallenConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(Math.PI/2), //90
             new Rotation2d()
         );
 

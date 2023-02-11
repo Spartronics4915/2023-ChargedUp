@@ -124,11 +124,11 @@ public final class DebugTeleopCommands {
     }
 
     public static class ArmWidget {
-        private GenericEntry linActDistance,stateRadius;
+        private GenericEntry linActDistance,stateRadius, MoterSped;
         private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
-        private GenericEntry shoulderRotation, stateShoulderRotation;
+        private GenericEntry shoulderRotation, stateShoulderRotation, refShoulderRotation;
         ArmWidget(ShuffleboardTab tab, String name) {
-            ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList);
+            ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3);
 
             linActDistance = armModule.add("current radius", 0).getEntry();
             stateRadius = armModule.add("desired radius",0).getEntry();
@@ -136,6 +136,8 @@ public final class DebugTeleopCommands {
             stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
             shoulderRotation = armModule.add("current shoulder angle", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle",0).getEntry();
+            refShoulderRotation = armModule.add("current refrence",0).getEntry();
+            MoterSped = armModule.add("sped",0).getEntry();
         }
 
         public void update(ArmSubsystem module) {
@@ -147,6 +149,8 @@ public final class DebugTeleopCommands {
             stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
             shoulderRotation.setDouble(current.armTheta.getDegrees());
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
+            refShoulderRotation.setDouble(module.getRef().getDegrees());
+            MoterSped.setDouble(module.getPivot().getMotorSpeed());
         }
     }
     public static class ArmTab {
@@ -157,7 +161,7 @@ public final class DebugTeleopCommands {
 
         ArmTab(ArmSubsystem armSubsystem, ArmCommands armCommands) {
             mArmCommands = armCommands;
-            tab = Shuffleboard.getTab("Swerve");
+            tab = Shuffleboard.getTab("Arm Tab");
             // module0 = new SwerveModuleWidget(tab, "Module 0");
             // module1 = new SwerveModuleWidget(tab, "Module 1");
             // module2 = new SwerveModuleWidget(tab, "Module 2");
@@ -179,9 +183,9 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.RETRACTED)).withName("retract"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT)).withName("90"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_FALLEN)).withName("180"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.RETRACTED)).withName("0"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT)).withName("45"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_FALLEN)).withName("90"));
         }
         
         public void update(){

@@ -1,0 +1,12 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Swerve/Orientation/0": "Command",
+      "/Shuffleboard/Swerve/Orientation/180": "Command",
+      "/Shuffleboard/Swerve/Orientation/45": "Command",
+      "/Shuffleboard/Swerve/Orientation/90": "Command",
+      "/Shuffleboard/Swerve/Orientation/retract": "Command"
+    }
+  }
+}

@@ -120,29 +120,33 @@ public class ArmSubsystem extends SubsystemBase {
     //    mWristPIDController.setReference(rotation.getRadians() + mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(), ControlType.kPosition);
     // }
 
-    // public ArmPosition getPosition() {
-    //     return new ArmPosition(
-    //         0,
-    //         new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
-    //         new Rotation2d(0)
-    //     );
-    // }
+    public ArmPosition getPosition() {
+        return new ArmPosition(
+            0,
+            new Rotation2d(mPivotMotor.getPosition()),
+            new Rotation2d(0)
+        );
+    }
 
     public ArmState getState() {
         return mState; //This will get the desired state
     }
 
     // //TODO determine offsets for absolute encoders
-    // private void setDesiredState(ArmState state) {
-    //     mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
-    //     System.out.println("testing123123");
-    //     // System.out.println();
-    //     // setLeveledWristAngle(state.wristTheta);
-    //     // setArmRadius(state.armRadius);
-    // }
+    private void setDesiredState(ArmState state) {
+        mPivotMotor.setReference(state.armTheta);
+        System.out.println("testing123123");
+        // System.out.println();
+        // setLeveledWristAngle(state.wristTheta);
+        // setArmRadius(state.armRadius);
+    }
 
     public void setState(ArmState state) {
         mState = state;
+        setDesiredState(mState);
+    }
+    public Rotation2d getRef(){
+        return mPivotMotor.getCurrentReference();
     }
 
     /**
