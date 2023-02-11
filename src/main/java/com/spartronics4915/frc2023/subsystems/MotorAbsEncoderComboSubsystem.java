@@ -17,18 +17,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     
     private CANSparkMax mMotor;
-    private RelativeEncoder mAbsEncoder;
+    private SparkMaxAbsoluteEncoder mAbsEncoder;
     private SparkMaxPIDController mPIDController;
-    private Rotation2d mLastReference = new Rotation2d(Math.PI*10);
+    private Rotation2d mLastReference = new Rotation2d(0);
 
     public MotorAbsEncoderComboSubsystem(int motorId, double kP) {
         mMotor = new CANSparkMax(motorId, MotorType.kBrushless);
         mMotor.setIdleMode(IdleMode.kCoast);
 
-        mAbsEncoder = mMotor.getEncoder();
-        mAbsEncoder.setPositionConversionFactor((Math.PI*2)/36);    
+        mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        mAbsEncoder.setPositionConversionFactor((Math.PI*2));    
         
-        mPIDController = initializePIDController(0.01);
+        mPIDController = initializePIDController(0.05);
     }
 
     private SparkMaxPIDController initializePIDController(double kP) {
@@ -37,10 +37,20 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         PIDController.setI(0);
         PIDController.setD(0);
         // PIDController.setPo
-        PIDController.setPositionPIDWrappingEnabled(true);
-        PIDController.setPositionPIDWrappingMaxInput(2*Math.PI);
+
+        PIDController.setSmartMotionMaxAccel(2.5, 0); //20
+ 
+        PIDController.setSmartMotionMaxVelocity(1, 0);
+
+        PIDController.setSmartMotionMinOutputVelocity(0, 0);
+        
+        PIDController.setSmartMotionAllowedClosedLoopError(Rotation2d.fromDegrees(5).getRotations(), 0);
+        // PIDController.setOutputRange(0, kP)
+        PIDController.setPositionPIDWrappingEnabled(false);
+        PIDController.setPositionPIDWrappingMaxInput(1);
         PIDController.setPositionPIDWrappingMinInput(0);
-        // PIDController.setFeedbackDevice(mAbsEncoder);
+        PIDController.setFeedbackDevice(mAbsEncoder);
+        
         
         return PIDController;
     }
@@ -48,7 +58,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     public void setReference(Rotation2d ref) {
         mLastReference = ref;
         System.out.println(ref + ": also this was called");
-        mPIDController.setReference(ref.getRadians(), ControlType.kPosition);
+        mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion);
     }
 
     public Rotation2d getCurrentReference() 
@@ -60,6 +70,6 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         return mAbsEncoder.getPosition();
     }
     public double getMotorSpeed(){
-        return mMotor.get();
+        return mMotor.getAppliedOutput();
     }
 }

@@ -239,7 +239,7 @@ public final class Constants {
 
         public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI),
+            new Rotation2d(Math.PI), //180
             new Rotation2d()
         );
 

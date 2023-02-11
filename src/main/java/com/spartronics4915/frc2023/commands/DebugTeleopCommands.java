@@ -124,16 +124,16 @@ public final class DebugTeleopCommands {
     }
 
     public static class ArmWidget {
-        private GenericEntry linActDistance,stateRadius, MoterSped;
-        private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
-        private GenericEntry shoulderRotation, stateShoulderRotation, refShoulderRotation;
+        // private GenericEntry linActDistance,stateRadius;
+        // private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
+        private GenericEntry shoulderRotation, stateShoulderRotation, refShoulderRotation, MoterSped;
         ArmWidget(ShuffleboardTab tab, String name) {
-            ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3);
+            ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3).withProperties(Map.of("Label position", "LEFT"));
 
-            linActDistance = armModule.add("current radius", 0).getEntry();
-            stateRadius = armModule.add("desired radius",0).getEntry();
-            wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
-            stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
+            // linActDistance = armModule.add("current radius", 0).getEntry();
+            // stateRadius = armModule.add("desired radius",0).getEntry();
+            // wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
+            // stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
             shoulderRotation = armModule.add("current shoulder angle", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle",0).getEntry();
             refShoulderRotation = armModule.add("current refrence",0).getEntry();
@@ -143,10 +143,10 @@ public final class DebugTeleopCommands {
         public void update(ArmSubsystem module) {
             ArmPosition current = module.getPosition();
             ArmState desired = module.getState();
-            linActDistance.setDouble(current.armRadius);
-            stateRadius.setDouble(desired.armRadius);
-            wristLeveledRotation.setDouble(current.wristTheta.getDegrees());
-            stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
+            // linActDistance.setDouble(current.armRadius);
+            // stateRadius.setDouble(desired.armRadius);
+            // wristLeveledRotation.setDouble(current.wristTheta.getDegrees());
+            // stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
             shoulderRotation.setDouble(current.armTheta.getDegrees());
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
             refShoulderRotation.setDouble(module.getRef().getDegrees());
