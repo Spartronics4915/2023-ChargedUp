@@ -11,7 +11,7 @@ import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
-import com.spartronics4915.frc2023.subsystems.Arm;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -42,7 +42,7 @@ public class RobotContainer {
     private final Swerve mSwerve;
     private final SwerveCommands mSwerveCommands;
     
-    private final Arm mArm;
+    private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     
     // private final Intake mIntake;
@@ -90,7 +90,7 @@ public class RobotContainer {
         }
         
         if (useArm) {
-            mArm = Arm.getInstance();
+            mArm = ArmSubsystem.getInstance();
             mArmCommands = new ArmCommands(mArm);
             
         }
@@ -171,7 +171,7 @@ public class RobotContainer {
     }
     
     public void initRobot() {
-        Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mSwerveCommands);
+        Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mArm, mArmCommands);
         shuffleboard_update_command.schedule();
         
         if (mSwerve != null) {

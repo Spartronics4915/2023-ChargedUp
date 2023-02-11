@@ -1,15 +1,16 @@
 package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import com.spartronics4915.frc2023.subsystems.SwerveModule;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -22,8 +23,7 @@ import java.util.Map;
 
 public final class DebugTeleopCommands {
     
-    public static void teleopInit() {
-		Swerve swerve_subsystem = Swerve.getInstance();
+    public static void teleopInit(Swerve swerve_subsystem) {
         swerve_subsystem.resetToAbsolute();
         swerve_subsystem.resetYaw();
         swerve_subsystem.resetOdometry(new Pose2d(0, 0, new Rotation2d(0))); // for odometry testing
@@ -34,48 +34,19 @@ public final class DebugTeleopCommands {
     }
     
     public static class ChassisWidget {
-        private GenericEntry vxEntry;
-        private GenericEntry vyEntry;
-        private GenericEntry omegaEntry;
+        private GenericEntry yawEntry;
 
         ChassisWidget(ShuffleboardTab tab) {
             ShuffleboardLayout yawLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
             
-            yawLayout.add(Swerve.getInstance().getIMU()).withWidget(BuiltInWidgets.kGyro);
-
-            vxEntry = yawLayout.add("vx (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            vyEntry = yawLayout.add("vy (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            omegaEntry = yawLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
-        }
-
-        public void update() {
-			Swerve swerveSubsystem = Swerve.getInstance();
-            
-            vxEntry.setDouble(swerveSubsystem.getChassisSpeeds().vxMetersPerSecond);
-            vyEntry.setDouble(swerveSubsystem.getChassisSpeeds().vyMetersPerSecond);
-            omegaEntry.setDouble(swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
-        }
-    }
-
-    public static class ChargeWidget {
-
-        private GenericEntry rollEntry;
-        public ChargeWidget(ShuffleboardTab tab) {
-
-        
-            ShuffleboardLayout layout = tab.getLayout("ChargeStation", BuiltInLayouts.kList)
-            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
-            
-            rollEntry = layout.add("Roll (Degrees)", 0).getEntry();
+            yawEntry = yawLayout.add("Yaw (Degrees)", 0).getEntry();
         }
 
         public void update(Swerve swerveSubsystem) {
-            rollEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
+            yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
         }
-
     }
-
     public static class SwerveModuleWidget {
         private GenericEntry angleEntry;
         private GenericEntry state_angle, abs_encoder, rel_encoder, rel_encoder_deg, shifted_abs_encoder;
@@ -104,47 +75,6 @@ public final class DebugTeleopCommands {
 
         }
     }
-
-    public static class ArmMotorWidget {
-        private GenericEntry angleEntry;
-        private GenericEntry state_angle, abs_encoder, rel_encoder, rel_encoder_deg, shifted_abs_encoder;
-        SwerveModuleWidget(ShuffleboardTab tab, String name) {
-            ShuffleboardLayout swerve_module = tab.getLayout(name, BuiltInLayouts.kList)
-            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
-
-            angleEntry = swerve_module.add("desired.angle", 0).getEntry();
-            state_angle = swerve_module.add("current.angle", 0).getEntry();
-            abs_encoder = swerve_module.add("abs_encoder", 0).getEntry();
-            rel_encoder = swerve_module.add("rel_encoder", 0).getEntry();
-            rel_encoder_deg = swerve_module.add("rel_encoder (degrees)", 0).getEntry();
-            shifted_abs_encoder = swerve_module.add("shifted abs_encoder", 0).getEntry();
-        }
-        
-        public void update(SwerveModule module) {
-            SwerveModuleState current = module.getState();
-            SwerveModuleState desired = module.getDesiredState();
-            
-            angleEntry.setDouble(desired.angle.getDegrees()); 
-            state_angle.setDouble(current.angle.getDegrees());
-            abs_encoder.setDouble(module.getAbsoluteEncoderValue()); 
-            rel_encoder.setDouble(module.getRelativeEncoderValue());
-            rel_encoder_deg.setDouble(Rotation2d.fromRadians(module.getRelativeEncoderValue()).getDegrees());
-            shifted_abs_encoder.setDouble(module.getShiftedAbsoluteEncoderRotations());
-
-        }
-    }
-
-    public static class ArmTab {
-        ShuffleboardTab mTab;
-
-        ArmSubsystem mArmSubsystem;
-
-        ArmTab(ArmSubsystem armSubsystem) {
-            mArmSubsystem = armSubsystem;
-        }
-
-    }
-
     public static class SwerveTab {
         SwerveModuleWidget module0, module1, module2, module3;
         ChassisWidget chassisWidget;
@@ -152,16 +82,16 @@ public final class DebugTeleopCommands {
         Swerve swerve_subsystem;
         SwerveCommands mSwerveCommands;
 
-        SwerveTab(SwerveCommands swerveCommands) {
+        SwerveTab(Swerve swerve, SwerveCommands swerveCommands) {
             mSwerveCommands = swerveCommands;
             tab = Shuffleboard.getTab("Swerve");
-            module0 = new SwerveModuleWidget(tab, "Module 0");
-            module1 = new SwerveModuleWidget(tab, "Module 1");
-            module2 = new SwerveModuleWidget(tab, "Module 2");
-            module3 = new SwerveModuleWidget(tab, "Module 3");
+            // module0 = new SwerveModuleWidget(tab, "Module 0");
+            // module1 = new SwerveModuleWidget(tab, "Module 1");
+            // module2 = new SwerveModuleWidget(tab, "Module 2");
+            // module3 = new SwerveModuleWidget(tab, "Module 3");
             chassisWidget = new ChassisWidget(tab);
 
-            swerve_subsystem = Swerve.getInstance();
+            swerve_subsystem = swerve;
             ShuffleboardLayout elevatorCommands = 
             tab.getLayout("Orientation", BuiltInLayouts.kList)
             .withSize(2, 3)
@@ -182,48 +112,113 @@ public final class DebugTeleopCommands {
         
         public void update(){
             
-            var swerve_modules = swerve_subsystem.getSwerveModules();
+            // var swerve_modules = swerve_subsystem.getSwerveModules();
             
-            module0.update(swerve_modules[0]);
-            module1.update(swerve_modules[1]);
-            module2.update(swerve_modules[2]);
-            module3.update(swerve_modules[3]);
+            // module0.update(swerve_modules[0]);
+            // module1.update(swerve_modules[1]);
+            // module2.update(swerve_modules[2]);
+            // module3.update(swerve_modules[3]);
 
-            chassisWidget.update();
+            chassisWidget.update(swerve_subsystem);
         }
     }
-    
+
+    public static class ArmWidget {
+        private GenericEntry linActDistance,stateRadius;
+        private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
+        private GenericEntry shoulderRotation, stateShoulderRotation;
+        ArmWidget(ShuffleboardTab tab, String name) {
+            ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList);
+
+            linActDistance = armModule.add("current radius", 0).getEntry();
+            stateRadius = armModule.add("desired radius",0).getEntry();
+            wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
+            stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
+            shoulderRotation = armModule.add("current shoulder angle", 0).getEntry();
+            stateShoulderRotation = armModule.add("desired shoulder angle",0).getEntry();
+        }
+
+        public void update(ArmSubsystem module) {
+            ArmPosition current = module.getPosition();
+            ArmState desired = module.getState();
+            linActDistance.setDouble(current.armRadius);
+            stateRadius.setDouble(desired.armRadius);
+            wristLeveledRotation.setDouble(current.wristTheta.getDegrees());
+            stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
+            shoulderRotation.setDouble(current.armTheta.getDegrees());
+            stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
+        }
+    }
+    public static class ArmTab {
+        ArmWidget widget0;
+        ShuffleboardTab tab;
+        ArmSubsystem mArmSubsystem;
+        ArmCommands mArmCommands;
+
+        ArmTab(ArmSubsystem armSubsystem, ArmCommands armCommands) {
+            mArmCommands = armCommands;
+            tab = Shuffleboard.getTab("Swerve");
+            // module0 = new SwerveModuleWidget(tab, "Module 0");
+            // module1 = new SwerveModuleWidget(tab, "Module 1");
+            // module2 = new SwerveModuleWidget(tab, "Module 2");
+            // module3 = new SwerveModuleWidget(tab, "Module 3");
+            widget0 = new ArmWidget(tab, "arm widget");
+
+            mArmSubsystem = armSubsystem;
+            ShuffleboardLayout elevatorCommands = 
+            tab.getLayout("Orientation", BuiltInLayouts.kList)
+            .withSize(2, 3)
+            .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
+            
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(0)).withName("Orientation 0"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(90)).withName("Orientation 90"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(180)).withName("Orientation 180"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(270)).withName("Orientation 270"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(360)).withName("Orientation 360"));
+            
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.RETRACTED)).withName("retract"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT)).withName("90"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_FALLEN)).withName("180"));
+        }
+        
+        public void update(){
+            
+            // var swerve_modules = swerve_subsystem.getSwerveModules();
+            
+            // module0.update(swerve_modules[0]);
+            // module1.update(swerve_modules[1]);
+            // module2.update(swerve_modules[2]);
+            // module3.update(swerve_modules[3]);
+
+            widget0.update(mArmSubsystem);
+        }
+    }
+  
     public static class ShuffleboardUpdateCommand extends CommandBase {
         
-        Swerve m_swerve_subsystem;
-        SwerveTab m_swerve_tab;
-        SwerveCommands mSwerveCommands;
+        ArmSubsystem mArmSubsystem;
+        ArmTab mArmTab;
+        ArmCommands mArmCommands;
 
-        public ShuffleboardUpdateCommand(SwerveCommands swerveCommands) {
-            mSwerveCommands = swerveCommands;
-            if(mSwerveCommands != null) {
-                m_swerve_subsystem = Swerve.getInstance();
-            }
-            else {
-                m_swerve_subsystem = null;
-            }
+        public ShuffleboardUpdateCommand(ArmSubsystem ArmSubsystem, ArmCommands ArmCommands) {
+            mArmSubsystem = ArmSubsystem;
+            mArmCommands = ArmCommands;
         }
         // Called when the command is initially scheduled.
         
         @Override
         public void initialize() {
-            if (m_swerve_tab != null) {
-            m_swerve_tab = new SwerveTab(mSwerveCommands);
-            }
-            else {
-                m_swerve_tab = null;
-            }
+            
+            mArmTab = new ArmTab(mArmSubsystem, mArmCommands);
         }
         
         // Called every time the scheduler runs while the command is scheduled.
         @Override
         public void execute() {
-            m_swerve_tab.update();
+            mArmTab.update();
         }
 
         // Lets this command run even when disabled

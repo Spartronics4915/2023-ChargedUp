@@ -19,7 +19,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
-import static com.spartronics4915.frc2023.subsystems.Arm.ArmPosition;
+import static com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

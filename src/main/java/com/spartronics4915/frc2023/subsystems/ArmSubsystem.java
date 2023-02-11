@@ -1,158 +1,204 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.spartronics4915.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.spartronics4915.frc2023.Constants.ArmConstants.MotorSetupConstants;
-import com.spartronics4915.frc2023.Constants.ArmConstants.LinearActuatorConstants;
 
-import com.spartronics4915.frc2023.Constants.ArmConstants.SparkMaxAbsoluteEncoderConstants;
-import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
+import static com.spartronics4915.frc2023.Constants.Arm.*;
 
 public class ArmSubsystem extends SubsystemBase {
-    private CANSparkMax mWristMotor;
-    private CANSparkMax mLinActuatorMotor;
+    /**
+     * Represents the position of the arm and wrist.
+     */
+    public enum ArmState {
+        RETRACTED(kRetractedConstants),
+        GRAB_UPRIGHT(kGrabUprightConstants),
+        GRAB_FALLEN(kGrabFallenConstants),
+        LEVEL_1(kLevel1Constants),
+        LEVEL_2(kLevel2Constants),
+        LEVEL_3(kLevel3Constants);
 
-    private SparkMaxAbsoluteEncoder mWristAbsEncoder;
-    private SparkMaxPIDController mWristPIDContoller;
-    private SparkMaxPIDController mLinActuatorPIDController;
+        public final double armRadius;
+        public final Rotation2d armTheta;
+        public final Rotation2d wristTheta;
 
-    private MotorAbsEncoderComboSubsystem mShoulderSubsystem;
-    private final boolean mHasWrist;
-    private final boolean mHasExtender;
-    /** Creates a new ExampleSubsystem. */
+        private ArmState(ArmPositionConstants armPositionConstants) {
+            armRadius = armPositionConstants.armRadius;
+            armTheta = armPositionConstants.armTheta;
+            wristTheta = armPositionConstants.wristTheta;
+        }
+    }
+
+    public static class ArmPosition {
+        public final double armRadius;
+        public final Rotation2d armTheta;
+        public final Rotation2d wristTheta;
+
+        public ArmPosition(double armRadius, Rotation2d armTheta, Rotation2d wristTheta) {
+            this.armRadius = armRadius;
+            this.armTheta = armTheta;
+            this.wristTheta = wristTheta;
+        }
+    }
+
+    // /**
+    //  * Represents the state of the arm. Contains the arm's position and the intake's state. 
+    //  */
+    // public static final class ArmState { // I wish java 11 had records :(
+    //     public final ArmPosition armPosition;
+    //     public final IntakeState intakeState;
+
+    //     public ArmState(ArmPosition armPosition, IntakeState intakeState) {
+    //         this.armPosition = armPosition;
+    //         this.intakeState = intakeState;
+    //     }
+    // }
+
+    private static ArmSubsystem mInstance;
+    
+    private ArmState mState;
+
+    private final CANSparkMax mPivotMotor;
+    private final SparkMaxPIDController mPivotPIDController;
+
+    // private final CANSparkMax mPivotFollower;
+
+    // private final CANSparkMax mExtenderMotor;
+    // private final SparkMaxPIDController mExtenderPIDController;
+
+    // private final CANSparkMax mWristMotor;
+    // private final SparkMaxPIDController mWristPIDController;
+
     public ArmSubsystem() {
-        //motor setup
-        //TODO check if motors are brushed or brushless, if brushed check if Idle Mode Setting is needed
-        //TODO there is a secondary motor connected to the sprocket shaft, see if you can set one up to follow the other
-        mHasWrist = false;
-        mHasExtender = false;
+        mState = ArmState.RETRACTED;
+        
+        mPivotMotor = configurePivotMotor(kNeoConstructor.apply(kPivotMotorID));
+        mPivotPIDController = mPivotMotor.getPIDController();
+        mPivotPIDController.setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        System.out.println(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        
+    //     mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
+    //     mPivotFollower.follow(mPivotMotor); //TODO check if this needs to be reversed
 
-        mShoulderSubsystem = new MotorAbsEncoderComboSubsystem(MotorSetupConstants.kShoulderMotorId);
-        if(mHasWrist) {
-        mWristMotor = new CANSparkMax(MotorSetupConstants.kWristMotorId,MotorType.kBrushed);
-        mWristMotor.setIdleMode(IdleMode.kBrake); 
-        mWristPIDContoller = initializePIDController(mWristMotor, MotorSetupConstants.kWristPID);
-        mWristAbsEncoder = initializeAbsEncoder(mWristMotor, MotorSetupConstants.kShoulderAbsEncoder);
+    //     mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
+    //     mExtenderPIDController = mExtenderMotor.getPIDController();
+    //     mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
+
+    //     mWristMotor = configureWristMotor(kNeoConstructor.apply(kWristMotorID));
+    //     mWristPIDController = mWristMotor.getPIDController();
+    //     mWristPIDController.setFeedbackDevice(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle));
+    }
+
+    public static ArmSubsystem getInstance() {
+        if (mInstance == null) {
+            mInstance = new ArmSubsystem();
         }
-        
-        if(mHasExtender) {
-        mLinActuatorMotor = new CANSparkMax(LinearActuatorConstants.kLinearActuatorMotorId, MotorType.kBrushless);
-        mLinActuatorMotor.setIdleMode(IdleMode.kBrake);
-        mLinActuatorPIDController = initializePIDController(mLinActuatorMotor, LinearActuatorConstants.kLinearActuatorPID);
-        mLinActuatorPIDController.setPositionPIDWrappingEnabled(false); //this way it can go over 1 rotation
-        }
-        
-        //TODO: seems there are going to be two motors for the shoulder maybe use the follow method       
-        
-
-        //should create a way to test where if the joystick button is pressed the angle the motors go to is incremented by ten
-        //TODO add limit switch IDs for linear actualor
+        return mInstance;
     }
 
-    private SparkMaxPIDController initializePIDController(CANSparkMax mMotor, PIDConstants kPIDConstants) {
-        SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(kPIDConstants.kP);
-        PIDController.setI(kPIDConstants.kI);
-        PIDController.setD(kPIDConstants.kD);
-        PIDController.setPositionPIDWrappingEnabled(true);
-        PIDController.setPositionPIDWrappingMaxInput(2*Math.PI);
-        PIDController.setPositionPIDWrappingMinInput(0);
-        return PIDController;
-    }
-    
-    // private AnalogEncoder initializeAbsEncoder(AnologAbsEncoderConstants kAbsoluteEncoderConstants) {
-    //     AnalogEncoder absoluteEncoder = new AnalogEncoder(new AnalogInput(kAbsoluteEncoderConstants.channel));
-    //     absoluteEncoder.setPositionOffset(kAbsoluteEncoderConstants.angleOffset);
-    //     absoluteEncoder.setDistancePerRotation(2*Math.PI);
-    //     return absoluteEncoder;
+    // private double getArmRadius() {
+    //     double rotations = (mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())/(2*Math.PI);
+    //     return rotations * kNumOfArmSegments*(1/(kThreadsPerInch));
     // }
-    private SparkMaxAbsoluteEncoder initializeAbsEncoder(CANSparkMax motorController, SparkMaxAbsoluteEncoderConstants constants){
-        SparkMaxAbsoluteEncoder x = motorController.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        x.setPositionConversionFactor(2*Math.PI);
-        x.setZeroOffset(constants.offset);
-        return x;
-    }
-
-    public MotorAbsEncoderComboSubsystem getShoulder() {
-        return mShoulderSubsystem;
-    }
-    //setup above this lines, actual commands and other methods below
-
-    // private void levelWrist(){ //TODO should run these periodically 
-    //     mWristPIDContoller.setReference(-mShoulderAbsEncoder.getPosition(), ControlType.kPosition);
+    // private void setArmRadius(double meters){
+    //     double rotations = (meters)/(kNumOfArmSegments*(1/(kThreadsPerInch)));
+    //     mExtenderPIDController.setReference(rotations, ControlType.kPosition);
     // }
 
-    // public void setShoulderSetpoint(double value) {
-    //     mShoulderPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
+    //TODO confirm that the +s and -s are correct for the conversions (as in whether or not they should be reversed)
+    // private Rotation2d getLeveledWristAngle() {
+    //     return new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition() - mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
     // }
-    public void setWristSetpoint(double value) {
-        mWristPIDContoller.setReference(value, CANSparkMax.ControlType.kPosition);
-    }
-    
+    // private void setLeveledWristAngle(Rotation2d rotation) {
+    //    mWristPIDController.setReference(rotation.getRadians() + mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(), ControlType.kPosition);
+    // }
 
-    private void setLinActuatorDistance(double value){
-        double result = value; //TODO INSERT CONVERSION CALCULATIONS HERE
-        mLinActuatorPIDController.setReference(result, ControlType.kPosition);
-    }
-
-    // public void setAbsoluteArmState(Translation2d vector) {  //either have two translation 2ds reperesenting the wrist's length or just repersent the wrist joint via the translation 2d
-    //     setShoulderSetpoint(vector.getAngle().getRadians()); //TODO add limits to this asap so the arm wont hit the robot or go overhead
-    //     setLinActuatorDistance(vector.getNorm()); //TODO at "0" the linear actuator is actually already out at some distance x so make sure to subtract that value
-    // }
-    // public void changeArmState(Translation2d vector){
-    //     Translation2d currentArmState = null; //TODO need a way to convert encoders to Translation2d
-    //     setAbsoluteArmState(currentArmState.plus(vector));        
-    // }
-    /**
-     * Example command factory method.
-     *
-     * @return a command
-     */
-    public CommandBase exampleMethodCommand() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
-        return runOnce(
-                () -> {
-                    /* one-time action goes here */
-                });
+    public ArmPosition getPosition() {
+        return new ArmPosition(
+            0,
+            new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
+            new Rotation2d(0)
+        );
     }
 
-    //TODO should make a command that will pass it a class with the settings for the actuator and the shoulder motor angle
+    public ArmState getState() {
+        return mState; //This will get the desired state
+    }
+
+    //TODO determine offsets for absolute encoders
+    private void setDesiredState(ArmState state) {
+        mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
+        System.out.println("testing123123");
+        // System.out.println();
+        // setLeveledWristAngle(state.wristTheta);
+        // setArmRadius(state.armRadius);
+    }
+
+    public void setState(ArmState state) {
+        mState = state;
+    }
 
     /**
-     * An example method querying a boolean state of the subsystem (for example, a
-     * digital sensor).
-     *
-     * @return value of some boolean subsystem state, such as a digital sensor.
+     * Configures the pivot motor.
+     * @param motor the pivot motor.
+     * @return the pivot motor (for chaining).
      */
-    public boolean exampleCondition() {
-        // Query some boolean state, such as a digital sensor.
-        return false;
+    public CANSparkMax configurePivotMotor(CANSparkMax motor) {
+        motor.setIdleMode(IdleMode.kBrake);
+        
+        motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kPivotPositionConversionFactor);
+        System.out.println("okay setting up PID");
+        motor.getPIDController().setP(kPivotP);
+        motor.getPIDController().setI(kPivotI);
+        motor.getPIDController().setD(kPivotD);
+        System.out.println("PID values:\n"+motor.getPIDController().getP()+"\n"+motor.getPIDController().getI()+"\n"+motor.getPIDController().getD());
+        motor.getPIDController().setPositionPIDWrappingMaxInput(Math.PI*2);
+        motor.getPIDController().setPositionPIDWrappingMinInput(0);
+        motor.getPIDController().setPositionPIDWrappingEnabled(true);
+        
+
+        return motor;
+    }
+
+    public CANSparkMax configureExtenderMotor(CANSparkMax motor) {
+        motor.setIdleMode(IdleMode.kBrake);
+        
+        motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kExtenderPositionConversionFactor);
+
+        motor.getPIDController().setP(kExtenderP);
+        motor.getPIDController().setI(kExtenderI);
+        motor.getPIDController().setD(kExtenderD);
+        motor.getPIDController().setPositionPIDWrappingEnabled(false);
+
+        
+        return motor;
+    }
+
+    public CANSparkMax configureWristMotor(CANSparkMax motor) {
+        motor.setIdleMode(IdleMode.kBrake);
+        
+        motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kWristPositionConversionFactor);
+
+        motor.getPIDController().setP(kWristP);
+        motor.getPIDController().setI(kWristI);
+        motor.getPIDController().setD(kWristD);
+        motor.getPIDController().setPositionPIDWrappingEnabled(true);
+
+        return motor;
     }
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
-        //TODO maybe have the wrist encoder be offset to be an absolute value so you dont have to constantly re calculate it
-    }
-
-    @Override
-    public void simulationPeriodic() {
-        // This method will be called once per scheduler run during simulation
+        System.out.println("testing testing testing");
+        setDesiredState(mState);
+        System.out.println(mState.armTheta);
     }
 }
