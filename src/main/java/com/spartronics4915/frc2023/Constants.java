@@ -207,7 +207,7 @@ public final class Constants {
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
         public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
 
-        public static final double kPivotP = 0.1;
+        public static final double kPivotP = 0.01;
         public static final double kPivotI = 0.0;
         public static final double kPivotD = 0.0;
 
@@ -238,8 +238,8 @@ public final class Constants {
         );
 
         public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
+            0,
+            new Rotation2d(Math.PI),
             new Rotation2d()
         );
 
