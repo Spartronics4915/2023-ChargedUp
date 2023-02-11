@@ -19,17 +19,17 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     private SparkMaxPIDController mPIDController;
     private Rotation2d mLastReference;
 
-    public MotorAbsEncoderComboSubsystem(int motorId, PIDConstants kPIDConstants) {
+    public MotorAbsEncoderComboSubsystem(int motorId, double kP) {
         mMotor = new CANSparkMax(motorId, MotorType.kBrushless);
         mMotor.setIdleMode(IdleMode.kCoast);
-        mPIDController = initializePIDController(kPIDConstants);
+        mPIDController = initializePIDController(kP);
     }
 
-    private SparkMaxPIDController initializePIDController(PIDConstants kPIDConstants) {
+    private SparkMaxPIDController initializePIDController(double kP) {
         SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(kPIDConstants.kP);
-        PIDController.setI(kPIDConstants.kI);
-        PIDController.setD(kPIDConstants.kD);
+        PIDController.setP(kP);
+        PIDController.setI(0);
+        PIDController.setD(0);
         PIDController.setPositionPIDWrappingEnabled(true);
         PIDController.setPositionPIDWrappingMaxInput(2*Math.PI);
         PIDController.setPositionPIDWrappingMinInput(0);
@@ -40,6 +40,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     public void setReference(Rotation2d ref) {
         mLastReference = ref;
         mPIDController.setReference(ref.getDegrees(), ControlType.kPosition);
+    }
+
+    public Rotation2d getCurrentReference() 
+    {
+        return mLastReference;
     }
 
 }
