@@ -281,30 +281,65 @@ public class SwerveCommands {
     }
     public class RotateToTarget extends CommandBase {
         private PhotonCameraWrapper cameraWrapper;
+        private final double mYawToleranceDegrees = 10;
+        private final double mAngularVelToleranceDegreesSec = 1;
+        private final double kP = 0.2;
+        private final ProfiledPIDController pid;
 
         public RotateToTarget(PhotonCameraWrapper camera) {
             cameraWrapper = camera;
+            pid = new ProfiledPIDController(kP, 0, 0.01, new TrapezoidProfile.Constraints(
+                10,
+                kMaxAcceleration
+            ));
+            pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
+            pid.enableContinuousInput(0, 360);
+
+            addRequirements(mSwerve);
         }
 
+        // @Override
+        // public void initialize() {
+        //     PhotonPipelineResult result = cameraWrapper.photonCamera.getLatestResult();
+        //     if (result.hasTargets()) {
+        //         // var yaw = mSwerve.getYaw();
+        //         // System.out.println("Current Yaw: " + yaw.getDegrees());
+        //         // double targetYaw = result.getBestTarget().getYaw();
+        //         double targetYaw = result.getBestTarget().getBestCameraToTarget().inverse().getTranslation().toTranslation2d().getAngle().getDegrees();
+        //         // System.out.println("Tag Yaw: " + targetYaw);
+        //         // Rotation2d newYaw = yaw.minus(Rotation2d.fromDegrees(targetYaw));
+        //         // System.out.println("Goal Yaw: " + newYaw.getDegrees());
+        //         var newCommand = new RotateYaw(Rotation2d.fromDegrees(targetYaw));
+        //         newCommand.schedule();
+        //     }
+        // }
+
         @Override
-        public void initialize() {
+        public void execute() {
             PhotonPipelineResult result = cameraWrapper.photonCamera.getLatestResult();
             if (result.hasTargets()) {
-                // var yaw = mSwerve.getYaw();
-                // System.out.println("Current Yaw: " + yaw.getDegrees());
-                // double targetYaw = result.getBestTarget().getYaw();
-                double targetYaw = result.getBestTarget().getBestCameraToTarget().inverse().getTranslation().toTranslation2d().getAngle().getDegrees();
-                // System.out.println("Tag Yaw: " + targetYaw);
-                // Rotation2d newYaw = yaw.minus(Rotation2d.fromDegrees(targetYaw));
-                // System.out.println("Goal Yaw: " + newYaw.getDegrees());
-                var newCommand = new RotateYaw(Rotation2d.fromDegrees(targetYaw));
-                newCommand.schedule();
+                double tagYaw = result.getBestTarget().getYaw();
+                double d = pid.calculate(tagYaw, 0);
+                mSwerve.drive(
+                    new ChassisSpeeds(
+                        0,
+                        0,
+                        -d
+                    ),
+                    true
+            );
             }
         }
 
         @Override
         public boolean isFinished() {
-            return true;
+            boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+            boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+            Boolean finished = positionFine && velocityFine;
+            if (finished) {
+                System.out.println("done");
+            }
+            return finished;
         }
     }
 
