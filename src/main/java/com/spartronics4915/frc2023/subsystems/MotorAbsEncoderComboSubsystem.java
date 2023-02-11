@@ -28,7 +28,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         mAbsEncoder = mMotor.getEncoder();
         mAbsEncoder.setPositionConversionFactor((Math.PI*2)/36);    
         
-        mPIDController = initializePIDController(kP);
+        mPIDController = initializePIDController(0.01);
     }
 
     private SparkMaxPIDController initializePIDController(double kP) {
