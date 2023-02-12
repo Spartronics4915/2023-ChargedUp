@@ -5,8 +5,11 @@ import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -16,8 +19,8 @@ public final class ChargeStationCommands {
 
         private final Swerve mSwerve;
 
-        private final PIDController vxPID; // TODO: change to profiled pid controller
-        private final PIDController thetaPID; // TODO: change to profiled pid controller
+        private final PIDController mVXPID;
+        private final ProfiledPIDController mThetaPID;
 
         public enum ClimbState {
             CLIMB_TO_GRIP, GRIP_TO_PLATFORM, LEVEL_ROBOT_SETUP, LEVEL_ROBOT, STOP, ERROR
@@ -32,14 +35,15 @@ public final class ChargeStationCommands {
             mSwerve = swerveSubsystem;
             mLogString = "";
             mCurrState = ClimbState.CLIMB_TO_GRIP;
-            vxPID = new PIDController(
+            mVXPID = new PIDController(
                     BalanceConstants.XVelocityPID.kP,
                     BalanceConstants.XVelocityPID.kI,
                     BalanceConstants.XVelocityPID.kD);
-            thetaPID = new PIDController(
+            mThetaPID = new ProfiledPIDController(
                     BalanceConstants.ThetaPID.kP,
                     BalanceConstants.ThetaPID.kI,
-                    BalanceConstants.ThetaPID.kD);
+                    BalanceConstants.ThetaPID.kD,
+                    new Constraints(kMaxAngularSpeed, kMaxAngularAcceleration));
         }
 
         /**
@@ -116,20 +120,20 @@ public final class ChargeStationCommands {
                 }
 
                 case LEVEL_ROBOT_SETUP: {
-                    vxPID.setSetpoint(0);
-                    thetaPID.setSetpoint(0);
+                    mVXPID.setSetpoint(0);
+                    mThetaPID.setGoal(new State(0, 0));
                     mCurrState = ClimbState.LEVEL_ROBOT;
                 }
 
                 case LEVEL_ROBOT: {
-                    double vx = vxPID.calculate(mSwerve.getPitch().getRadians());
-                    double omega = thetaPID.calculate(mSwerve.getYaw().getRadians());
+                    double vx = mVXPID.calculate(mSwerve.getPitch().getRadians());
+                    double omega = mThetaPID.calculate(mSwerve.getYaw().getRadians());
 
                     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
 
                     mSwerve.drive(chassisSpeeds, true, true);
 
-                    if (vxPID.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1) {
+                    if (mVXPID.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1) {
                         mCurrState = ClimbState.STOP;
                     }
                     break;
