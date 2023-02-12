@@ -33,27 +33,37 @@ public final class DebugTeleopCommands {
     }
     
     public static class ChassisWidget {
+        private GenericEntry yawEntry;
+        private GenericEntry pitchEntry;
+        private GenericEntry rollEntry;
+        
         private GenericEntry vxEntry;
         private GenericEntry vyEntry;
         private GenericEntry omegaEntry;
 
         ChassisWidget(ShuffleboardTab tab) {
-            ShuffleboardLayout yawLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
+            ShuffleboardLayout chassisLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
             
-            yawLayout.add(Swerve.getInstance().getIMU()).withWidget(BuiltInWidgets.kGyro);
+            yawEntry = chassisLayout.add("yaw (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
+            pitchEntry = chassisLayout.add("pitch (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
+            rollEntry = chassisLayout.add("roll (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
 
-            vxEntry = yawLayout.add("vx (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            vyEntry = yawLayout.add("vy (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            omegaEntry = yawLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
+            vxEntry = chassisLayout.add("vx (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            vyEntry = chassisLayout.add("vy (m/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            omegaEntry = chassisLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
         }
 
         public void update() {
-			Swerve swerveSubsystem = Swerve.getInstance();
+			Swerve swerve = Swerve.getInstance();
+
+            yawEntry.setDouble(swerve.getIMU().getYaw());
+            pitchEntry.setDouble(swerve.getIMU().getPitch());
+            rollEntry.setDouble(swerve.getIMU().getRoll());
             
-            vxEntry.setDouble(swerveSubsystem.getChassisSpeeds().vxMetersPerSecond);
-            vyEntry.setDouble(swerveSubsystem.getChassisSpeeds().vyMetersPerSecond);
-            omegaEntry.setDouble(swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
+            vxEntry.setDouble(swerve.getChassisSpeeds().vxMetersPerSecond);
+            vyEntry.setDouble(swerve.getChassisSpeeds().vyMetersPerSecond);
+            omegaEntry.setDouble(swerve.getChassisSpeeds().omegaRadiansPerSecond);
         }
     }
 

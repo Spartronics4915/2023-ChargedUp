@@ -20,7 +20,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 
 public class SwerveModule {
     private final int mModuleNumber;
-    private double mAbsoluteOffset;
+    private Rotation2d mAbsoluteOffset;
     private double mLastAngle;
 
     private CANSparkMax mDriveMotor;
@@ -37,10 +37,10 @@ public class SwerveModule {
 
     private SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
-    public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffset) {
+    public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRotations) {
         mModuleNumber = moduleNumber;
 
-        mAbsoluteOffset = absoluteOffset;
+        mAbsoluteOffset = Rotation2d.fromRotations(absoluteOffsetRotations);
         
         mDriveMotor = kMotorConstructor.apply(driveMotorID);
         mDriveEncoder = mDriveMotor.getEncoder();
@@ -60,7 +60,7 @@ public class SwerveModule {
     }
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
-        this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.absoluteOffset);
+        this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.absoluteOffsetRotations);
     }
 
     public void forceModuleOrientation(Rotation2d newAngle, boolean isOpenLoop){
@@ -70,7 +70,7 @@ public class SwerveModule {
         var currentState = this.getState();
         var newState = new SwerveModuleState(currentState.speedMetersPerSecond, newAngle);
 
-        this.setDesiredState(newState, isOpenLoop, false);
+        this.setDesiredState(newState, isOpenLoop, true);
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningAtLowSpeed) {
@@ -88,12 +88,16 @@ public class SwerveModule {
             );
         }
 
-        double angle = (suppressTurningAtLowSpeed && Math.abs(desiredState.speedMetersPerSecond) < kMaxSpeed * 0.01) ?
-            mLastAngle :
-            desiredState.angle.getRadians();
+        if (!(suppressTurningAtLowSpeed && Math.abs(desiredState.speedMetersPerSecond) < kMaxSpeed * 0.002)) {
+            mAngleController.setReference(desiredState.angle.getRadians(), ControlType.kPosition);
+        }
 
-        mAngleController.setReference(angle, ControlType.kPosition);
-        mLastAngle = angle;
+        // double angle = (suppressTurningAtLowSpeed && Math.abs(desiredState.speedMetersPerSecond) < kMaxSpeed * 0.01) ?
+        //     mLastAngle :
+        //     desiredState.angle.getRadians();
+
+        // mAngleController.setReference(angle, ControlType.kPosition);
+        // mLastAngle = angle;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -123,19 +127,15 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute() {
-        Rotation2d encoderAngle = getShiftedAbsoluteEncoderRotation();
-        System.out.println(mModuleNumber + " " + getAbsoluteEncoderValue() + " " + encoderAngle.getRadians());
-        mIntegratedAngleEncoder.setPosition(encoderAngle.getRadians());
-        mDriveController.setReference(encoderAngle.getRadians(), ControlType.kPosition);
+        mIntegratedAngleEncoder.setPosition(getShiftedAbsoluteEncoderRotation().getRadians());
     }
 
     public double getAbsoluteEncoderValue() {
-        return -mAngleEncoder.getAbsolutePosition();
+        return mAngleEncoder.getAbsolutePosition();
     }
 
     public Rotation2d getShiftedAbsoluteEncoderRotation() {
-        return Rotation2d.fromDegrees(getAbsoluteEncoderValue()).minus(
-            Rotation2d.fromRotations(mAbsoluteOffset));
+        return Rotation2d.fromDegrees(getAbsoluteEncoderValue()).minus(mAbsoluteOffset);
     }
 
     public double getShiftedAbsoluteEncoderRotations() {
@@ -147,7 +147,7 @@ public class SwerveModule {
     }
 
     private void configureDriveMotor() {
-        mDriveMotor.restoreFactoryDefaults(); // ?
+        mDriveMotor.restoreFactoryDefaults();
         mDriveMotor.setSmartCurrentLimit(Drive.kContinuousCurrentLimit);
         mDriveMotor.setInverted(kDriveMotorsAreInverted);
         mDriveMotor.setIdleMode(kDriveIdleMode);
@@ -166,6 +166,7 @@ public class SwerveModule {
         mAngleMotor.restoreFactoryDefaults();
         mAngleMotor.setSmartCurrentLimit(Angle.kContinuousCurrentLimit);
         mAngleMotor.setIdleMode(kAngleIdleMode);
+        mAngleMotor.setInverted(true);
         mIntegratedAngleEncoder.setPositionConversionFactor(Angle.kPositionConversionFactor);
         mAngleController.setP(Angle.kP);
         mAngleController.setI(Angle.kI);
@@ -190,7 +191,7 @@ public class SwerveModule {
         return new SwerveModulePosition(drivePosition, angle);
     }
 
-    public void zeroPIDP(){
+    public void zeroPIDP() {
         mAngleController.setP(0);
     }
 }
