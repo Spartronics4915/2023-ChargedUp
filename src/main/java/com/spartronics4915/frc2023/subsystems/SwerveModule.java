@@ -54,6 +54,8 @@ public class SwerveModule {
 
         mAngleEncoder = new CANCoder(encoderID);
 
+        resetToAbsolute();
+
         mDesiredState = new SwerveModuleState();
 
         mLastAngle = getState().angle.getRadians();
