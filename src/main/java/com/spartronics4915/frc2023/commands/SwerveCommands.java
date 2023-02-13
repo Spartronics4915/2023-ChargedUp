@@ -67,6 +67,9 @@ public class SwerveCommands {
 		}
     }
 
+    /**
+     * Mainly for debugging, probably shouldn't be used during a match
+     */
     public class ResetOdometry extends InstantCommand {
         public ResetOdometry() {
 
@@ -79,6 +82,9 @@ public class SwerveCommands {
 		}
     }
 
+    /**
+     * Mainly used to initialize robot
+     */
     public class ResetCommand extends InstantCommand {
         public ResetCommand() {
             addRequirements(mSwerve);
@@ -202,46 +208,6 @@ public class SwerveCommands {
         @Override
         public boolean isFinished() {
             return mXVelocityPIDController.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1;
-        }
-    }
-
-    public class TestInitCommand extends CommandBase {
-        public TestInitCommand() {
-            addRequirements(mSwerve);
-        }
-
-        @Override
-        public void initialize() {}
-
-        @Override
-        public void execute() {}
-
-        @Override
-        public void end(boolean interrupted) {}
-
-        @Override
-        public boolean isFinished() {
-            return true;
-        }
-    }
-
-    public class TestCommand extends CommandBase {
-        public TestCommand() {
-            addRequirements(mSwerve);
-        }
-
-        @Override
-        public void initialize() {}
-
-        @Override
-        public void execute() {}
-
-        @Override
-        public void end(boolean interrupted) {}
-
-        @Override
-        public boolean isFinished() {
-            return true;
         }
     }
 
