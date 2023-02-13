@@ -74,7 +74,7 @@ public class Arm extends SubsystemBase {
         mPivotPIDController = mPivotMotor.getPIDController(); // FIXME: change to WPILib ProfiledPidController
 
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
-        mPivotFollower.follow(mPivotMotor);
+        mPivotFollower.follow(mPivotMotor); // TODO check if this needs to be reversed
 
         mPivotFeedforward = new ArmFeedforward(kPivotS, kPivotG, kPivotV, kPivotA);
 
@@ -92,6 +92,28 @@ public class Arm extends SubsystemBase {
         return mInstance;
     }
 
+    private double getArmRadius() {
+        double rotations = (mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()) / (2 * Math.PI);
+        return rotations * kNumOfArmSegments * (1 / (kThreadsPerInch));
+    }
+
+    private void setArmRadius(double meters) {
+        double rotations = (meters) / (kNumOfArmSegments * (1 / (kThreadsPerInch)));
+        mExtenderPIDController.setReference(rotations, ControlType.kPosition);
+    }
+
+    // TODO confirm that the +s and -s are correct for the conversions
+    private Rotation2d getLeveledWristAngle() {
+        return new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()
+                - mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    }
+
+    private void setLeveledWristAngle(Rotation2d rotation) {
+        mWristPIDController.setReference(
+                rotation.getRadians() + mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(),
+                ControlType.kPosition);
+    }
+
     public ArmPosition getPosition() {
         return new ArmPosition(
                 mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(),
@@ -100,20 +122,22 @@ public class Arm extends SubsystemBase {
     }
 
     public ArmState getState() {
-        return mState;
+        return mState; // This will get the desired state
     }
 
+    // TODO determine offsets for absolute encoders
     private void setDesiredState(ArmState state) {
         mPivotPIDController.setReference(
-            state.armTheta.getRadians(),
-            ControlType.kPosition,
-            0,
-            mPivotFeedforward.calculate(
-                getState().armTheta.getRadians(),
-                mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getVelocity()),
-            ArbFFUnits.kVoltage);
+                state.armTheta.getRadians(),
+                ControlType.kPosition,
+                0,
+                mPivotFeedforward.calculate(
+                        getState().armTheta.getRadians(),
+                        mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getVelocity()),
+                ArbFFUnits.kVoltage);
         mExtenderPIDController.setReference(state.armRadius, ControlType.kPosition);
-        mWristPIDController.setReference(state.wristTheta.minus(getState().armTheta).getRadians(), ControlType.kPosition);
+        mWristPIDController.setReference(state.wristTheta.minus(getState().armTheta).getRadians(),
+                ControlType.kPosition);
     }
 
     public void setState(ArmState state) {
@@ -122,6 +146,7 @@ public class Arm extends SubsystemBase {
 
     /**
      * Configures the pivot motor.
+     * 
      * @param motor the pivot motor.
      * @return the pivot motor (for chaining).
      */
@@ -130,7 +155,7 @@ public class Arm extends SubsystemBase {
 
         motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kPivotPositionConversionFactor);
         motor.getAbsoluteEncoder(Type.kDutyCycle).setVelocityConversionFactor(kPivotVelocityConversionFactor);
-        
+
         motor.getPIDController().setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
 
         motor.getPIDController().setP(kPivotP);
@@ -149,6 +174,7 @@ public class Arm extends SubsystemBase {
         motor.getPIDController().setP(kExtenderP);
         motor.getPIDController().setI(kExtenderI);
         motor.getPIDController().setD(kExtenderD);
+        motor.getPIDController().setPositionPIDWrappingEnabled(false);
 
         return motor;
     }

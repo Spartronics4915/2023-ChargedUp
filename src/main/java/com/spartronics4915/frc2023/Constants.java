@@ -210,6 +210,9 @@ public final class Constants {
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
         public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
 
+        public static final int kNumOfArmSegments = 3;
+        public static final int kThreadsPerInch = -1; // placeholder
+
         public static final double kPivotP = 0.0;
         public static final double kPivotI = 0.0;
         public static final double kPivotD = 0.0;

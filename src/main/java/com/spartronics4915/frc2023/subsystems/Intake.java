@@ -46,6 +46,7 @@ public class Intake extends SubsystemBase {
         return mState;
     }
 
+
     @Override
     public void periodic() {
         switch(mState) {
