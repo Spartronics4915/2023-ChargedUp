@@ -71,8 +71,7 @@ public class Arm extends SubsystemBase {
         mState = ArmState.RETRACTED;
 
         mPivotMotor = configurePivotMotor(kNeoConstructor.apply(kPivotMotorID));
-        mPivotPIDController = mPivotMotor.getPIDController(); // FIXME: change to WPILib ProfiledPidController
-
+        mPivotPIDController = mPivotMotor.getPIDController();
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.follow(mPivotMotor); // TODO check if this needs to be reversed
 
