@@ -136,6 +136,10 @@ public class SwerveModule {
         return mAngleEncoder.getAbsolutePosition();
     }
 
+    public Rotation2d getAbsoluteEncoderRotation() {
+        return Rotation2d.fromDegrees(getAbsoluteEncoderValue());
+    }
+
     public Rotation2d getShiftedAbsoluteEncoderRotation() {
         return Rotation2d.fromDegrees(getAbsoluteEncoderValue()).minus(mAbsoluteOffset);
     }
@@ -146,6 +150,10 @@ public class SwerveModule {
 
     public double getRelativeEncoderValue() {
         return mIntegratedAngleEncoder.getPosition();
+    }
+
+    public Rotation2d getRelativeEncoderRotation() {
+        return Rotation2d.fromRadians(getRelativeEncoderValue());
     }
 
     private void configureDriveMotor() {
