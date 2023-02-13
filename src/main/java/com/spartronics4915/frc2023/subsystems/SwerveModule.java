@@ -20,22 +20,22 @@ import com.ctre.phoenix.sensors.CANCoder;
 
 public class SwerveModule {
     private final int mModuleNumber;
-    private Rotation2d mAbsoluteOffset;
+    private final Rotation2d mAbsoluteOffset;
     private double mLastAngle;
 
-    private CANSparkMax mDriveMotor;
-    private CANSparkMax mAngleMotor;
+    private final CANSparkMax mDriveMotor;
+    private final CANSparkMax mAngleMotor;
 
-    private RelativeEncoder mDriveEncoder;
-    private RelativeEncoder mIntegratedAngleEncoder;
-    private CANCoder mAngleEncoder;
+    private final RelativeEncoder mDriveEncoder;
+    private final RelativeEncoder mIntegratedAngleEncoder;
+    private final CANCoder mAngleEncoder;
 
     private final SparkMaxPIDController mDriveController;
     private final SparkMaxPIDController mAngleController;
 
     private SwerveModuleState mDesiredState;
 
-    private SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
+    private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
     public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRotations) {
         mModuleNumber = moduleNumber;
@@ -134,11 +134,7 @@ public class SwerveModule {
     }
 
     public Rotation2d getShiftedAbsoluteEncoderRotation() {
-        return Rotation2d.fromDegrees(getAbsoluteEncoderValue()).minus(mAbsoluteOffset);
-    }
-
-    public double getShiftedAbsoluteEncoderRotations() {
-        return getShiftedAbsoluteEncoderRotation().getRotations();
+        return getAbsoluteEncoderRotation().minus(mAbsoluteOffset);
     }
 
     public double getRelativeEncoderValue() {
