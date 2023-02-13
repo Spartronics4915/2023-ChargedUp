@@ -202,21 +202,36 @@ public final class Constants {
         public static final int kExtenderMotorID = -1;
         public static final int kWristMotorID = -1;
 
-        public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
+        public static final boolean kPivotMotorIsInverted = false;
+        public static final boolean kPivotFollowerIsInverted = false;
+
+        public static final double kPivotPositionConversionFactor = (2 * Math.PI) * (48.0 / 1.0);
+        public static final double kPivotVelocityConversionFactor = (2 * Math.PI) * (48.0 / 1.0) / 60.0;
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
         public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
 
         public static final double kPivotP = 0.0;
         public static final double kPivotI = 0.0;
         public static final double kPivotD = 0.0;
-
+        public static final double kPivotFF = 0.0;
+        public static final double kPivotS = 0.0; // V
+        public static final double kPivotG = 0.0; // V
+        public static final double kPivotV = 0.0; // Vs/rad
+        public static final double kPivotA = 0.0; // Vs^2/rad
+        
         public static final double kExtenderP = 0.0;
         public static final double kExtenderI = 0.0;
         public static final double kExtenderD = 0.0;
+        public static final double kExtenderFF = 0.0;
 
         public static final double kWristP = 0.0;
         public static final double kWristI = 0.0;
         public static final double kWristD = 0.0;
+        public static final double kWristFF = 0.0;
+        public static final double kWristS = 0.0;
+        public static final double kWristG = 0.0;
+        public static final double kWristV = 0.0;
+        public static final double kWristA = 0.0;
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             -1,

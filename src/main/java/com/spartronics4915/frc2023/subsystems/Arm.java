@@ -7,7 +7,9 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -49,25 +51,13 @@ public class Arm extends SubsystemBase {
         }
     }
 
-    // /**
-    //  * Represents the state of the arm. Contains the arm's position and the intake's state. 
-    //  */
-    // public static final class ArmState { // I wish java 11 had records :(
-    //     public final ArmPosition armPosition;
-    //     public final IntakeState intakeState;
-
-    //     public ArmState(ArmPosition armPosition, IntakeState intakeState) {
-    //         this.armPosition = armPosition;
-    //         this.intakeState = intakeState;
-    //     }
-    // }
-
     private static Arm mInstance;
-    
+
     private ArmState mState;
 
     private final CANSparkMax mPivotMotor;
     private final SparkMaxPIDController mPivotPIDController;
+    private final ArmFeedforward mPivotFeedforward;
 
     private final CANSparkMax mPivotFollower;
 
@@ -77,23 +67,22 @@ public class Arm extends SubsystemBase {
     private final CANSparkMax mWristMotor;
     private final SparkMaxPIDController mWristPIDController;
 
-    private Arm() { // TODO: config motors
+    private Arm() {
         mState = ArmState.RETRACTED;
-        
+
         mPivotMotor = configurePivotMotor(kNeoConstructor.apply(kPivotMotorID));
-        mPivotPIDController = mPivotMotor.getPIDController();
-        mPivotPIDController.setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        mPivotPIDController = mPivotMotor.getPIDController(); // FIXME: change to WPILib ProfiledPidController
 
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.follow(mPivotMotor);
 
+        mPivotFeedforward = new ArmFeedforward(kPivotS, kPivotG, kPivotV, kPivotA);
+
         mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
         mExtenderPIDController = mExtenderMotor.getPIDController();
-        mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
 
         mWristMotor = configureWristMotor(kNeoConstructor.apply(kWristMotorID));
         mWristPIDController = mWristMotor.getPIDController();
-        mWristPIDController.setFeedbackDevice(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle));
     }
 
     public static Arm getInstance() {
@@ -105,10 +94,9 @@ public class Arm extends SubsystemBase {
 
     public ArmPosition getPosition() {
         return new ArmPosition(
-            mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(),
-            new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
-            new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition())
-        );
+                mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition(),
+                new Rotation2d(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()),
+                new Rotation2d(mWristMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
     }
 
     public ArmState getState() {
@@ -116,9 +104,16 @@ public class Arm extends SubsystemBase {
     }
 
     private void setDesiredState(ArmState state) {
-        mPivotPIDController.setReference(state.armTheta.getRadians(), ControlType.kPosition);
+        mPivotPIDController.setReference(
+            state.armTheta.getRadians(),
+            ControlType.kPosition,
+            0,
+            mPivotFeedforward.calculate(
+                getState().armTheta.getRadians(),
+                mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle).getVelocity()),
+            ArbFFUnits.kVoltage);
         mExtenderPIDController.setReference(state.armRadius, ControlType.kPosition);
-        mWristPIDController.setReference(state.wristTheta.getRadians(), ControlType.kPosition);
+        mWristPIDController.setReference(state.wristTheta.minus(getState().armTheta).getRadians(), ControlType.kPosition);
     }
 
     public void setState(ArmState state) {
@@ -132,36 +127,43 @@ public class Arm extends SubsystemBase {
      */
     public CANSparkMax configurePivotMotor(CANSparkMax motor) {
         motor.setIdleMode(IdleMode.kBrake);
-        
+
         motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kPivotPositionConversionFactor);
+        motor.getAbsoluteEncoder(Type.kDutyCycle).setVelocityConversionFactor(kPivotVelocityConversionFactor);
         
+        motor.getPIDController().setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
+
         motor.getPIDController().setP(kPivotP);
         motor.getPIDController().setI(kPivotI);
         motor.getPIDController().setD(kPivotD);
-        
+        motor.getPIDController().setFF(kPivotFF);
+
         return motor;
     }
 
     public CANSparkMax configureExtenderMotor(CANSparkMax motor) {
         motor.setIdleMode(IdleMode.kBrake);
-        
+
         motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kExtenderPositionConversionFactor);
 
         motor.getPIDController().setP(kExtenderP);
         motor.getPIDController().setI(kExtenderI);
         motor.getPIDController().setD(kExtenderD);
-        
+
         return motor;
     }
 
     public CANSparkMax configureWristMotor(CANSparkMax motor) {
         motor.setIdleMode(IdleMode.kBrake);
-        
+
         motor.getAbsoluteEncoder(Type.kDutyCycle).setPositionConversionFactor(kWristPositionConversionFactor);
+
+        motor.getPIDController().setFeedbackDevice(mPivotMotor.getAbsoluteEncoder(Type.kDutyCycle));
 
         motor.getPIDController().setP(kWristP);
         motor.getPIDController().setI(kWristI);
         motor.getPIDController().setD(kWristD);
+        motor.getPIDController().setFF(kWristFF);
 
         return motor;
     }
