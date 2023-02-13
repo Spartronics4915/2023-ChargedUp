@@ -80,7 +80,7 @@ public class Arm extends SubsystemBase {
         mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
         mExtenderPIDController = mExtenderMotor.getPIDController();
 
-        mWristMotor = configureWristMotor(kNeoConstructor.apply(kWristMotorID));
+        mWristMotor = configureWristMotor(kSnowblowerConstructor.apply(kWristMotorID));
         mWristPIDController = mWristMotor.getPIDController();
     }
 
