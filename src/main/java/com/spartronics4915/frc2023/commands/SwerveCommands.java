@@ -20,6 +20,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
+
+import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
+
 import static com.spartronics4915.frc2023.Constants.OI.*;
 
 public class SwerveCommands {
@@ -225,29 +228,37 @@ public class SwerveCommands {
 
     public class RotateDegrees extends CommandBase {
 
-        private double mDegreeRotate;
-        public RotateDegrees(double degrees) {
-            mDegreeRotate = degrees;
+        private Rotation2d mDegreeRotate;
+        public RotateDegrees(Rotation2d rot) {
+            mDegreeRotate = rot;
         }
 
         @Override
         public void initialize() {
             var yaw = mSwerve.getYaw();
 
-            Rotation2d newYaw = yaw.plus(Rotation2d.fromDegrees(mDegreeRotate));
+            Rotation2d newYaw = yaw.plus(mDegreeRotate);
             var newCommand = new RotateToYaw(newYaw);
             newCommand.schedule();
         }
     }
+    
     public class RotateToYaw extends CommandBase {
 
         private final double mYawToleranceDegrees = 2;
         private final double mAngularVelToleranceDegreesSec = 1;
         private Rotation2d mDestinationYaw;
         private final ProfiledPIDController pid;
+        private final PIDWidget mPIDWidget;
 
         public RotateToYaw(Rotation2d destinationYaw) {
-            pid = new ProfiledPIDController(0.000002, 0, 0, 
+            this(destinationYaw, null);
+        
+        }
+
+        public RotateToYaw(Rotation2d destinationYaw, PIDWidget pidWidget) {
+            mPIDWidget = pidWidget;
+            pid = new ProfiledPIDController(0.000000002, 0, 0, 
             new TrapezoidProfile.Constraints(Math.PI / 64.0, 0.1));
             pid.setTolerance((Math.PI / 180.) * mYawToleranceDegrees, (Math.PI / 180.) * mAngularVelToleranceDegreesSec);
             pid.enableContinuousInput(-Math.PI, Math.PI);
@@ -267,9 +278,10 @@ public class SwerveCommands {
             double goal = mDestinationYaw.getRadians();
             double yaw = mSwerve.getYaw().getRadians();
             double d = pid.calculate(yaw, goal);
-            SmartDashboard.putNumber("Yaw", yaw);
-            SmartDashboard.putNumber("Goal", goal);
-            SmartDashboard.putNumber("Theta", d);
+
+            if (mPIDWidget != null) {
+                mPIDWidget.update(yaw, goal, d);
+            }
             mSwerve.drive(
                 new ChassisSpeeds(0, 0, d),
                 true,
