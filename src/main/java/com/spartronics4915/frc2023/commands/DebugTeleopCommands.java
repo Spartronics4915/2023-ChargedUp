@@ -34,17 +34,21 @@ public final class DebugTeleopCommands {
     
     public static class PIDWidget {
         public GenericEntry measurementEntry;
-        public GenericEntry outputEntry;
+        public GenericEntry outputEntry, goalEntry;
 
         public PIDWidget(ShuffleboardTab tab) {
             ShuffleboardLayout layout = tab.getLayout("PID", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
 
             measurementEntry = layout.add("Measurement", 0).getEntry();
+            goalEntry = layout.add("Goal", 0).getEntry();
+            outputEntry = layout.add("Output", 0).getEntry();
         }
 
         public void update(double measurement, double goal, double output) {
             measurementEntry.setDouble(measurement);
+            goalEntry.setDouble(goal);
+            outputEntry.setDouble(output);
         }
     
     }
@@ -166,7 +170,7 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
             commands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
-            commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(45), pidWidget).withName("Rotate to 45"));
+            commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(-45), pidWidget).withName("Rotate to 45"));
 
             commands.add(mSwerveCommands.new RotateDegrees(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
         }

@@ -248,8 +248,9 @@ public class SwerveCommands {
         private final double mYawToleranceDegrees = 2;
         private final double mAngularVelToleranceDegreesSec = 1;
         private Rotation2d mDestinationYaw;
-        private final ProfiledPIDController pid;
         private final PIDWidget mPIDWidget;
+        private final TrapezoidProfile.Constraints motionConstraints;
+        public double mlastVelocity;
 
         public RotateToYaw(Rotation2d destinationYaw) {
             this(destinationYaw, null);
@@ -258,47 +259,53 @@ public class SwerveCommands {
 
         public RotateToYaw(Rotation2d destinationYaw, PIDWidget pidWidget) {
             mPIDWidget = pidWidget;
-            pid = new ProfiledPIDController(0.000000002, 0, 0, 
-            new TrapezoidProfile.Constraints(Math.PI / 64.0, 0.1));
-            pid.setTolerance((Math.PI / 180.) * mYawToleranceDegrees, (Math.PI / 180.) * mAngularVelToleranceDegreesSec);
-            pid.enableContinuousInput(-Math.PI, Math.PI);
-            
+            motionConstraints = new TrapezoidProfile.Constraints(Math.PI / 10, Math.PI / 20);
             addRequirements(mSwerve);
+            mlastVelocity = 0;
             mDestinationYaw = destinationYaw.times(-1);
         }
 
         @Override
         public void initialize() {
-            pid.reset(mSwerve.getYaw().getRadians());
         }
         
 
         @Override
         public void execute() {
-            double goal = mDestinationYaw.getRadians();
             double yaw = mSwerve.getYaw().getRadians();
-            double d = pid.calculate(yaw, goal);
-
+            double goal = mDestinationYaw.getRadians();
+            var currState = new TrapezoidProfile.State(yaw, mlastVelocity);
+            var goalState = new TrapezoidProfile.State(goal, 0);
+            TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
+            double ticLength = 1./20; //Robot runs at 20Hz
+            var driveCommand = currMotionProfile.calculate(ticLength);
+            mlastVelocity = driveCommand.velocity;
             if (mPIDWidget != null) {
-                mPIDWidget.update(yaw, goal, d);
+                mPIDWidget.update(yaw, goal, driveCommand.velocity);
             }
             mSwerve.drive(
-                new ChassisSpeeds(0, 0, d),
+                new ChassisSpeeds(0, 0, driveCommand.velocity),
                 true,
                 true
             );
         }
 
         @Override
+
+        public void end(boolean isInterrupted) {
+            mSwerve.stop();
+        }
+        @Override
         public boolean isFinished() {
-            // boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+            double yaw = mSwerve.getYaw().getDegrees();
+            double goal = mDestinationYaw.getDegrees();
+            boolean positionFine = (Math.abs(yaw - goal) < mYawToleranceDegrees);
             // // boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
-            // Boolean finished = positionFine;
-            // if (finished) {
-            //     System.out.println("done");
-            // }
-            // return finished;
-            return false;
+            boolean finished = positionFine;
+            if (finished) {
+              System.out.println("done");
+            }
+            return finished;
         }
 
     }
@@ -307,5 +314,10 @@ public class SwerveCommands {
         public RotateYaw(Rotation2d deltaYaw) {
             super(deltaYaw.plus(mSwerve.getYaw()));
         }
+
+        public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
+            super(deltaYaw.plus(mSwerve.getYaw()), widget);
+        }
+
     }
 }
