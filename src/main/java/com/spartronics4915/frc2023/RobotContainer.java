@@ -136,8 +136,8 @@ public class RobotContainer {
                         .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
 
                     mDriverController.x()
-                        // .onTrue(mSwerveCommands.new RotateToTarget(mCameraWrapper));
-                        .onTrue(mSwerveCommands.new RotateYaw(Rotation2d.fromRadians(Math.PI/4)));
+                        // .onTrue(mSwerveCommands.new RotateToTarget());
+                        .onTrue(mSwerveCommands.new RotateToYaw(Rotation2d.fromRadians(Math.PI/4)));
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
                     //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));

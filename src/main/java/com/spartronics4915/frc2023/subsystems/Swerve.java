@@ -3,6 +3,7 @@ package com.spartronics4915.frc2023.subsystems;
 // import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.spartronics4915.frc2023.PhotonCameraWrapper;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -37,6 +38,8 @@ public class Swerve extends SubsystemBase {
     private Rotation2d mLastLastPitch;
 
 	private final int mModuleCount;
+    
+    public static PhotonCameraWrapper mCameraWrapper;
     // private PhotonCamera mFrontCamera;
 
     private boolean mIsFieldRelative = true;
@@ -54,6 +57,7 @@ public class Swerve extends SubsystemBase {
         mIMU = new Pigeon2(kPigeonID);
         configurePigeon(mIMU);
 
+        mCameraWrapper = new PhotonCameraWrapper();
         // mFrontCamera = new PhotonCamera(NetworkTableInstance.getDefault(), kFrontCameraName);
 
         mModules = new SwerveModule[] {
