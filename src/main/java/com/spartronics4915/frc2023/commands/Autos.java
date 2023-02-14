@@ -14,6 +14,7 @@ import com.spartronics4915.frc2023.subsystems.Swerve;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -98,14 +99,33 @@ public final class Autos {
 	}
 
 
-    public class LeaveCommunity extends SequentialCommandGroup {
-        public LeaveCommunity() {
-            addRequirements(mSwerve);
-            addCommands(
-                new InstantCommand(() -> mSwerve.drive(new Translation2d(3, 0), 0, mIsOpenLoop)),
-				new WaitCommand(1),
-				new InstantCommand(() -> mSwerve.drive(new Translation2d(), 0, mIsOpenLoop))
-            );
-        }    
-    }
+	public class MoveForwardDistance extends CommandBase {
+		private final Pose2d beginningPose;
+		private final double distance; 
+
+		public MoveForwardDistance(double x) {
+			addRequirements(mSwerve);
+			distance = x;
+			beginningPose = mSwerve.getPose();
+		}
+	
+		@Override
+		public void initialize() {
+
+			mSwerve.drive(new ChassisSpeeds(1,1,0), mIsOpenLoop);
+		}
+
+		@Override
+		public void execute() {
+		}
+
+		@Override
+		public void end(boolean interrupted) {}
+
+		@Override
+		public boolean isFinished() {
+			double dist = mSwerve.getPose().minus(beginningPose).getTranslation().getDistance(new Translation2d());
+			return dist >= distance;
+		}
+	}
 }
