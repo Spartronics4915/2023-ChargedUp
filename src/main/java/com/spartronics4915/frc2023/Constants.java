@@ -76,9 +76,9 @@ public final class Constants {
 
         public static final int kPigeonID = 9;
 
-        public static final double kPigeonMountPoseYaw = 90;
-        public static final double kPigeonMountPosePitch = 180;
-        public static final double kPigeonMountPoseRoll = 0;
+        public static final double kPigeonMountPoseYaw = -90;
+        public static final double kPigeonMountPosePitch = 0;
+        public static final double kPigeonMountPoseRoll = 180;
         
         public static final double kTrackWidth = Units.inchesToMeters(18.75);
         public static final double kWheelBase = Units.inchesToMeters(23.75);
@@ -109,44 +109,44 @@ public final class Constants {
             public static final int kDriveMotorID = 5;
             public static final int kAngleMotorID = 6;
             public static final int kEncoderID = 13;
-            public static final double kRawAngleOffsetDegrees = 355.60546875;
+            public static final double kRawAngleOffsetDegrees = 96.328125;
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kRawAngleOffsetRotations);
+                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
         }
 
         public static final class Module1 {
             public static final int kDriveMotorID = 3;
             public static final int kAngleMotorID = 4;
             public static final int kEncoderID = 12;
-            public static final double kRawAngleOffsetDegrees = 59.677734375;
+            public static final double kRawAngleOffsetDegrees = 167.431640625;
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kRawAngleOffsetRotations);
+                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
         }
 
         public static final class Module2 {
             public static final int kDriveMotorID = 7;
             public static final int kAngleMotorID = 8;
             public static final int kEncoderID = 14;
-            public static final double kRawAngleOffsetDegrees = 313.505859375;
+            public static final double kRawAngleOffsetDegrees = 16.962890625;
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kRawAngleOffsetRotations);
+                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
         }
 
         public static final class Module3 {
             public static final int kDriveMotorID = 1;
             public static final int kAngleMotorID = 2;
             public static final int kEncoderID = 11;
-            public static final double kRawAngleOffsetDegrees = 266.748046875;
+            public static final double kRawAngleOffsetDegrees = 118.65234375;
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kRawAngleOffsetRotations);
+                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
         }
 
         public static final class BalanceConstants {
@@ -181,14 +181,14 @@ public final class Constants {
             public final int angleMotorID;
             public final int encoderID;
             public final double angleOffset;
-            public final double absoluteOffsetRotations;
+            public final double absoluteOffset;
 
             public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRotations) {
                 driveMotorID = d;
                 angleMotorID = a;
                 encoderID = e;
                 angleOffset = o;
-                absoluteOffsetRotations = _absoluteOffsetRotations;
+                absoluteOffset = _absoluteOffsetRotations;
             }
         }
     }

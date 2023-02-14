@@ -37,10 +37,10 @@ public class SwerveModule {
 
     private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
-    public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRotations) {
+    public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRadians) {
         mModuleNumber = moduleNumber;
 
-        mAbsoluteOffset = Rotation2d.fromRotations(absoluteOffsetRotations);
+        mAbsoluteOffset = Rotation2d.fromRadians(absoluteOffsetRadians);
         
         mDriveMotor = kMotorConstructor.apply(driveMotorID);
         mDriveEncoder = mDriveMotor.getEncoder();
@@ -62,7 +62,7 @@ public class SwerveModule {
     }
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
-        this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.absoluteOffsetRotations);
+        this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.absoluteOffset);
     }
 
     public void forceModuleOrientation(Rotation2d newAngle, boolean isOpenLoop){
