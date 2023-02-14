@@ -1,6 +1,8 @@
 package com.spartronics4915.frc2023.commands;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
+
 import static com.spartronics4915.frc2023.Constants.Trajectory.*;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 
@@ -15,53 +17,44 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPoint;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 public class SwerveTrajectoryFollowerCommands {
 	private final Swerve mSwerve;
 	private final PIDController mXPID, mYPID;
-	private final ProfiledPIDController mThetaPID;
+	private final PIDController mThetaPID;
 
 	public SwerveTrajectoryFollowerCommands() {
 		mSwerve = Swerve.getInstance();
 		mXPID = new PIDController(kLinearP, 0, 0);
 		mYPID = new PIDController(kLinearP, 0, 0);
-		mThetaPID = new ProfiledPIDController(
-			kThetaP, 0, 0, new TrapezoidProfile.Constraints(kMaxAngularSpeed, 1) // FIXME: 1 is a placeholder
-		);
+		mThetaPID = new PIDController(kThetaP, 0, 0);
 		mThetaPID.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
-	class FollowTrajectory extends SwerveControllerCommand {
-		private TrapezoidProfile.Constraints mConstraints;
+	class FollowTrajectory extends PPSwerveControllerCommand {
 		public FollowTrajectory(
-			ArrayList<Pose2d> waypoints, // meters
-			double startVelocity, double endVelocity, double maxVelocity, // meters per second
-			double maxAccel, // meters per second squared
-			double maxAngularVelocity, double maxAngularAcceleration // radians per second
+			ArrayList<PathPoint> waypoints, // meters
+			double maxVelocity, // meters per second
+			double maxAccel // meters per second squared
 		) {
 			super(
-				TrajectoryGenerator.generateTrajectory( // FIXME: will possibly take longer than 1 cycle (don't worry 'bout it)
-					waypoints,
-					new TrajectoryConfig(maxVelocity, maxAccel)
-						.setStartVelocity(startVelocity)
-						.setEndVelocity(endVelocity)
+				PathPlanner.generatePath(
+					new PathConstraints(maxVelocity, maxAccel),
+					waypoints
 				),
 				mSwerve::getPose,
 				kKinematics,
 				mXPID, mYPID,
 				mThetaPID,
 				mSwerve::setModuleStates,
+				false,
 				mSwerve
 			);
-			mConstraints = new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration);
-		}
-
-		@Override
-		public void initialize() {
-			mThetaPID.setConstraints(mConstraints);
-			mThetaPID.reset(mSwerve.getYaw().getRadians());
-			super.initialize();
 		}
 
 		@Override
@@ -73,7 +66,7 @@ public class SwerveTrajectoryFollowerCommands {
 			SmartDashboard.putNumber("Swerve yPID Setpoint", mYPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve yPID Position Error", mYPID.getPositionError());
 			
-			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint().velocity);
+			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve thetaPID Position Error", mThetaPID.getPositionError());
 		}
 	}
