@@ -32,6 +32,8 @@ public final class Autos {
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
 	private final double maxVelocity = 0.1;
 	private final double maxAccel = 0.4;
+	private final double maxAngularVelocity = 0.8;
+	private final double maxAngularAcceleration = 0.2;
 			
 
     public Autos(SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {

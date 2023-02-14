@@ -66,7 +66,7 @@ public class SwerveTrajectoryFollowerCommands {
 			SmartDashboard.putNumber("Swerve yPID Setpoint", mYPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve yPID Position Error", mYPID.getPositionError());
 			
-			// SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
+			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve thetaPID Position Error", mThetaPID.getPositionError());
 		}
 	}
