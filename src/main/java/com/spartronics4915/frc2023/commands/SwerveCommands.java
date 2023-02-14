@@ -247,7 +247,7 @@ public class SwerveCommands {
         private final ProfiledPIDController pid;
 
         public RotateToYaw(Rotation2d destinationYaw) {
-            pid = new ProfiledPIDController(0.000000002, 0, 0, 
+            pid = new ProfiledPIDController(0.000002, 0, 0, 
             new TrapezoidProfile.Constraints(Math.PI / 64.0, 0.1));
             pid.setTolerance((Math.PI / 180.) * mYawToleranceDegrees, (Math.PI / 180.) * mAngularVelToleranceDegreesSec);
             pid.enableContinuousInput(-Math.PI, Math.PI);
@@ -291,48 +291,9 @@ public class SwerveCommands {
 
     }
 
-    public class RotateYaw extends CommandBase {
-
-        private final double mYawToleranceDegrees = 10;
-        private final double mAngularVelToleranceDegreesSec = 1;
-        private final double kP = 0.2;
-        private Rotation2d mDeltaYaw;
-        private final ProfiledPIDController pid;
-
+    public class RotateYaw extends RotateToYaw {
         public RotateYaw(Rotation2d deltaYaw) {
-            pid = new ProfiledPIDController(kP, 0, 0.01, new TrapezoidProfile.Constraints(
-                10,
-                kMaxAcceleration
-            ));
-            pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
-            pid.enableContinuousInput(0, 360);
-
-            addRequirements(mSwerve);
-            mDeltaYaw = deltaYaw;
+            super(deltaYaw.plus(mSwerve.getYaw()));
         }
-
-        @Override
-        public void execute() {
-            double d = pid.calculate(mDeltaYaw.getDegrees(), 0);
-            //System.out.println(d);
-            mSwerve.drive(
-                new Translation2d(),
-                -d,
-                true
-            );
-        }
-
-        @Override
-        public boolean isFinished() {
-            boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
-            boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
-            Boolean finished = positionFine && velocityFine;
-            if (finished) {
-                System.out.println("done");
-            }
-            return finished;
-        }
-
     }
-
 }
