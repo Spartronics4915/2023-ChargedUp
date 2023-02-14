@@ -3,6 +3,7 @@ package com.spartronics4915.frc2023.commands;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -10,10 +11,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import static com.spartronics4915.frc2023.Constants.OI.*;
@@ -237,44 +241,96 @@ public class SwerveCommands {
     }
     public class RotateToYaw extends CommandBase {
 
-        private final double kMaxSpeedDegreesSec = 15;
         private final double mYawToleranceDegrees = 2;
-        private final double ticDuration = 1.0 / 20;
+        private final double mAngularVelToleranceDegreesSec = 1;
         private Rotation2d mDestinationYaw;
-        private Swerve mSwerveSubsystem;
+        private final ProfiledPIDController pid;
 
         public RotateToYaw(Rotation2d destinationYaw) {
+            pid = new ProfiledPIDController(0.000000002, 0, 0, 
+            new TrapezoidProfile.Constraints(Math.PI / 64.0, 0.1));
+            pid.setTolerance((Math.PI / 180.) * mYawToleranceDegrees, (Math.PI / 180.) * mAngularVelToleranceDegreesSec);
+            pid.enableContinuousInput(-Math.PI, Math.PI);
+            
             addRequirements(mSwerve);
-            mDestinationYaw = destinationYaw;
-        }
-
-        private double getYawToGo() {
-            var currYaw = mSwerve.getYaw();
-
-            return currYaw.minus(mDestinationYaw).getDegrees();
+            mDestinationYaw = destinationYaw.times(-1);
         }
 
         @Override
+        public void initialize() {
+            pid.reset(mSwerve.getYaw().getRadians());
+        }
+        
+
+        @Override
         public void execute() {
-
-            var yawToGo = getYawToGo();
-            double timeToFinish = Math.abs(yawToGo) / ticDuration;
-            double currRotationSpeed = yawToGo / timeToFinish;
-
-            if(currRotationSpeed > kMaxSpeedDegreesSec) {
-                currRotationSpeed = kMaxSpeedDegreesSec;
-            }
-
-            Translation2d zeroTranslation = new Translation2d();
-            double currRotationSpeedRadians = currRotationSpeed / 180 * Math.PI;
-
-            mSwerve.drive(zeroTranslation, currRotationSpeedRadians, true);
+            double goal = mDestinationYaw.getRadians();
+            double yaw = mSwerve.getYaw().getRadians();
+            double d = pid.calculate(yaw, goal);
+            SmartDashboard.putNumber("Yaw", yaw);
+            SmartDashboard.putNumber("Goal", goal);
+            SmartDashboard.putNumber("Theta", d);
+            mSwerve.drive(
+                new ChassisSpeeds(0, 0, d),
+                true,
+                true
+            );
         }
 
         @Override
         public boolean isFinished() {
+            // boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+            // // boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+            // Boolean finished = positionFine;
+            // if (finished) {
+            //     System.out.println("done");
+            // }
+            // return finished;
+            return false;
+        }
 
-            return (Math.abs(getYawToGo()) < mYawToleranceDegrees);
+    }
+
+    public class RotateYaw extends CommandBase {
+
+        private final double mYawToleranceDegrees = 10;
+        private final double mAngularVelToleranceDegreesSec = 1;
+        private final double kP = 0.2;
+        private Rotation2d mDeltaYaw;
+        private final ProfiledPIDController pid;
+
+        public RotateYaw(Rotation2d deltaYaw) {
+            pid = new ProfiledPIDController(kP, 0, 0.01, new TrapezoidProfile.Constraints(
+                10,
+                kMaxAcceleration
+            ));
+            pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
+            pid.enableContinuousInput(0, 360);
+
+            addRequirements(mSwerve);
+            mDeltaYaw = deltaYaw;
+        }
+
+        @Override
+        public void execute() {
+            double d = pid.calculate(mDeltaYaw.getDegrees(), 0);
+            //System.out.println(d);
+            mSwerve.drive(
+                new Translation2d(),
+                -d,
+                true
+            );
+        }
+
+        @Override
+        public boolean isFinished() {
+            boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+            boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+            Boolean finished = positionFine && velocityFine;
+            if (finished) {
+                System.out.println("done");
+            }
+            return finished;
         }
 
     }

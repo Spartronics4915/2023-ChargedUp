@@ -132,7 +132,7 @@ public final class DebugTeleopCommands {
             chassisWidget = new ChassisWidget(tab);
 
             swerve_subsystem = Swerve.getInstance();
-            ShuffleboardLayout elevatorCommands = 
+            ShuffleboardLayout commands = 
             tab.getLayout("Orientation", BuiltInLayouts.kList)
             .withSize(2, 3)
             .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
@@ -146,8 +146,10 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
-            elevatorCommands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
-            elevatorCommands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
+            commands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
+            commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(45)).withName("Rotate to 45"));
+
+            commands.add(mSwerveCommands.new RotateYaw(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
         }
         
         public void update(){
