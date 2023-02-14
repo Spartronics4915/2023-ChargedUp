@@ -74,7 +74,7 @@ public final class Constants {
             public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
         }
 
-        public static final int kPigeonID = 9;
+        public static final int kPigeonID = 2;
 
         public static final double kPigeonMountPoseYaw = -90;
         public static final double kPigeonMountPosePitch = 0;
@@ -139,8 +139,8 @@ public final class Constants {
         }
 
         public static final class Module3 {
-            public static final int kDriveMotorID = 1;
-            public static final int kAngleMotorID = 2;
+            public static final int kDriveMotorID = 9;
+            public static final int kAngleMotorID = 10;
             public static final int kEncoderID = 11;
             public static final double kRawAngleOffsetDegrees = 118.65234375;
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
