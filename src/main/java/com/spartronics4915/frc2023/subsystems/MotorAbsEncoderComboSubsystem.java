@@ -33,7 +33,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
 
     private SparkMaxPIDController initializePIDController(double kP) {
         SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(kP);
+        PIDController.setP(0.05);
         PIDController.setI(0);
         PIDController.setD(0);
         // PIDController.setPo
