@@ -38,7 +38,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         PIDController.setD(0);
         // PIDController.setPo
 
-        PIDController.setSmartMotionMaxAccel(2.5, 0); //20
+        PIDController.setSmartMotionMaxAccel(1, 0); //20
  
         PIDController.setSmartMotionMaxVelocity(1, 0);
 
