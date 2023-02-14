@@ -1,8 +1,12 @@
 package com.spartronics4915.frc2023.subsystems;
 
+import com.ctre.phoenix.sensors.BasePigeon;
+
 // import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMUConfiguration;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -32,7 +36,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveModule[] mModules;
 
-    private Pigeon2 mIMU;
+    private BasePigeon mIMU;
     private Rotation2d mLastPitch;
     private Rotation2d mLastLastPitch;
 
@@ -51,8 +55,8 @@ public class Swerve extends SubsystemBase {
     }
 
     private Swerve() {
-        mIMU = new Pigeon2(kPigeonID);
-        configurePigeon(mIMU);
+		mIMU = kPigeonConstructor.apply(kPigeonID);
+		configurePigeon(mIMU);
 
         // mFrontCamera = new PhotonCamera(NetworkTableInstance.getDefault(), kFrontCameraName);
 
@@ -77,8 +81,13 @@ public class Swerve extends SubsystemBase {
         );
     }
 
-    private void configurePigeon(Pigeon2 pigeon2) {
-        pigeon2.configMountPose(kPigeonMountPoseYaw, kPigeonMountPosePitch, kPigeonMountPoseRoll);
+    private void configurePigeon(BasePigeon pigeon) {
+		if (mIMU instanceof Pigeon2)
+			((Pigeon2)pigeon).configMountPose(
+				kPigeonMountPoseYaw,
+				kPigeonMountPosePitch,
+				kPigeonMountPoseRoll
+			);
     }
 
 	public int getModuleCount() {
@@ -159,7 +168,7 @@ public class Swerve extends SubsystemBase {
         return mIsFieldRelative;
     }
 
-    public Pigeon2 getIMU() {
+    public BasePigeon getIMU() {
         return mIMU;
     }
 

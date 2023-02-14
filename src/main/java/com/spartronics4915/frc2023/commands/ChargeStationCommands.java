@@ -10,14 +10,17 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 public final class ChargeStationCommands {
 
     public static class AutoChargeStationClimb extends CommandBase {
 
         private Swerve mSwerveSubsystem;
-        private Pigeon2 mIMU;
+        private BasePigeon mIMU;
 
         final PIDController vxPID;
         final PIDController thetaPID;
@@ -30,9 +33,9 @@ public final class ChargeStationCommands {
         private Timer mCurrStateTimer;
         private String mLogString;
 
-        public AutoChargeStationClimb(Swerve swerveSubsystem) {
-            addRequirements(swerveSubsystem);
-            mSwerveSubsystem = swerveSubsystem;
+        public AutoChargeStationClimb() {
+			mSwerveSubsystem = Swerve.getInstance();
+            addRequirements(mSwerveSubsystem);
             mIMU = mSwerveSubsystem.getIMU();
             mLogString = "";
             mCurrState = ClimbState.CLIMB_TO_GRIP;
@@ -49,8 +52,8 @@ public final class ChargeStationCommands {
         /**
          * Only for testing
          */
-        public AutoChargeStationClimb(Swerve swerveSubsystem, ClimbState initialState) {
-            this(swerveSubsystem);
+        public AutoChargeStationClimb(ClimbState initialState) {
+            this();
             mCurrState = initialState;
         }
 

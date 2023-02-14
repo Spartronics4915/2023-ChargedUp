@@ -7,6 +7,9 @@ package com.spartronics4915.frc2023;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+import com.ctre.phoenix.sensors.BasePigeon;
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -45,7 +48,41 @@ public final class Constants {
 	}
 
     public static final class Swerve {
-        public static final class Drive {
+        
+		public static class ChassisConstants {
+			public final double driveGearRatio, angleGearRatio;
+			public final double trackWidth, wheelBase;
+			public final double[] moduleOffsets;
+			public final IntFunction<BasePigeon> pigeonConstructor;
+			public ChassisConstants(
+				double driveGearRatio, double angleGearRatio,
+				double trackWidth, double wheelBase,
+				double[] moduleOffsets, IntFunction<BasePigeon> pigeonConstructor
+			) {
+				this.driveGearRatio = driveGearRatio;
+				this.angleGearRatio = angleGearRatio;
+				this.trackWidth = trackWidth;
+				this.wheelBase = wheelBase;
+				this.moduleOffsets = moduleOffsets;
+				this.pigeonConstructor = pigeonConstructor;
+			}
+		}
+		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
+			6.75 / 1.0, 150.0 / 7.0,
+			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75),
+			new double[]{ -96.855, -168.486, -15.820, -118.916 },
+			(int id) -> { return (BasePigeon)(new Pigeon2(id)); }
+		);
+		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
+			8.33 / 1.0, 18.8 / 1.0,
+			0.75, 0.75,
+			new double[]{  0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
+			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); }
+		);
+		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
+
+
+		public static final class Drive {
             public static final double kP = 0.0; // placeholder
             public static final double kI = 0.0; // placeholder
             public static final double kD = 0.0; // placeholder
@@ -57,7 +94,7 @@ public final class Constants {
 
             public static final int kContinuousCurrentLimit = 30;
 
-            public static final double kGearRatio = 6.75 / 1.0;
+            public static final double kGearRatio = kChassisConstants.driveGearRatio;
             public static final double kVelocityConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio) / 60.0;
             public static final double kPositionConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio);
         }
@@ -70,18 +107,19 @@ public final class Constants {
 
             public static final int kContinuousCurrentLimit = 15;
 
-            public static final double kGearRatio = 150.0 / 7.0;
+            public static final double kGearRatio = kChassisConstants.angleGearRatio;
             public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
         }
 
         public static final int kPigeonID = 9;
+		public static final IntFunction<BasePigeon> kPigeonConstructor = kChassisConstants.pigeonConstructor;
 
         public static final double kPigeonMountPoseYaw = 90;
         public static final double kPigeonMountPosePitch = 180;
         public static final double kPigeonMountPoseRoll = 0;
         
-        public static final double kTrackWidth = Units.inchesToMeters(18.75);
-        public static final double kWheelBase = Units.inchesToMeters(23.75);
+        public static final double kTrackWidth = kChassisConstants.trackWidth;
+        public static final double kWheelBase = kChassisConstants.wheelBase;
         public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
 		public static final Pose2d kInitialPose = new Pose2d();
 
@@ -108,7 +146,7 @@ public final class Constants {
             public static final int kDriveMotorID = 5;
             public static final int kAngleMotorID = 6;
             public static final int kEncoderID = 13;
-            public static final double kRawAngleOffsetDegrees = -96.855;
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[0];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -119,7 +157,7 @@ public final class Constants {
             public static final int kDriveMotorID = 3;
             public static final int kAngleMotorID = 4;
             public static final int kEncoderID = 12;
-            public static final double kRawAngleOffsetDegrees = -168.486;
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[1];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -130,7 +168,7 @@ public final class Constants {
             public static final int kDriveMotorID = 7;
             public static final int kAngleMotorID = 8;
             public static final int kEncoderID = 14;
-            public static final double kRawAngleOffsetDegrees = -15.820;
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[2];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -141,7 +179,7 @@ public final class Constants {
             public static final int kDriveMotorID = 1;
             public static final int kAngleMotorID = 2;
             public static final int kEncoderID = 11;
-            public static final double kRawAngleOffsetDegrees = -118.916;
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[3];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
