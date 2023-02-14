@@ -8,6 +8,7 @@ import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -17,26 +18,34 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     
     private CANSparkMax mMotor;
+    private RelativeEncoder relEncoder;
     private SparkMaxAbsoluteEncoder mAbsEncoder;
     private SparkMaxPIDController mPIDController;
     private Rotation2d mLastReference = new Rotation2d(0);
+    private boolean useAbs;
 
-    public MotorAbsEncoderComboSubsystem(int motorId, double kP) {
-        mMotor = new CANSparkMax(motorId, MotorType.kBrushless);
+    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, boolean useAbs) {
+        this.useAbs = useAbs;
+        
+        mMotor = new CANSparkMax(MotorConstants.kMotorID, MotorType.kBrushless);
         mMotor.setIdleMode(IdleMode.kCoast);
 
-        mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        mAbsEncoder.setPositionConversionFactor((Math.PI*2));    
-        
-        mPIDController = initializePIDController(0.05);
+        if(useAbs){
+            mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+            mAbsEncoder.setPositionConversionFactor((Math.PI*2));    
+        } else {
+            relEncoder = mMotor.getEncoder();
+            relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);
+        }
+
+        mPIDController = initializePIDController(MotorConstants);
     }
 
-    private SparkMaxPIDController initializePIDController(double kP) {
+    private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
         SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(0.05);
-        PIDController.setI(0);
-        PIDController.setD(0);
-        // PIDController.setPo
+        PIDController.setP(MotorConstants.kP);
+        PIDController.setI(MotorConstants.kI);
+        PIDController.setD(MotorConstants.kD);
 
         PIDController.setSmartMotionMaxAccel(1, 0); //20
  
@@ -49,26 +58,39 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         PIDController.setPositionPIDWrappingEnabled(false);
         PIDController.setPositionPIDWrappingMaxInput(1);
         PIDController.setPositionPIDWrappingMinInput(0);
-        PIDController.setFeedbackDevice(mAbsEncoder);
-        
-        
+        if(useAbs) PIDController.setFeedbackDevice(mAbsEncoder);
+        else {
+            PIDController.setFeedbackDevice(mMotor.getEncoder());
+        }
+        System.out.println(PIDController.getP());
+        System.out.println(PIDController.getI());
+        System.out.println(PIDController.getD());
         return PIDController;
     }
 
     public void setReference(Rotation2d ref) {
+        System.out.println("set Ref called");
+
         mLastReference = ref;
         System.out.println(ref + ": also this was called");
         mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion);
     }
 
+    public CANSparkMax getMotor(){
+        return mMotor;
+    }
     public Rotation2d getCurrentReference() 
     {
         return mLastReference;
     }
 
     public double getPosition(){
-        return mAbsEncoder.getPosition();
+        // System.out.println("get Pos Called");
+        if (useAbs) return mAbsEncoder.getPosition();
+        else return(mMotor.getEncoder().getPosition());
+        // return 123;
     }
+
     public double getMotorSpeed(){
         return mMotor.getAppliedOutput();
     }

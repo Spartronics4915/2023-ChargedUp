@@ -125,19 +125,20 @@ public final class DebugTeleopCommands {
 
     public static class ArmWidget {
         // private GenericEntry linActDistance,stateRadius;
-        // private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
+        private GenericEntry wristLeveledRotation, stateWristLeveledRotation, WristSpeed;
         private GenericEntry shoulderRotation, stateShoulderRotation, refShoulderRotation, MoterSped;
         ArmWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3).withProperties(Map.of("Label position", "LEFT"));
 
             // linActDistance = armModule.add("current radius", 0).getEntry();
             // stateRadius = armModule.add("desired radius",0).getEntry();
-            // wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
-            // stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
+            wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
+            stateWristLeveledRotation = armModule.add("desired leveled wrist angle",0).getEntry();
             shoulderRotation = armModule.add("current shoulder angle", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle",0).getEntry();
             refShoulderRotation = armModule.add("current refrence",0).getEntry();
-            MoterSped = armModule.add("sped",0).getEntry();
+            MoterSped = armModule.add("pivot speed",0).getEntry();
+            WristSpeed = armModule.add("wrist Speed", 0).getEntry();
         }
 
         public void update(ArmSubsystem module) {
@@ -145,12 +146,14 @@ public final class DebugTeleopCommands {
             ArmState desired = module.getState();
             // linActDistance.setDouble(current.armRadius);
             // stateRadius.setDouble(desired.armRadius);
-            // wristLeveledRotation.setDouble(current.wristTheta.getDegrees());
-            // stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
+            wristLeveledRotation.setDouble(current.wristTheta.getDegrees()); //TODO edit this;
+            stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
             shoulderRotation.setDouble(current.armTheta.getDegrees());
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
             refShoulderRotation.setDouble(module.getRef().getDegrees());
             MoterSped.setDouble(module.getPivot().getMotorSpeed());
+            MoterSped.setDouble(module.getPivot().getMotorSpeed());
+            WristSpeed.setDouble(module.getWrist().getMotorSpeed());
         }
     }
     public static class ArmTab {

@@ -195,11 +195,54 @@ public final class Constants {
     }
 
     public static final class Arm {
+        public static final class ArmMotorConstants{
+            public final int kMotorID;
+            public final double kPositionConversionFactor;
+            public final double kP;
+            public final double kI;
+            public final double kD;
+            public final double kSmartMotionMaxAccel;
+            public final double kSmartMotionMaxVelocity;
+            public final double kSmartMotionMinOutputVelocity;
+            public ArmMotorConstants(int MotorID, double PositionConversionFactor, double P, double I, double D, double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity) {
+                super();
+                this.kMotorID = MotorID;
+                this.kPositionConversionFactor = PositionConversionFactor;
+                this.kP = P;
+                this.kI = I;
+                this.kD = D;
+                this.kSmartMotionMaxAccel = SmartMotionMaxAccel;
+                this.kSmartMotionMaxVelocity = SmartMotionMaxVelocity;
+                this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
+            }
+        }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
         public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
 
+        public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
+            2,  //actual value 15
+            Math.PI * 2,
+            0.05, 0, 0,
+            1, 1, 0
+        ); 
+
+        public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
+            3, 
+            Math.PI * 2,
+            0.01, 0, 0,
+            1, 1, 0
+        ); 
+
+        public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
+            -1, 
+            0,
+            0, 0, 0,
+            0, 0, 0
+        ); 
+        public static final int kPivotFollowerID = -1; //actual value: 16
+
+
         public static final int kPivotMotorID = 2;
-        public static final int kPivotFollowerID = -1;
         public static final int kExtenderMotorID = -1;
         public static final int kWristMotorID = -1;
 
@@ -207,7 +250,7 @@ public final class Constants {
         public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
         public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
 
-        public static final double kPivotP = 0.01;
+        public static final double kPivotP = 0.05;
         public static final double kPivotI = 0.0;
         public static final double kPivotD = 0.0;
 
@@ -222,25 +265,25 @@ public final class Constants {
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,
             new Rotation2d(0), //0
-            new Rotation2d()
+            new Rotation2d(0) //0
         );
 
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
             0,
             new Rotation2d(Math.PI/4), //45
-            new Rotation2d()
+            new Rotation2d(Math.PI/4) //45
         );
 
         public static final ArmPositionConstants kGrabFallenConstants = new ArmPositionConstants(
             0,
             new Rotation2d(Math.PI/2), //90
-            new Rotation2d()
+            new Rotation2d(Math.PI/2) //90
         );
 
         public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
             0,
             new Rotation2d(Math.PI), //180
-            new Rotation2d()
+            new Rotation2d(Math.PI) //180
         );
 
         public static final ArmPositionConstants kLevel2Constants = new ArmPositionConstants(

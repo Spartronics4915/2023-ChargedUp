@@ -68,6 +68,7 @@ public class ArmSubsystem extends SubsystemBase {
     private ArmState mState;
 
     private final MotorAbsEncoderComboSubsystem mPivotMotor;
+    private final MotorAbsEncoderComboSubsystem mWristMotor;
     // private final CANSparkMax mPivotFollower;
 
     // private final CANSparkMax mExtenderMotor;
@@ -78,10 +79,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
         mState = ArmState.RETRACTED;
-        
-        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorID, kPivotP);    
-    //     mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
-    //     mPivotFollower.follow(mPivotMotor); //TODO check if this needs to be reversed
+        System.out.println("arm created");
+        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true);  
+        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, false);
+        // mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
+        // mPivotFollower.follow(mPivotMotor.getMotor()); //TODO check if this needs to be reversed
 
     //     mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
     //     mExtenderPIDController = mExtenderMotor.getPIDController();
@@ -94,6 +96,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     public MotorAbsEncoderComboSubsystem getPivot() {
         return mPivotMotor;
+    }
+    public MotorAbsEncoderComboSubsystem getWrist() {
+        return mWristMotor;
     }
 
     public static ArmSubsystem getInstance() {
@@ -124,7 +129,8 @@ public class ArmSubsystem extends SubsystemBase {
         return new ArmPosition(
             0,
             new Rotation2d(mPivotMotor.getPosition()),
-            new Rotation2d(0)
+            new Rotation2d(mWristMotor.getPosition())
+            // new Rotation2d(0)
         );
     }
 
@@ -135,8 +141,12 @@ public class ArmSubsystem extends SubsystemBase {
     // //TODO determine offsets for absolute encoders
     private void setDesiredState(ArmState state) {
         mPivotMotor.setReference(state.armTheta);
+        mWristMotor.setReference(state.wristTheta);
+        // mWristMotor.setReference( Rotation2d.fromDegrees(
+        //     270 - state.armTheta.getDegrees() + state.wristTheta.getDegrees()
+        // ));
         System.out.println("testing123123");
-        // System.out.println();
+        // TODO add way for driver to interact
         // setLeveledWristAngle(state.wristTheta);
         // setArmRadius(state.armRadius);
     }
