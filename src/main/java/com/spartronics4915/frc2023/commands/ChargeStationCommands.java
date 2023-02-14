@@ -5,22 +5,27 @@ import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 
 public final class ChargeStationCommands {
 
     public static class AutoChargeStationClimb extends CommandBase {
 
-        private Swerve mSwerveSubsystem;
-        private Pigeon2 mIMU;
+        private Swerve mSwerve;
+        private BasePigeon mIMU;
 
-        final PIDController vxPID;
-        final PIDController thetaPID;
+        private final PIDController mVXPID;
+        private final ProfiledPIDController mThetaPID;
 
         public enum ClimbState {
             CLIMB_TO_GRIP, GRIP_TO_PLATFORM, LEVEL_ROBOT_SETUP, LEVEL_ROBOT, STOP, ERROR
@@ -30,27 +35,28 @@ public final class ChargeStationCommands {
         private Timer mCurrStateTimer;
         private String mLogString;
 
-        public AutoChargeStationClimb(Swerve swerveSubsystem) {
-            addRequirements(swerveSubsystem);
-            mSwerveSubsystem = swerveSubsystem;
-            mIMU = mSwerveSubsystem.getIMU();
+        public AutoChargeStationClimb() {
+			mSwerve = Swerve.getInstance();
+            addRequirements(mSwerve);
+            mIMU = mSwerve.getIMU();
             mLogString = "";
             mCurrState = ClimbState.CLIMB_TO_GRIP;
-            vxPID = new PIDController(
+            mVXPID = new PIDController(
                     BalanceConstants.XVelocityPID.kP,
                     BalanceConstants.XVelocityPID.kI,
                     BalanceConstants.XVelocityPID.kD);
-            thetaPID = new PIDController(
+            mThetaPID = new ProfiledPIDController(
                     BalanceConstants.ThetaPID.kP,
                     BalanceConstants.ThetaPID.kI,
-                    BalanceConstants.ThetaPID.kD);
+                    BalanceConstants.ThetaPID.kD,
+                    new Constraints(kMaxAngularSpeed, kMaxAngularAcceleration));
         }
 
         /**
          * Only for testing
          */
-        public AutoChargeStationClimb(Swerve swerveSubsystem, ClimbState initialState) {
-            this(swerveSubsystem);
+        public AutoChargeStationClimb(ClimbState initialState) {
+            this();
             mCurrState = initialState;
         }
 
@@ -63,7 +69,7 @@ public final class ChargeStationCommands {
 
         @Override
         public void end(boolean interrupted) {
-            mSwerveSubsystem.stop();
+            mSwerve.stop();
             if (interrupted) {
                 mLastState = mCurrState;
                 mLogString = "Interrupted";
@@ -85,13 +91,13 @@ public final class ChargeStationCommands {
                     final double climb_to_grip_time_allowed = 5;
 
                     if (mCurrStateTimer.hasElapsed(climb_to_grip_time_allowed)) {
-                        mSwerveSubsystem.stop();
+                        mSwerve.stop();
                         mLastState = mCurrState;
                         mCurrState = ClimbState.ERROR;
                         mLogString = "Climb_To_Grip Timeout";
                     }
-                    mSwerveSubsystem.drive(new ChassisSpeeds(climb_to_grip_speed_m_s, 0, 0), true, true);
-                    if (Math.abs(mSwerveSubsystem.getPitch().getDegrees()) > climb_to_grip_target_pitch_deg) {
+                    mSwerve.drive(new ChassisSpeeds(climb_to_grip_speed_m_s, 0, 0), true, true);
+                    if (Math.abs(mSwerve.getPitch().getDegrees()) > climb_to_grip_target_pitch_deg) {
                         mLastState = mCurrState;
                         mCurrState = ClimbState.GRIP_TO_PLATFORM;
                         mCurrStateTimer = new Timer();
@@ -105,13 +111,13 @@ public final class ChargeStationCommands {
                     final double grip_to_platform_target_roll_deg = 8;
                     final double grip_to_platform_time_allowed = 5;
                     if (mCurrStateTimer.hasElapsed(grip_to_platform_time_allowed)) {
-                        mSwerveSubsystem.stop();
+                        mSwerve.stop();
                         mLastState = mCurrState;
                         mCurrState = ClimbState.ERROR;
                         mLogString = "grip_to_platform Timeout";
                     }
-                    mSwerveSubsystem.drive(new ChassisSpeeds(grip_to_platform_speed_m_s, 0, 0), true, true);
-                    if (Math.abs(mSwerveSubsystem.getPitch().getDegrees()) < grip_to_platform_target_roll_deg) {
+                    mSwerve.drive(new ChassisSpeeds(grip_to_platform_speed_m_s, 0, 0), true, true);
+                    if (Math.abs(mSwerve.getPitch().getDegrees()) < grip_to_platform_target_roll_deg) {
                         mLastState = mCurrState;
                         mCurrState = ClimbState.LEVEL_ROBOT_SETUP;
                         mCurrStateTimer = null;
@@ -120,26 +126,27 @@ public final class ChargeStationCommands {
                 }
 
                 case LEVEL_ROBOT_SETUP: {
-                    vxPID.setSetpoint(0);
-                    thetaPID.setSetpoint(0);
+                    mVXPID.setSetpoint(0);
+                    mThetaPID.setGoal(new State(0, 0));
                     mCurrState = ClimbState.LEVEL_ROBOT;
                 }
 
                 case LEVEL_ROBOT: {
-                    double vx = vxPID.calculate(mSwerveSubsystem.getPitch().getRadians());
-                    double omega = thetaPID.calculate(mSwerveSubsystem.getYaw().getRadians());
+                    double vx = mVXPID.calculate(mSwerve.getPitch().getRadians());
+                    double omega = mThetaPID.calculate(mSwerve.getYaw().getRadians());
 
                     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
 
-                    mSwerveSubsystem.drive(chassisSpeeds, true, true);
+                    mSwerve.drive(chassisSpeeds, true, true);
 
-                    if (vxPID.atSetpoint() && Math.abs(mSwerveSubsystem.getPitchOmega()) <= 0.1) {
+                    if (mVXPID.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1) {
                         mCurrState = ClimbState.STOP;
                     }
+                    break;
                 }
 
                 default: {
-                    mSwerveSubsystem.stop();
+                    mSwerve.stop();
                     mLogString = "Got to Default";
                     mLastState = mCurrState;
                     mCurrStateTimer = null;

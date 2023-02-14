@@ -80,10 +80,10 @@ public class RobotContainer {
         mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
         
         mSwerve = Swerve.getInstance();
-        mSwerveCommands = new SwerveCommands(mDriverController, mSwerve);
+        mSwerveCommands = new SwerveCommands(mDriverController);
         mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
         
-        mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands(mSwerve);
+        mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
 
         // mArm = Arm.getInstance();
         // mArmCommands = new ArmCommands(mArm);
@@ -91,7 +91,7 @@ public class RobotContainer {
         // mIntake = Intake.getInstance();
         // mIntakeCommands = new IntakeCommands(mIntake);
         
-        mAutos = new Autos(mSwerve, mSwerveTrajectoryFollowerCommands);
+        mAutos = new Autos(mSwerveTrajectoryFollowerCommands);
         
         mAutonomousCommand = new SequentialCommandGroup(
             mSwerveCommands.new ResetCommand(),
@@ -130,10 +130,10 @@ public class RobotContainer {
                         .onFalse(mSwerveCommands.new DisableSprintMode());
 
                     mDriverController.rightBumper()
-                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
                     mDriverController.leftBumper()
-                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));
 
                     mDriverController.x()
                         // .onTrue(mSwerveCommands.new RotateToTarget());
@@ -187,8 +187,7 @@ public class RobotContainer {
             }
 
             public void initRobot() {
-                Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mSwerve,
-                mSwerveCommands);
+                Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mSwerveCommands);
                 shuffleboard_update_command.schedule();
 
                 mSwerve.resetToAbsolute();

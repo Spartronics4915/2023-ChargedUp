@@ -34,9 +34,9 @@ public class SwerveCommands {
     private final Swerve mSwerve;
     private boolean mIsSprintMode = false;
 
-    public SwerveCommands(CommandXboxController controller, Swerve swerve) {
+    public SwerveCommands(CommandXboxController controller) {
         mDriverController = controller;
-        mSwerve = swerve;
+        mSwerve = Swerve.getInstance();
     }
 
     public class SetFieldRelative extends InstantCommand {
@@ -77,6 +77,9 @@ public class SwerveCommands {
 		}
     }
 
+    /**
+     * Mainly for debugging, probably shouldn't be used during a match
+     */
     public class ResetOdometry extends InstantCommand {
         public ResetOdometry() {
 
@@ -89,6 +92,9 @@ public class SwerveCommands {
 		}
     }
 
+    /**
+     * Mainly used to initialize robot
+     */
     public class ResetCommand extends InstantCommand {
         public ResetCommand() {
             addRequirements(mSwerve);
@@ -139,8 +145,8 @@ public class SwerveCommands {
             y1 = applyTransformations(y1);
             x2 = applyTransformations(x2);
 
-            Translation2d translation = new Translation2d(-y1, x1).times(kMaxSpeed);
-            double rotation = x2 * kMaxAngularSpeed;
+            Translation2d translation = new Translation2d(-y1, -x1).times(kMaxSpeed);
+            double rotation = -x2 * kMaxAngularSpeed;
 
             if (!mIsSprintMode) {
                 translation = translation.times(kSlowModeSpeedMultiplier);
@@ -212,46 +218,6 @@ public class SwerveCommands {
         @Override
         public boolean isFinished() {
             return mXVelocityPIDController.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1;
-        }
-    }
-
-    public class TestInitCommand extends CommandBase {
-        public TestInitCommand() {
-            addRequirements(mSwerve);
-        }
-
-        @Override
-        public void initialize() {}
-
-        @Override
-        public void execute() {}
-
-        @Override
-        public void end(boolean interrupted) {}
-
-        @Override
-        public boolean isFinished() {
-            return true;
-        }
-    }
-
-    public class TestCommand extends CommandBase {
-        public TestCommand() {
-            addRequirements(mSwerve);
-        }
-
-        @Override
-        public void initialize() {}
-
-        @Override
-        public void execute() {}
-
-        @Override
-        public void end(boolean interrupted) {}
-
-        @Override
-        public boolean isFinished() {
-            return true;
         }
     }
 
