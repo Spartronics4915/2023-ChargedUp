@@ -13,6 +13,9 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -54,10 +57,13 @@ public final class Constants {
 			public final double trackWidth, wheelBase;
 			public final double[] moduleOffsets;
 			public final IntFunction<BasePigeon> pigeonConstructor;
+			public final IntFunction<AbsoluteEncoder> absoluteEncoderConstructor;
 			public ChassisConstants(
 				double driveGearRatio, double angleGearRatio,
 				double trackWidth, double wheelBase,
-				double[] moduleOffsets, IntFunction<BasePigeon> pigeonConstructor
+				double[] moduleOffsets,
+				IntFunction<BasePigeon> pigeonConstructor,
+				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor
 			) {
 				this.driveGearRatio = driveGearRatio;
 				this.angleGearRatio = angleGearRatio;
@@ -65,19 +71,22 @@ public final class Constants {
 				this.wheelBase = wheelBase;
 				this.moduleOffsets = moduleOffsets;
 				this.pigeonConstructor = pigeonConstructor;
+				this.absoluteEncoderConstructor = absoluteEncoderConstructor;
 			}
 		}
 		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
 			6.75 / 1.0, 150.0 / 7.0,
 			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75),
 			new double[]{ -96.855, -168.486, -15.820, -118.916 },
-			(int id) -> { return (BasePigeon)(new Pigeon2(id)); }
+			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
+			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); }
 		);
 		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
 			8.33 / 1.0, 18.8 / 1.0,
 			0.75, 0.75,
 			new double[]{  0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
-			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); }
+			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
+			(int id) -> { return (AbsoluteEncoder)(new AbsoluteAnalogEncoder(id)); }
 		);
 		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
 
@@ -113,6 +122,8 @@ public final class Constants {
 
         public static final int kPigeonID = 9;
 		public static final IntFunction<BasePigeon> kPigeonConstructor = kChassisConstants.pigeonConstructor;
+
+		public static final IntFunction<AbsoluteEncoder> kAbsoluteEncoderConstructor = kChassisConstants.absoluteEncoderConstructor;
 
         public static final double kPigeonMountPoseYaw = 90;
         public static final double kPigeonMountPosePitch = 180;
