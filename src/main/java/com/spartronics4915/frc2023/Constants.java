@@ -56,12 +56,14 @@ public final class Constants {
 			public final double driveGearRatio, angleGearRatio;
 			public final double trackWidth, wheelBase;
 			public final double[] moduleOffsets;
+			public final int[] driveMotorIDs, angleMotorIDs, encoderIDs;
 			public final IntFunction<BasePigeon> pigeonConstructor;
 			public final IntFunction<AbsoluteEncoder> absoluteEncoderConstructor;
 			public ChassisConstants(
 				double driveGearRatio, double angleGearRatio,
 				double trackWidth, double wheelBase,
 				double[] moduleOffsets,
+				int[] driveMotorIDs, int[] angleMotorIDs, int[] encoderIDs,
 				IntFunction<BasePigeon> pigeonConstructor,
 				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor
 			) {
@@ -72,12 +74,18 @@ public final class Constants {
 				this.moduleOffsets = moduleOffsets;
 				this.pigeonConstructor = pigeonConstructor;
 				this.absoluteEncoderConstructor = absoluteEncoderConstructor;
+				this.driveMotorIDs = driveMotorIDs;
+				this.angleMotorIDs = angleMotorIDs;
+				this.encoderIDs = encoderIDs;
 			}
 		}
 		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
 			6.75 / 1.0, 150.0 / 7.0,
 			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75),
 			new double[]{ 96.328, 167.431, 16.962, 118.652 },
+			new int[]{ 5, 3, 7, 9 },
+			new int[]{ 6, 4, 8, 10 },
+			new int[]{ 13, 12, 14, 11 },
 			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
 			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); }
 		);
@@ -85,6 +93,9 @@ public final class Constants {
 			8.33 / 1.0, 18.8 / 1.0,
 			0.75, 0.75,
 			new double[]{  0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
+			new int[]{ 1, 3, 5, 7 },
+			new int[]{ 2, 4, 6, 8 },
+			new int[]{ 0, 1, 2, 3 },
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			(int id) -> { return (AbsoluteEncoder)(new AbsoluteAnalogEncoder(id)); }
 		);
@@ -155,10 +166,11 @@ public final class Constants {
         public static final double kVoltageCompensation = 12.0;
 
         public static final class Module0 {
-            public static final int kDriveMotorID = 5;
-            public static final int kAngleMotorID = 6;
-            public static final int kEncoderID = 13;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[0];
+			public static final int kIndex = 0;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -166,10 +178,11 @@ public final class Constants {
         }
 
         public static final class Module1 {
-            public static final int kDriveMotorID = 3;
-            public static final int kAngleMotorID = 4;
-            public static final int kEncoderID = 12;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[1];
+			public static final int kIndex = 1;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -177,10 +190,11 @@ public final class Constants {
         }
 
         public static final class Module2 {
-            public static final int kDriveMotorID = 7;
-            public static final int kAngleMotorID = 8;
-            public static final int kEncoderID = 14;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[2];
+			public static final int kIndex = 2;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -188,10 +202,11 @@ public final class Constants {
         }
 
         public static final class Module3 {
-            public static final int kDriveMotorID = 9;
-            public static final int kAngleMotorID = 10;
-            public static final int kEncoderID = 11;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[3];
+			public static final int kIndex = 3;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
