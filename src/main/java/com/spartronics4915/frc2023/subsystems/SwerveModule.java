@@ -17,35 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 public class SwerveModule {
-	public interface AbsoluteEncoder {
-		public double getAbsolutePosition();
-	}
-
-	public static class AbsoluteCANCoder implements AbsoluteEncoder {
-		private final CANCoder mCANCoder;
-		public AbsoluteCANCoder(int id) {
-			mCANCoder = new CANCoder(id);
-		}
-
-		public double getAbsolutePosition() {
-			return mCANCoder.getAbsolutePosition();
-		}
-	}
-
-	public static class AbsoluteAnalogEncoder implements AbsoluteEncoder {
-		private final AnalogEncoder mAnalogEncoder;
-		public AbsoluteAnalogEncoder(int id) {
-			mAnalogEncoder = new AnalogEncoder(new AnalogInput(id));
-		}
-
-		public double getAbsolutePosition() {
-			return mAnalogEncoder.getAbsolutePosition();
-		}
-	}
-
     private final int mModuleNumber;
     private final Rotation2d mAbsoluteOffset;
     private double mLastAngle;
@@ -53,9 +26,9 @@ public class SwerveModule {
     private final CANSparkMax mDriveMotor;
     private final CANSparkMax mAngleMotor;
 
-    private RelativeEncoder mDriveEncoder;
-    private RelativeEncoder mIntegratedAngleEncoder;
-    private AbsoluteEncoder mAngleEncoder;
+    private final RelativeEncoder mDriveEncoder;
+    private final RelativeEncoder mIntegratedAngleEncoder;
+    private final CANCoder mAngleEncoder;
 
     private final SparkMaxPIDController mDriveController;
     private final SparkMaxPIDController mAngleController;
@@ -79,8 +52,7 @@ public class SwerveModule {
         mAngleController = mAngleMotor.getPIDController();
         configureAngleMotor();
 
-
-        mAngleEncoder = kAbsoluteEncoderConstructor.apply(encoderID);
+        mAngleEncoder = new CANCoder(encoderID);
 
         resetToAbsolute();
 

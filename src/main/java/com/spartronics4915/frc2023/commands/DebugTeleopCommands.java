@@ -32,6 +32,27 @@ public final class DebugTeleopCommands {
         
     }
     
+    public static class PIDWidget {
+        public GenericEntry measurementEntry;
+        public GenericEntry outputEntry, goalEntry;
+
+        public PIDWidget(ShuffleboardTab tab) {
+            ShuffleboardLayout layout = tab.getLayout("PID", BuiltInLayouts.kList)
+            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
+
+            measurementEntry = layout.add("Measurement", 0).getEntry();
+            goalEntry = layout.add("Goal", 0).getEntry();
+            outputEntry = layout.add("Output", 0).getEntry();
+        }
+
+        public void update(double measurement, double goal, double output) {
+            measurementEntry.setDouble(measurement);
+            goalEntry.setDouble(goal);
+            outputEntry.setDouble(output);
+        }
+    
+    }
+
     public static class ChassisWidget {
         private GenericEntry yawEntry;
         private GenericEntry pitchEntry;
@@ -118,6 +139,7 @@ public final class DebugTeleopCommands {
     public static class SwerveTab {
         SwerveModuleWidget module0, module1, module2, module3;
         ChassisWidget chassisWidget;
+        PIDWidget pidWidget;
         ShuffleboardTab tab;
         Swerve swerve_subsystem;
         SwerveCommands mSwerveCommands;
@@ -130,9 +152,10 @@ public final class DebugTeleopCommands {
             module2 = new SwerveModuleWidget(tab, "Module 2");
             module3 = new SwerveModuleWidget(tab, "Module 3");
             chassisWidget = new ChassisWidget(tab);
+            pidWidget = new PIDWidget(tab);
 
             swerve_subsystem = Swerve.getInstance();
-            ShuffleboardLayout elevatorCommands = 
+            ShuffleboardLayout commands = 
             tab.getLayout("Orientation", BuiltInLayouts.kList)
             .withSize(2, 3)
             .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
@@ -146,8 +169,10 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
-            elevatorCommands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
-            elevatorCommands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
+            commands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
+            // commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(-45), pidWidget).withName("Rotate to 45"));
+
+            // commands.add(mSwerveCommands.new RotateDegrees(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
         }
         
         public void update(){

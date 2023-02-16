@@ -1,13 +1,10 @@
 package com.spartronics4915.frc2023.subsystems;
 
-import com.ctre.phoenix.sensors.BasePigeon;
-
-// import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
-import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix.sensors.PigeonIMUConfiguration;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Nat;
@@ -37,7 +34,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveModule[] mModules;
 
-    private BasePigeon mIMU;
+    private WPI_Pigeon2 mIMU;
     private Rotation2d mLastPitch;
     private Rotation2d mLastLastPitch;
 
@@ -60,8 +57,8 @@ public class Swerve extends SubsystemBase {
     }
 
     private Swerve() {
-		mIMU = kPigeonConstructor.apply(kPigeonID);
-		configurePigeon(mIMU);
+        mIMU = new WPI_Pigeon2(kPigeonID);
+        configurePigeon(mIMU);
 
         mCameraWrapper = new PhotonCameraWrapper();
         // mFrontCamera = new PhotonCamera(NetworkTableInstance.getDefault(), kFrontCameraName);
@@ -87,13 +84,8 @@ public class Swerve extends SubsystemBase {
         );
     }
 
-    private void configurePigeon(BasePigeon pigeon) {
-		if (mIMU instanceof Pigeon2)
-			((Pigeon2)pigeon).configMountPose(
-				kPigeonMountPoseYaw,
-				kPigeonMountPosePitch,
-				kPigeonMountPoseRoll
-			);
+    private void configurePigeon(Pigeon2 pigeon2) {
+        pigeon2.configMountPose(kPigeonMountPoseYaw, kPigeonMountPosePitch, kPigeonMountPoseRoll);
     }
 
 	public int getModuleCount() {
@@ -174,7 +166,7 @@ public class Swerve extends SubsystemBase {
         return mIsFieldRelative;
     }
 
-    public BasePigeon getIMU() {
+    public WPI_Pigeon2 getIMU() {
         return mIMU;
     }
 
@@ -275,24 +267,24 @@ public class Swerve extends SubsystemBase {
 	};
 
 	private VisionMeasurement getVisionMeasurement() {
-        // if (!useCamera) {
-        //     return null;
-        // }
-        // var frontLatestResult = mFrontCamera.getLatestResult();
-        // if (frontLatestResult.hasTargets()) {
-        //     double imageCaptureTime = (Timer.getFPGATimestamp() * 1000) - frontLatestResult.getLatencyMillis();
-        //     var bestTarget = frontLatestResult.getBestTarget();
-        //     int bestTargetID = bestTarget.getFiducialId();
-        //     var camToTargetTransform3d = bestTarget.getBestCameraToTarget();
-        //     var camToTargetTransform2d = new Transform2d(
-        //         camToTargetTransform3d.getTranslation().toTranslation2d(),
-        //         camToTargetTransform3d.getRotation().toRotation2d()
-        //     );
-        //     Pose2d camPose = kTagPoses[bestTargetID].transformBy(camToTargetTransform2d.inverse());
-        //     SmartDashboard.putNumber("x to tag", camPose.getX());
-        //     SmartDashboard.putNumber("y to tag", camPose.getY());
-		// 	return new VisionMeasurement(camPose.transformBy(kFrontCameraToRobot), imageCaptureTime);
-		// }
+        if (!useCamera) {
+            return null;
+        }
+        var frontLatestResult = mFrontCamera.getLatestResult();
+        if (frontLatestResult.hasTargets()) {
+            double imageCaptureTime = (Timer.getFPGATimestamp() * 1000) - frontLatestResult.getLatencyMillis();
+            var bestTarget = frontLatestResult.getBestTarget();
+            int bestTargetID = bestTarget.getFiducialId();
+            var camToTargetTransform3d = bestTarget.getBestCameraToTarget();
+            var camToTargetTransform2d = new Transform2d(
+                camToTargetTransform3d.getTranslation().toTranslation2d(),
+                camToTargetTransform3d.getRotation().toRotation2d()
+            );
+            Pose2d camPose = kTagPoses[bestTargetID].transformBy(camToTargetTransform2d.inverse());
+            SmartDashboard.putNumber("x to tag", camPose.getX());
+            SmartDashboard.putNumber("y to tag", camPose.getY());
+			return new VisionMeasurement(camPose.transformBy(kFrontCameraToRobot), imageCaptureTime);
+		}
         return null;
 	}
 

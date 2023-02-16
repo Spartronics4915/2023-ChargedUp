@@ -130,10 +130,10 @@ public class RobotContainer {
                         .onFalse(mSwerveCommands.new DisableSprintMode());
 
                     mDriverController.rightBumper()
-                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
 
                     mDriverController.leftBumper()
-                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));
+                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
 
                     mDriverController.x()
                         .onTrue(mSwerveCommands.new RotateToTarget());

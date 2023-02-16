@@ -7,15 +7,9 @@ package com.spartronics4915.frc2023;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-import com.ctre.phoenix.sensors.BasePigeon;
-import com.ctre.phoenix.sensors.Pigeon2;
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
-import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
-import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -108,7 +102,7 @@ public final class Constants {
 
             public static final int kContinuousCurrentLimit = 30;
 
-            public static final double kGearRatio = kChassisConstants.driveGearRatio;
+            public static final double kGearRatio = 6.75 / 1.0;
             public static final double kVelocityConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio) / 60.0;
             public static final double kPositionConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio);
         }
@@ -121,28 +115,25 @@ public final class Constants {
 
             public static final int kContinuousCurrentLimit = 15;
 
-            public static final double kGearRatio = kChassisConstants.angleGearRatio;
+            public static final double kGearRatio =  150.0 / 7.0;
             public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
         }
 
         public static final int kPigeonID = 2;
-		public static final IntFunction<BasePigeon> kPigeonConstructor = kChassisConstants.pigeonConstructor;
-
-		public static final IntFunction<AbsoluteEncoder> kAbsoluteEncoderConstructor = kChassisConstants.absoluteEncoderConstructor;
 
         public static final double kPigeonMountPoseYaw = -90;
         public static final double kPigeonMountPosePitch = 0;
         public static final double kPigeonMountPoseRoll = 180;
         
-        public static final double kTrackWidth = kChassisConstants.trackWidth;
-        public static final double kWheelBase = kChassisConstants.wheelBase;
+        public static final double kTrackWidth = Units.inchesToMeters(18.75);
+        public static final double kWheelBase = Units.inchesToMeters(23.75);
         public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
 		public static final Pose2d kInitialPose = new Pose2d();
 
         public static final double kMaxSpeed = Units.feetToMeters(14.5);
         public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s
         public static final double kMaxAcceleration = Units.feetToMeters(14.5); // TODO: get an actual value because this should be higher
-        public static final double kMaxAngularAcceleration = kMaxAngularSpeed / kChassisRadius;
+        public static final double kMaxAngularAcceleration = kMaxAcceleration / kChassisRadius;
 
         public static final double kSlowModeSpeedMultiplier = 0.3;
         public static final double kSlowModeAngularSpeedMultiplier = 0.3;
