@@ -310,7 +310,6 @@ public class SwerveCommands {
 
         private final double mYawToleranceDegrees = 2;
         private final double mAngularVelToleranceDegreesSec = 1;
-        private final double mAngularVelToleranceDegreesSec = 1;
         private Rotation2d mDestinationYaw;
         private final ProfiledPIDController pid;
 
@@ -357,54 +356,54 @@ public class SwerveCommands {
 
     }
 
-    public class RotateYaw extends CommandBase {
+    // public class RotateYaw extends CommandBase {
 
-        private final double mYawToleranceDegrees = 10;
-        private final double mAngularVelToleranceDegreesSec = 1;
-        private final double kP = 0.2;
-        private Rotation2d mDeltaYaw;
-        private final ProfiledPIDController pid;
+    //     private final double mYawToleranceDegrees = 10;
+    //     private final double mAngularVelToleranceDegreesSec = 1;
+    //     private final double kP = 0.2;
+    //     private Rotation2d mDeltaYaw;
+    //     private final ProfiledPIDController pid;
 
-        public RotateYaw(Rotation2d deltaYaw) {
-            pid = new ProfiledPIDController(kP, 0, 0.01, new TrapezoidProfile.Constraints(
-                10,
-                kMaxAcceleration
-            ));
-            pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
-            pid.enableContinuousInput(0, 360);
+    //     public RotateYaw(Rotation2d deltaYaw) {
+    //         pid = new ProfiledPIDController(kP, 0, 0.01, new TrapezoidProfile.Constraints(
+    //             10,
+    //             kMaxAcceleration
+    //         ));
+    //         pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
+    //         pid.enableContinuousInput(0, 360);
 
-            addRequirements(mSwerve);
-            mDeltaYaw = deltaYaw;
-        }
+    //         addRequirements(mSwerve);
+    //         mDeltaYaw = deltaYaw;
+    //     }
 
-        @Override
-        public void execute() {
-            double d = pid.calculate(mDeltaYaw.getDegrees(), 0);
-            //System.out.println(d);
-            mSwerve.drive(
-                new Translation2d(),
-                -d,
-                true
-            );
-        }
+    //     @Override
+    //     public void execute() {
+    //         double d = pid.calculate(mDeltaYaw.getDegrees(), 0);
+    //         //System.out.println(d);
+    //         mSwerve.drive(
+    //             new Translation2d(),
+    //             -d,
+    //             true
+    //         );
+    //     }
 
-        @Override
+    //     @Override
 
-        public void end(boolean isInterrupted) {
-            mSwerve.stop();
-        }
-        @Override
-        public boolean isFinished() {
-            boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
-            boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
-            Boolean finished = positionFine && velocityFine;
-            if (finished) {
-                System.out.println("done");
-            }
-            return finished;
-        }
+    //     public void end(boolean isInterrupted) {
+    //         mSwerve.stop();
+    //     }
+    //     @Override
+    //     public boolean isFinished() {
+    //         boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+    //         boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+    //         Boolean finished = positionFine && velocityFine;
+    //         if (finished) {
+    //             System.out.println("done");
+    //         }
+    //         return finished;
+    //     }
 
-    }
+    // }
 
     public class RotateYaw extends RotateToYaw {
         public RotateYaw(Rotation2d deltaYaw) {
