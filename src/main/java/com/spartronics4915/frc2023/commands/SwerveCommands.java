@@ -251,7 +251,6 @@ public class SwerveCommands {
         private final PIDWidget mPIDWidget;
         private final TrapezoidProfile.Constraints motionConstraints;
         public double mlastVelocity;
-        private int executeCounter;
 
         public RotateToYaw(Rotation2d destinationYaw) {
             this(destinationYaw, null);
@@ -259,11 +258,10 @@ public class SwerveCommands {
 
         public RotateToYaw(Rotation2d destinationYaw, PIDWidget pidWidget) {
             mPIDWidget = pidWidget;
-            motionConstraints = new TrapezoidProfile.Constraints(Math.PI / 10, Math.PI / 20);
+            motionConstraints = new TrapezoidProfile.Constraints(Math.PI / 4, Math.PI / 4);
             addRequirements(mSwerve);
             mlastVelocity = 0;
-            mDestinationYaw = destinationYaw.times(-1);
-            executeCounter = 0;
+            mDestinationYaw = destinationYaw;
         }
 
         @Override
@@ -279,7 +277,7 @@ public class SwerveCommands {
             var goalState = new TrapezoidProfile.State(goal, 0);
             TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
             double ticLength = 1./50; // Robot runs at 50Hz
-            var state = currMotionProfile.calculate(ticLength * executeCounter++);
+            var state = currMotionProfile.calculate(ticLength);
             mlastVelocity = state.velocity;
             if (mPIDWidget != null) {
                 mPIDWidget.update(yaw, goal, state.velocity);
@@ -308,7 +306,6 @@ public class SwerveCommands {
             }
             return finished;
         }
-
     }
 
     public class RotateYaw extends RotateToYaw {

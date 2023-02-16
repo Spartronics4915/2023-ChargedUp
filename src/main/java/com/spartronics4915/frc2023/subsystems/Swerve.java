@@ -6,6 +6,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -174,6 +175,10 @@ public class Swerve extends SubsystemBase {
 
     public Rotation2d getYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
+    }
+
+    public Rotation2d getModYaw() {
+        return Rotation2d.fromDegrees(mIMU.getYaw() % 360);
     }
 
     public Rotation2d getPitch() {

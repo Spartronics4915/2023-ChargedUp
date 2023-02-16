@@ -170,7 +170,7 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
             commands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
-            commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(-45), pidWidget).withName("Rotate to 45"));
+            commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(45), pidWidget).withName("Rotate to 45"));
 
             commands.add(mSwerveCommands.new RotateDegrees(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
         }
