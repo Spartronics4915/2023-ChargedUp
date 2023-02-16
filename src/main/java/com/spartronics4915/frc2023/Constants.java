@@ -204,40 +204,45 @@ public final class Constants {
             public final double kSmartMotionMaxAccel;
             public final double kSmartMotionMaxVelocity;
             public final double kSmartMotionMinOutputVelocity;
-            public ArmMotorConstants(int MotorID, double PositionConversionFactor, double P, double I, double D, double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity) {
+            public final double kZeroOffset;
+            public ArmMotorConstants(int MotorID, double PositionConversionFactor, double P, double I, double D, double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, double zeroOffset) {
                 super();
                 this.kMotorID = MotorID;
                 this.kPositionConversionFactor = PositionConversionFactor;
                 this.kP = P;
                 this.kI = I;
                 this.kD = D;
-                this.kSmartMotionMaxAccel = SmartMotionMaxAccel;
+                this.kSmartMotionMaxAccel = SmartMotionMaxAccel; 
                 this.kSmartMotionMaxVelocity = SmartMotionMaxVelocity;
                 this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
+                this.kZeroOffset = zeroOffset;
             }
         }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
         public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
 
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
-            2,  //actual value 15
+            1,  //actual value 15
             Math.PI * 2,
             0.05, 0, 0,
-            1, 1, 0
+            1, 1, 0,
+            0
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
-            3, 
+            2, 
             Math.PI * 2,
-            0.01, 0, 0,
-            1, 1, 0
+            0.05 / 36, 0, 0,
+            1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
+            0
         ); 
 
         public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
             -1, 
             0,
             0, 0, 0,
-            0, 0, 0
+            0, 0, 0,
+            0
         ); 
         public static final int kPivotFollowerID = -1; //actual value: 16
 

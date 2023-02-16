@@ -32,7 +32,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
 
         if(useAbs){
             mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-            mAbsEncoder.setPositionConversionFactor((Math.PI*2));    
+            mAbsEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);    
+            mAbsEncoder.setZeroOffset(MotorConstants.kZeroOffset);
         } else {
             relEncoder = mMotor.getEncoder();
             relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);
@@ -47,11 +48,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         PIDController.setI(MotorConstants.kI);
         PIDController.setD(MotorConstants.kD);
 
-        PIDController.setSmartMotionMaxAccel(1, 0); //20
+        PIDController.setSmartMotionMaxAccel(MotorConstants.kSmartMotionMaxAccel, 0); //20
  
-        PIDController.setSmartMotionMaxVelocity(1, 0);
+        PIDController.setSmartMotionMaxVelocity(MotorConstants.kSmartMotionMaxVelocity, 0);
 
-        PIDController.setSmartMotionMinOutputVelocity(0, 0);
+        PIDController.setSmartMotionMinOutputVelocity(MotorConstants.kSmartMotionMinOutputVelocity, 0);
         
         PIDController.setSmartMotionAllowedClosedLoopError(Rotation2d.fromDegrees(5).getRotations(), 0);
         // PIDController.setOutputRange(0, kP)
@@ -74,6 +75,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         mLastReference = ref;
         System.out.println(ref + ": also this was called");
         mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion);
+    }
+    public void resetToZero(){
+        mAbsEncoder.setZeroOffset(-mAbsEncoder.getPosition());
     }
 
     public CANSparkMax getMotor(){

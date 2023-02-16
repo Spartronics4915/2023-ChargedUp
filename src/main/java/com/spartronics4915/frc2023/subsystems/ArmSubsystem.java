@@ -139,24 +139,42 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // //TODO determine offsets for absolute encoders
-    private void setDesiredState(ArmState state) {
+    private void setDesiredPosition(ArmPosition state) {
         mPivotMotor.setReference(state.armTheta);
         mWristMotor.setReference(state.wristTheta);
-        // mWristMotor.setReference( Rotation2d.fromDegrees(
-        //     270 - state.armTheta.getDegrees() + state.wristTheta.getDegrees()
-        // ));
+        mWristMotor.setReference(getCorrectAngle(state.armTheta));
         System.out.println("testing123123");
         // TODO add way for driver to interact
         // setLeveledWristAngle(state.wristTheta);
         // setArmRadius(state.armRadius);
+    }
+    private void setDesiredState(ArmState state) {
+        setDesiredPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+    }
+
+    private Rotation2d getCorrectAngle(Rotation2d armAngle){
+        //assuming 0 on the arm is straight up
+        //assuming 0 on the wrist is level with arm (makes a straight line), specifically 180 is level with the arm, 0 is opposite
+        // arm ---- 0 ---- wrist 
+        //the wrist angle will be the the arm angle - 90
+        //ask val if this is unclear or not working
+        return Rotation2d.fromDegrees(270).minus(armAngle);
     }
 
     public void setState(ArmState state) {
         mState = state;
         setDesiredState(mState);
     }
+
     public Rotation2d getRef(){
         return mPivotMotor.getCurrentReference();
+    }
+
+    //TODO make a way 
+    public void transformState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta){
+        ArmState current = getState();
+        ArmPosition transformed = new ArmPosition(current.armRadius - exstensionDelta, current.armTheta.minus(armDelta), current.wristTheta.minus(wristDelta));
+
     }
 
     /**
