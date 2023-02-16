@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import static com.spartronics4915.frc2023.Constants.OI.*;
@@ -239,6 +240,34 @@ public class SwerveCommands {
             newCommand.schedule();
         }
     }
+
+	public class RotateToYaw2 extends CommandBase {
+		private final double kYawTolerance = Units.degreesToRadians(2);
+		private final double kMaxAngularVelocity = Units.degreesToRadians(50);
+		private final Rotation2d mDestinationYaw;
+		private final double kP = 0.2;
+
+		public RotateToYaw2(Rotation2d destinationYaw) {
+			mDestinationYaw = destinationYaw;
+
+		}
+
+		private double getError() {
+			return mDestinationYaw.minus(Swerve.getInstance().getYaw()).getRadians();
+		}
+
+		@Override
+		public void execute() {
+			double omega = Math.min(getError() * kP, kMaxAngularVelocity);
+			Swerve.getInstance().drive(new ChassisSpeeds(0, 0, omega), true);
+		}
+
+		@Override
+		public boolean isFinished() {
+			return getError() < kYawTolerance;
+		}
+	}
+
     public class RotateToYaw extends CommandBase {
 
         private final double mYawToleranceDegrees = 2;

@@ -86,12 +86,13 @@ public class Swerve extends SubsystemBase {
     }
 
     private void configurePigeon(BasePigeon pigeon) {
-		if (mIMU instanceof Pigeon2)
+		if (mIMU instanceof Pigeon2) {
 			((Pigeon2)pigeon).configMountPose(
 				kPigeonMountPoseYaw,
 				kPigeonMountPosePitch,
 				kPigeonMountPoseRoll
 			);
+		}
     }
 
 	public int getModuleCount() {

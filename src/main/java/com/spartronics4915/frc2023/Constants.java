@@ -59,13 +59,15 @@ public final class Constants {
 			public final int[] driveMotorIDs, angleMotorIDs, encoderIDs;
 			public final IntFunction<BasePigeon> pigeonConstructor;
 			public final IntFunction<AbsoluteEncoder> absoluteEncoderConstructor;
+			private final int pigeonId;
 			public ChassisConstants(
 				double driveGearRatio, double angleGearRatio,
 				double trackWidth, double wheelBase,
 				double[] moduleOffsets,
 				int[] driveMotorIDs, int[] angleMotorIDs, int[] encoderIDs,
+				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor,
 				IntFunction<BasePigeon> pigeonConstructor,
-				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor
+				int pigeonId
 			) {
 				this.driveGearRatio = driveGearRatio;
 				this.angleGearRatio = angleGearRatio;
@@ -77,6 +79,7 @@ public final class Constants {
 				this.driveMotorIDs = driveMotorIDs;
 				this.angleMotorIDs = angleMotorIDs;
 				this.encoderIDs = encoderIDs;
+				this.pigeonId = pigeonId;
 			}
 		}
 		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
@@ -86,8 +89,9 @@ public final class Constants {
 			new int[]{ 5, 3, 7, 9 },
 			new int[]{ 6, 4, 8, 10 },
 			new int[]{ 13, 12, 14, 11 },
+			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); },
 			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
-			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); }
+			9
 		);
 		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
 			8.33 / 1.0, 18.8 / 1.0,
@@ -96,8 +100,9 @@ public final class Constants {
 			new int[]{ 1, 3, 5, 7 },
 			new int[]{ 2, 4, 6, 8 },
 			new int[]{ 0, 1, 2, 3 },
+			(int id) -> { return (AbsoluteEncoder)(new AbsoluteAnalogEncoder(id)); },
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
-			(int id) -> { return (AbsoluteEncoder)(new AbsoluteAnalogEncoder(id)); }
+			12
 		);
 		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
 
@@ -131,7 +136,7 @@ public final class Constants {
             public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
         }
 
-        public static final int kPigeonID = 2;
+        public static final int kPigeonID = kChassisConstants.pigeonId;
 		public static final IntFunction<BasePigeon> kPigeonConstructor = kChassisConstants.pigeonConstructor;
 
 		public static final IntFunction<AbsoluteEncoder> kAbsoluteEncoderConstructor = kChassisConstants.absoluteEncoderConstructor;
