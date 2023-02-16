@@ -283,12 +283,13 @@ public class SwerveCommands {
             PhotonPipelineResult result = Swerve.mCameraWrapper.photonCamera.getLatestResult();
             if (result.hasTargets()) {
                 double tagYaw = result.getBestTarget().getYaw();
-                double d = pid.calculate(tagYaw, 0);
-                mSwerve.drive(
-                    new Translation2d(),
-                    -d,
-                    true
-            );
+                // double d = pid.calculate(tagYaw, 0);
+                // mSwerve.drive(
+                //     new Translation2d(),
+                //     -d,
+                //     true
+                // );
+                System.out.println(tagYaw);
             }
         }
 
