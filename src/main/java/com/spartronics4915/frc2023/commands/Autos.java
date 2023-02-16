@@ -99,20 +99,22 @@ public final class Autos {
 	}
 
 
-	public class MoveForwardDistance extends CommandBase {
+	public class Translate extends CommandBase {
 		private final Pose2d beginningPose;
-		private final double distance; 
+		private final double mX; 
+		private final double mY; 
 
-		public MoveForwardDistance(double x) {
+		public Translate(double x, double y) {
 			addRequirements(mSwerve);
-			distance = x;
+			mX = x;
+			mY = y;
 			beginningPose = mSwerve.getPose();
 		}
 	
 		@Override
 		public void initialize() {
 
-			mSwerve.drive(new ChassisSpeeds(1,1,0), mIsOpenLoop);
+			mSwerve.drive(new ChassisSpeeds(Math.signum(mX),Math.signum(mY), 0), mIsOpenLoop);
 		}
 
 		@Override
@@ -125,7 +127,7 @@ public final class Autos {
 		@Override
 		public boolean isFinished() {
 			double dist = mSwerve.getPose().minus(beginningPose).getTranslation().getDistance(new Translation2d());
-			return dist >= distance;
+			return dist >= Math.hypot(mX, mY);
 		}
 	}
 }

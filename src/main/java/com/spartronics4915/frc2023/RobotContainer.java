@@ -61,7 +61,7 @@ public class RobotContainer {
         
         mAutonomousCommand = new SequentialCommandGroup(
             mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardDistance(1)
+            mAutos.new Translate(1,1)
         );
         
         mTeleopInitCommand = mSwerveCommands.new ResetCommand();
