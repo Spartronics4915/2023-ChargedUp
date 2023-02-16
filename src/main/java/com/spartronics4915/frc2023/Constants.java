@@ -247,25 +247,25 @@ public final class Constants {
         public static final int kPivotFollowerID = -1; //actual value: 16
 
 
-        public static final int kPivotMotorID = 2;
-        public static final int kExtenderMotorID = -1;
-        public static final int kWristMotorID = -1;
+        // public static final int kPivotMotorID = 2;
+        // public static final int kExtenderMotorID = -1;
+        // public static final int kWristMotorID = -1;
 
-        public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
-        public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
-        public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
+        // public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
+        // public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
+        // public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
 
-        public static final double kPivotP = 0.05;
-        public static final double kPivotI = 0.0;
-        public static final double kPivotD = 0.0;
+        // public static final double kPivotP = 0.05;
+        // public static final double kPivotI = 0.0;
+        // public static final double kPivotD = 0.0;
 
-        public static final double kExtenderP = 0.0;
-        public static final double kExtenderI = 0.0;
-        public static final double kExtenderD = 0.0;
+        // public static final double kExtenderP = 0.0;
+        // public static final double kExtenderI = 0.0;
+        // public static final double kExtenderD = 0.0;
 
-        public static final double kWristP = 0.0;
-        public static final double kWristI = 0.0;
-        public static final double kWristD = 0.0;
+        // public static final double kWristP = 0.0;
+        // public static final double kWristI = 0.0;
+        // public static final double kWristD = 0.0;
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,

@@ -5,6 +5,7 @@ import com.spartronics4915.frc2023.subsystems.SwerveModule;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -125,8 +126,8 @@ public final class DebugTeleopCommands {
 
     public static class ArmWidget {
         // private GenericEntry linActDistance,stateRadius;
-        private GenericEntry wristLeveledRotation, stateWristLeveledRotation, WristSpeed;
-        private GenericEntry shoulderRotation, stateShoulderRotation, refShoulderRotation, MoterSped;
+        private GenericEntry wristLeveledRotation, stateWristLeveledRotation, wristSpeed;
+        private GenericEntry shoulderRotation, stateShoulderRotation, refShoulderRotation, pivotSpeed;
         ArmWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3).withProperties(Map.of("Label position", "LEFT"));
 
@@ -137,13 +138,14 @@ public final class DebugTeleopCommands {
             shoulderRotation = armModule.add("current shoulder angle", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle",0).getEntry();
             refShoulderRotation = armModule.add("current refrence",0).getEntry();
-            MoterSped = armModule.add("pivot speed",0).getEntry();
-            WristSpeed = armModule.add("wrist Speed", 0).getEntry();
+            pivotSpeed = armModule.add("pivot speed",0).getEntry();
+            wristSpeed = armModule.add("wrist Speed", 0).getEntry();
         }
 
         public void update(ArmSubsystem module) {
             ArmPosition current = module.getPosition();
             ArmState desired = module.getState();
+            MotorAbsEncoderComboSubsystem[] motors = module.getMotors();
             // linActDistance.setDouble(current.armRadius);
             // stateRadius.setDouble(desired.armRadius);
             wristLeveledRotation.setDouble(current.wristTheta.getDegrees()); //TODO edit this;
@@ -151,9 +153,8 @@ public final class DebugTeleopCommands {
             shoulderRotation.setDouble(current.armTheta.getDegrees());
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
             refShoulderRotation.setDouble(module.getRef().getDegrees());
-            MoterSped.setDouble(module.getPivot().getMotorSpeed());
-            MoterSped.setDouble(module.getPivot().getMotorSpeed());
-            WristSpeed.setDouble(module.getWrist().getMotorSpeed());
+            pivotSpeed.setDouble(motors[0].getMotorSpeed());
+            wristSpeed.setDouble(motors[1].getMotorSpeed());
         }
     }
     public static class ArmTab {
