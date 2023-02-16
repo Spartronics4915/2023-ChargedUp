@@ -410,9 +410,9 @@ public class SwerveCommands {
             super(deltaYaw.plus(mSwerve.getYaw()));
         }
 
-        public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
-            super(deltaYaw.plus(mSwerve.getYaw()), widget);
-        }
+        // public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
+        //     super(deltaYaw.plus(mSwerve.getYaw()), widget);
+        // }
 
     }
 }

@@ -1,373 +1,3 @@
-<<<<<<< HEAD
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package com.spartronics4915.frc2023;
-
-import java.util.function.Function;
-import java.util.function.IntFunction;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.util.Units;
-
-import static com.spartronics4915.frc2023.subsystems.Arm.ArmPosition;
-
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- * 
- * <p>UNITS: All distances, positions, displacements, etc. should be defined in meters. All
- * angles should be measured in radians. All times and time intervals should be measured in seconds. 
- * 
- * <p>ROBOT ORIENTED: Robot forward is positive x, robot left is positive y, CCW rotation is positive, 
- * and the angle measure 0 is directly forward.
- * 
- * <p>FIELD ORIENTED: Away from alliance wall is positive x, left relative to driver station is y, CCW 
- * rotation is positive, and the angle measure 0 is directly away from the alliance wall.
- */
-public final class Constants {
-	public static final class Trajectory {
-		public static final double kLinearP = 0.01;
-		public static final double kThetaP = 0.01;
-	}
-
-    public static final class Swerve {
-        
-		public static class ChassisConstants {
-			public final double driveGearRatio, angleGearRatio;
-			public final double trackWidth, wheelBase;
-			public final double[] moduleOffsets;
-			public final IntFunction<BasePigeon> pigeonConstructor;
-			public final IntFunction<AbsoluteEncoder> absoluteEncoderConstructor;
-			public ChassisConstants(
-				double driveGearRatio, double angleGearRatio,
-				double trackWidth, double wheelBase,
-				double[] moduleOffsets,
-				IntFunction<BasePigeon> pigeonConstructor,
-				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor
-			) {
-				this.driveGearRatio = driveGearRatio;
-				this.angleGearRatio = angleGearRatio;
-				this.trackWidth = trackWidth;
-				this.wheelBase = wheelBase;
-				this.moduleOffsets = moduleOffsets;
-				this.pigeonConstructor = pigeonConstructor;
-				this.absoluteEncoderConstructor = absoluteEncoderConstructor;
-			}
-		}
-		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
-			6.75 / 1.0, 150.0 / 7.0,
-			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75),
-			new double[]{ 96.328, 167.431, 16.962, 118.652 },
-			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
-			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); }
-		);
-		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
-			8.33 / 1.0, 18.8 / 1.0,
-			0.75, 0.75,
-			new double[]{  0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
-			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
-			(int id) -> { return (AbsoluteEncoder)(new AbsoluteAnalogEncoder(id)); }
-		);
-        // ____#____
-        // |_4915__| ->
-        //  O   O
-		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
-
-		public static final class Drive {
-            public static final double kP = 0.0; // placeholder
-            public static final double kI = 0.0; // placeholder
-            public static final double kD = 0.0; // placeholder
-            public static final double kFF = 0.0; // placeholder
-            
-            public static final double kS = 0.0; // placeholder
-            public static final double kV = 0.0; // placeholder
-            public static final double kA = 0.0; // placeholder
-
-            public static final int kContinuousCurrentLimit = 30;
-
-            public static final double kGearRatio = 6.75 / 1.0;
-            public static final double kVelocityConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio) / 60.0;
-            public static final double kPositionConversionFactor = ((kWheelDiameter * Math.PI) / kGearRatio);
-        }
-
-        public static final class Angle {
-            public static final double kP = 1.0;
-            public static final double kI = 0.0;
-            public static final double kD = 0.5;
-            public static final double kFF = 0;
-
-            public static final int kContinuousCurrentLimit = 15;
-
-            public static final double kGearRatio =  150.0 / 7.0;
-            public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
-        }
-
-        public static final int kPigeonID = 2;
-
-        public static final double kPigeonMountPoseYaw = -90;
-        public static final double kPigeonMountPosePitch = 0;
-        public static final double kPigeonMountPoseRoll = 180;
-        
-        public static final double kTrackWidth = Units.inchesToMeters(18.75);
-        public static final double kWheelBase = Units.inchesToMeters(23.75);
-        public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
-		public static final Pose2d kInitialPose = new Pose2d();
-
-        public static final double kMaxSpeed = Units.feetToMeters(14.5);
-        public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s
-        public static final double kMaxAcceleration = Units.feetToMeters(14.5); // TODO: get an actual value because this should be higher
-        public static final double kMaxAngularAcceleration = kMaxAcceleration / kChassisRadius;
-
-        public static final double kSlowModeSpeedMultiplier = 0.3;
-        public static final double kSlowModeAngularSpeedMultiplier = 0.3;
-
-        public static final double kWheelDiameter = Units.inchesToMeters(4.0);
-        
-        public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
-        
-        public static final boolean kDriveMotorsAreInverted = true;
-        public static final boolean kAngleMotorsAreInverted = false;
-
-        public static final IdleMode kDriveIdleMode = IdleMode.kBrake;
-        public static final IdleMode kAngleIdleMode = IdleMode.kBrake;
-
-        public static final double kVoltageCompensation = 12.0;
-
-        public static final class Module0 {
-            public static final int kDriveMotorID = 1;
-            public static final int kAngleMotorID = 2;
-            public static final int kEncoderID = 0;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[0];
-            public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
-			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
-        }
-
-        public static final class Module1 {
-            public static final int kDriveMotorID = 3;
-            public static final int kAngleMotorID = 4;
-            public static final int kEncoderID = 1;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[1];
-            public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
-			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
-        }
-
-        public static final class Module2 {
-            public static final int kDriveMotorID = 5;
-            public static final int kAngleMotorID = 6;
-            public static final int kEncoderID = 2;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[2];
-            public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
-			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
-        }
-
-        public static final class Module3 {
-            public static final int kDriveMotorID = 7;
-            public static final int kAngleMotorID = 8;
-            public static final int kEncoderID = 3;
-            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[3];
-            public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
-			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
-            public static final SwerveModuleConstants kConstants = 
-                new SwerveModuleConstants(kDriveMotorID, kAngleMotorID, kEncoderID, kAngleOffset, kAngleOffset);
-        }
-
-        public static final class BalanceConstants {
-            public static final class XVelocityPID {
-                public static final double kP = 0.0;
-                public static final double kI = 0.0;
-                public static final double kD = 0.0;
-            }
-
-            // public static final class YVelocityPID {
-            //     public static final double kP = 0.0;
-            //     public static final double kI = 0.0;
-            //     public static final double kD = 0.0;
-            // }
-
-            public static final class ThetaPID {
-                public static final double kP = 0.0;
-                public static final double kI = 0.0;
-                public static final double kD = 0.0;
-            }
-        }
-
-        public static final SwerveDriveKinematics kKinematics = new SwerveDriveKinematics( // FIXME: dont know if module numbers in comments below are correct
-            new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0), // front left, module 0
-            new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0), // front right, module 1
-            new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0), // back left, module 2
-            new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0) // back right, module 3
-        );
-        
-        public static class SwerveModuleConstants {
-            public final int driveMotorID;
-            public final int angleMotorID;
-            public final int encoderID;
-            public final double angleOffset;
-            public final double absoluteOffset;
-
-            public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRotations) {
-                driveMotorID = d;
-                angleMotorID = a;
-                encoderID = e;
-                angleOffset = o;
-                absoluteOffset = _absoluteOffsetRotations;
-            }
-        }
-    }
-
-    public static final class Arm {
-        public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
-        public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
-
-        public static final int kPivotMotorID = -1;
-        public static final int kPivotFollowerID = -1;
-        public static final int kExtenderMotorID = -1;
-        public static final int kWristMotorID = -1;
-
-        public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
-        public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
-        public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
-
-        public static final double kPivotP = 0.0;
-        public static final double kPivotI = 0.0;
-        public static final double kPivotD = 0.0;
-
-        public static final double kExtenderP = 0.0;
-        public static final double kExtenderI = 0.0;
-        public static final double kExtenderD = 0.0;
-
-        public static final double kWristP = 0.0;
-        public static final double kWristI = 0.0;
-        public static final double kWristD = 0.0;
-        
-        public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
-        );
-
-        public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
-        );
-
-        public static final ArmPositionConstants kGrabFallenConstants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
-        );
-
-        public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
-        );
-
-        public static final ArmPositionConstants kLevel2Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
-        );
-
-        public static final ArmPositionConstants kLevel3Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
-        );
-
-        // used to store target measurements for different arm states
-        // arm constants assume pivot axle is origin and wrist axle is point
-        // rotation2ds in this class are used assuming that:
-        // - level with the ground is 0, and
-        // - a positive value represents the arm moving up
-        public static final class ArmPositionConstants extends ArmPosition {
-            public ArmPositionConstants(double armRadius, Rotation2d armTheta, Rotation2d wristTheta) {
-                super(armRadius, armTheta, wristTheta);
-            }
-        }
-    }
-
-    public static final class Intake {
-        public static final int kIntakeMotorID = -1;
-
-        public static final boolean kIsInverted = false;
-
-        public static final double kInSpeed = 0.3;
-        public static final double kOutSpeed = 0.3;
-
-        public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
-    }
-
-    public static final class Camera {
-        public static final String kFrontCameraName = "frontcamera";
-
-        public static final Pose2d[] kTagPoses = new Pose2d[] {
-            null,
-            new Pose2d()
-        };
-
-        public static final Transform2d kFrontCameraToRobot = new Transform2d(
-            new Pose2d(0, 0, new Rotation2d(0)), // camera
-            new Pose2d(0, 0, new Rotation2d(0)) // robot (0)
-        );
-    }
-
-    public static final class OI {
-        public static final int kDriverControllerID = 2;
-        public static final int kOperatorControllerID = 4;
-
-        public static final int kToggleFieldRelativeButton = 1;
-        public static final int kResetYawButton = 8;
-        public static final int kResetOdometryButton = 3;
-        public static final int kSlowModeAxis = 3;
-        public static final int kAimButton = 4;
-
-        public static final double kStickDeadband = 0.08;
-        public static final double kTriggerDeadband = 0.08;
-        public static final double kResponseCurveExponent = 5.0 / 3.0;
-    }
-
-    public static final class FieldConstants {
-        static final double length = Units.feetToMeters(54);
-        static final double width = Units.feetToMeters(27);
-    }
-
-    public static final class VisionConstants {
-        static final Transform3d robotToCam =
-                new Transform3d(
-                        new Translation3d(0.5, 0.0, 0.5),
-                        new Rotation3d(
-                                0, 0,
-                                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
-        // from center.
-        static final String cameraName = "Arducam_OV9281_USB_Camera";
-    }
-=======
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -384,14 +14,18 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
+import com.spartronics4915.frc2023.subsystems.Arm.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
@@ -738,5 +372,20 @@ public final class Constants {
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
     }
->>>>>>> drivetrain-mk2
+
+    public static final class FieldConstants {
+        static final double length = Units.feetToMeters(54);
+        static final double width = Units.feetToMeters(27);
+    }
+
+    public static final class VisionConstants {
+        static final Transform3d robotToCam =
+                new Transform3d(
+                        new Translation3d(0.5, 0.0, 0.5),
+                        new Rotation3d(
+                                0, 0,
+                                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+        // from center.
+        static final String cameraName = "OV5647";
+    }
 }

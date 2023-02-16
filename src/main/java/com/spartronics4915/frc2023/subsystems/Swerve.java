@@ -267,24 +267,24 @@ public class Swerve extends SubsystemBase {
 	};
 
 	private VisionMeasurement getVisionMeasurement() {
-        if (!useCamera) {
-            return null;
-        }
-        var frontLatestResult = mFrontCamera.getLatestResult();
-        if (frontLatestResult.hasTargets()) {
-            double imageCaptureTime = (Timer.getFPGATimestamp() * 1000) - frontLatestResult.getLatencyMillis();
-            var bestTarget = frontLatestResult.getBestTarget();
-            int bestTargetID = bestTarget.getFiducialId();
-            var camToTargetTransform3d = bestTarget.getBestCameraToTarget();
-            var camToTargetTransform2d = new Transform2d(
-                camToTargetTransform3d.getTranslation().toTranslation2d(),
-                camToTargetTransform3d.getRotation().toRotation2d()
-            );
-            Pose2d camPose = kTagPoses[bestTargetID].transformBy(camToTargetTransform2d.inverse());
-            SmartDashboard.putNumber("x to tag", camPose.getX());
-            SmartDashboard.putNumber("y to tag", camPose.getY());
-			return new VisionMeasurement(camPose.transformBy(kFrontCameraToRobot), imageCaptureTime);
-		}
+        // if (!useCamera) {
+        //     return null;
+        // }
+        // var frontLatestResult = mFrontCamera.getLatestResult();
+        // if (frontLatestResult.hasTargets()) {
+        //     double imageCaptureTime = (Timer.getFPGATimestamp() * 1000) - frontLatestResult.getLatencyMillis();
+        //     var bestTarget = frontLatestResult.getBestTarget();
+        //     int bestTargetID = bestTarget.getFiducialId();
+        //     var camToTargetTransform3d = bestTarget.getBestCameraToTarget();
+        //     var camToTargetTransform2d = new Transform2d(
+        //         camToTargetTransform3d.getTranslation().toTranslation2d(),
+        //         camToTargetTransform3d.getRotation().toRotation2d()
+        //     );
+        //     Pose2d camPose = kTagPoses[bestTargetID].transformBy(camToTargetTransform2d.inverse());
+        //     SmartDashboard.putNumber("x to tag", camPose.getX());
+        //     SmartDashboard.putNumber("y to tag", camPose.getY());
+		// 	return new VisionMeasurement(camPose.transformBy(kFrontCameraToRobot), imageCaptureTime);
+		// }
         return null;
 	}
 
