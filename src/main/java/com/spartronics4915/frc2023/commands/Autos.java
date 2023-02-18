@@ -30,7 +30,7 @@ public final class Autos {
 	private final Swerve mSwerve;
 	private final boolean mIsOpenLoop = true;
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
-	private final double maxVelocity = 0.1;
+	private final double maxVelocity = 0.5;
 	private final double maxAccel = 0.4;
 	private final double maxAngularVelocity = 0.8;
 	private final double maxAngularAcceleration = 0.2;
@@ -58,8 +58,8 @@ public final class Autos {
 			addCommands(
 				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
 					new ArrayList<>(List.of(
-						new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
-						new PathPoint(new Translation2d(1, 0), new Rotation2d(Math.PI / 2))
+						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
 					)),
 					maxVelocity, maxAccel
 				),
