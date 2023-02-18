@@ -42,7 +42,8 @@ public class SwerveModule {
 		}
 
 		public double getAbsolutePosition() {
-			return mAnalogEncoder.getAbsolutePosition();
+            System.out.println(mAnalogEncoder.getAbsolutePosition());
+			return 360 * (1.0 - mAnalogEncoder.getAbsolutePosition());
 		}
 	}
 
@@ -65,10 +66,12 @@ public class SwerveModule {
     private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
     public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRadians) {
+        System.out.println(moduleNumber + ", " + driveMotorID + ", " + angleMotorID + ", " + encoderID + ", " + absoluteOffsetRadians);
+
         mModuleNumber = moduleNumber;
 
         mAbsoluteOffset = Rotation2d.fromRadians(absoluteOffsetRadians);
-        
+
         mDriveMotor = kMotorConstructor.apply(driveMotorID);
         mDriveEncoder = mDriveMotor.getEncoder();
         mDriveController = mDriveMotor.getPIDController();
@@ -100,10 +103,10 @@ public class SwerveModule {
         var currentState = this.getState();
         var newState = new SwerveModuleState(currentState.speedMetersPerSecond, newAngle);
 
-        this.setDesiredState(newState, isOpenLoop, true);
+        this.setDesiredState(newState, isOpenLoop, false);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningForLowError) {
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningAtLowSpeed) {
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         mDesiredState = desiredState;
 
@@ -118,9 +121,15 @@ public class SwerveModule {
             );
         }
 
-        if (Math.abs(desiredState.angle.getRadians() - getState().angle.getRadians()) > 0.02) {
-            mAngleController.setReference(desiredState.angle.getRadians(), ControlType.kPosition);
-        }
+        // if (Math.abs(desiredState.angle.getRadians() - getState().angle.getRadians()) > 0.02) {
+        //     mAngleController.setReference(desiredState.angle.getRadians(), ControlType.kPosition);
+        // }
+        double angle = (suppressTurningAtLowSpeed && Math.abs(desiredState.speedMetersPerSecond) < kMaxSpeed * 0.01) ?
+            mLastAngle :
+            desiredState.angle.getRadians();
+
+        mAngleController.setReference(angle, ControlType.kPosition);
+        mLastAngle = angle;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -193,14 +202,14 @@ public class SwerveModule {
         mAngleMotor.restoreFactoryDefaults();
         mAngleMotor.setSmartCurrentLimit(Angle.kContinuousCurrentLimit);
         mAngleMotor.setIdleMode(kAngleIdleMode);
-        mAngleMotor.setInverted(true);
+        mAngleMotor.setInverted(false);
         mIntegratedAngleEncoder.setPositionConversionFactor(Angle.kPositionConversionFactor);
         mAngleController.setP(Angle.kP);
         mAngleController.setI(Angle.kI);
         mAngleController.setD(Angle.kD);
         mAngleController.setFF(Angle.kFF);
-        mAngleController.setPositionPIDWrappingMaxInput(Math.PI);
         mAngleController.setPositionPIDWrappingMinInput(-Math.PI);
+        mAngleController.setPositionPIDWrappingMaxInput(Math.PI);
         mAngleController.setPositionPIDWrappingEnabled(true);
         mAngleMotor.enableVoltageCompensation(kVoltageCompensation);
         mAngleMotor.burnFlash();

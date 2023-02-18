@@ -95,10 +95,10 @@ public final class Constants {
 			new int[]{ 13, 12, 14, 11 },
 			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); },
 			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
-			9
+			2
 		);
 		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
-			8.33 / 1.0, 18.8 / 1.0,
+			8.33 / 1.0, 18.0 / 1.0,
 			0.75, 0.75,
 			new double[]{  0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
 			new int[]{ 1, 3, 5, 7 },
@@ -256,12 +256,12 @@ public final class Constants {
             public final double angleOffset;
             public final double absoluteOffset;
 
-            public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRotations) {
+            public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRadians) {
                 driveMotorID = d;
                 angleMotorID = a;
                 encoderID = e;
                 angleOffset = o;
-                absoluteOffset = _absoluteOffsetRotations;
+                absoluteOffset = _absoluteOffsetRadians;
             }
         }
     }

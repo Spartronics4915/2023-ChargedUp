@@ -1,6 +1,9 @@
 package com.spartronics4915.frc2023.commands;
 
+import org.photonvision.PhotonCamera;
+
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,15 +13,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command that uses an example subsystem. */
 public class PrintPos extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    private PhotonCameraWrapper cam;
-
+    private final Swerve mSwerve;
+    private PhotonCameraWrapper cameraWrapper;
+    // private PhotonCamera mPhotonCamera;
     /**
      * Creates a new ExampleCommand.
      *
      * @param subsystem The subsystem used by this command.
      */
-    public PrintPos(PhotonCameraWrapper cameraWrapper) {
-        cam = cameraWrapper;
+    public PrintPos() {
+        mSwerve = Swerve.getInstance();
         // Use addRequirements() here to declare subsystem dependencies.
     }
 
@@ -31,7 +35,7 @@ public class PrintPos extends CommandBase {
     @Override
     public void execute() {
         while(true) {
-            Pose2d result = cam.getEstimatedGlobalPose().getFirst();
+            Pose2d result = mSwerve.mCameraWrapper.getEstimatedGlobalPose().getFirst();
             if(result != null) {
                 SmartDashboard.putNumber("Pose2D X", result.getX());
                 SmartDashboard.putNumber("Pose2D Y", result.getY());

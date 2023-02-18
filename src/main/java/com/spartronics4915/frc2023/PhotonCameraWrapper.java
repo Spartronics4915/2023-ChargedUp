@@ -44,6 +44,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
  import org.photonvision.PhotonPoseEstimator;
  import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.common.hardware.VisionLEDMode;
  
  public class PhotonCameraWrapper {
      public PhotonCamera photonCamera;
@@ -63,7 +64,8 @@ import org.photonvision.PhotonCamera;
                          VisionConstants
                                  .cameraName); // Change the name of your camera here to whatever it is in the
          // PhotonVision UI.
- 
+        //  photonCamera.setLED(VisionLEDMode.kOn);
+        //  System.out.println("LED thing");
          // ... Add other cameras here
  
          // Assemble the list of cameras & mount locations

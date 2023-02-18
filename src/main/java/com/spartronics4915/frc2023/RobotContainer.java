@@ -4,35 +4,24 @@
 
 package com.spartronics4915.frc2023;
 
-import com.spartronics4915.frc2023.commands.ArmCommands;
+import static com.spartronics4915.frc2023.Constants.OI.kDriverControllerID;
+import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
+import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
+
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
-import com.spartronics4915.frc2023.commands.IntakeCommands;
+import com.spartronics4915.frc2023.commands.PrintPos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
-import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
-import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
-import com.spartronics4915.frc2023.subsystems.Arm;
-import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Swerve;
-import com.spartronics4915.frc2023.subsystems.Arm.ArmState;
-import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
-import com.spartronics4915.frc2023.commands.PrintPos;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import static com.spartronics4915.frc2023.Constants.OI.*;
-
-import org.opencv.photo.Photo;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -123,7 +112,7 @@ public class RobotContainer {
                         .onTrue(mSwerveCommands.new ResetYaw());
 
                     mDriverController.y()
-                        .onTrue(mSwerveCommands.new ResetOdometry());
+                        .onTrue(mSwerveCommands.new ResetCommand());
 
                     mDriverController.rightTrigger(kTriggerDeadband)
                         .onTrue(mSwerveCommands.new EnableSprintMode())
@@ -136,6 +125,7 @@ public class RobotContainer {
                         .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
 
                     mDriverController.x()
+                        // .onTrue(new PrintPos());
                         .onTrue(mSwerveCommands.new RotateToTarget());
                         // .onTrue(mSwerveCommands.new RotateToYaw(Rotation2d.fromRadians(Math.PI/4)));
                     // OPERATOR CONTROLS
@@ -183,7 +173,7 @@ public class RobotContainer {
             }
             
             public Command getTestingCommand() {
-                return new PrintPos(mCameraWrapper);
+                return new PrintPos();
             }
 
             public void initRobot() {

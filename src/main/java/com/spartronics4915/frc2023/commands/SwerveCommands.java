@@ -11,8 +11,6 @@ import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeSpeedMultipl
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.spartronics4915.frc2023.Constants.Swerve.BalanceConstants;
-import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
-import com.spartronics4915.frc2023.commands.SwerveCommands.RotateToYaw;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.MathUtil;
@@ -281,7 +279,7 @@ public class SwerveCommands {
 
         @Override
         public void execute() {
-            PhotonPipelineResult result = Swerve.mCameraWrapper.photonCamera.getLatestResult();
+            PhotonPipelineResult result = mSwerve.mCameraWrapper.photonCamera.getLatestResult();
             if (result.hasTargets()) {
                 double tagYaw = result.getBestTarget().getYaw();
                 // double d = pid.calculate(tagYaw, 0);
@@ -290,7 +288,8 @@ public class SwerveCommands {
                 //     -d,
                 //     true
                 // );
-                System.out.println(tagYaw);
+                System.out.println("Tag Yaw: " + tagYaw);
+                System.out.println("Tag Pitch: " + result.getBestTarget().getPitch());
             }
         }
 
@@ -299,6 +298,7 @@ public class SwerveCommands {
             boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
             boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
             Boolean finished = positionFine && velocityFine;
+            finished = false;
             if (finished) {
                 System.out.println("done");
             }
