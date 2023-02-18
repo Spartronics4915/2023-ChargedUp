@@ -64,7 +64,7 @@ import org.photonvision.common.hardware.VisionLEDMode;
                          VisionConstants
                                  .cameraName); // Change the name of your camera here to whatever it is in the
          // PhotonVision UI.
-        //  photonCamera.setLED(VisionLEDMode.kOn);
+         photonCamera.setLED(VisionLEDMode.kOn);
         //  System.out.println("LED thing");
          // ... Add other cameras here
  

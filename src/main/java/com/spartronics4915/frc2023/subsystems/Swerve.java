@@ -300,12 +300,15 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         updatePoseEstimator();
+        
         for (SwerveModule mod : mModules) {
             mod.putSmartDashboardValues();
         }
         SmartDashboard.putNumber("pose x", getPose().getX());
         SmartDashboard.putNumber("pose y", getPose().getY());
         SmartDashboard.putNumber("pose rotation degrees", getPose().getRotation().getDegrees());
+        
+        SmartDashboard.putNumber("Yaw", getYaw().getDegrees());
 
         SmartDashboard.putBoolean("field relative", mIsFieldRelative);
 

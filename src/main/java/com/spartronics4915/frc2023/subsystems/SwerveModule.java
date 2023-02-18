@@ -42,7 +42,6 @@ public class SwerveModule {
 		}
 
 		public double getAbsolutePosition() {
-            System.out.println(mAnalogEncoder.getAbsolutePosition());
 			return 360 * (1.0 - mAnalogEncoder.getAbsolutePosition());
 		}
 	}
@@ -66,7 +65,6 @@ public class SwerveModule {
     private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
     public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRadians) {
-        System.out.println(moduleNumber + ", " + driveMotorID + ", " + angleMotorID + ", " + encoderID + ", " + absoluteOffsetRadians);
 
         mModuleNumber = moduleNumber;
 

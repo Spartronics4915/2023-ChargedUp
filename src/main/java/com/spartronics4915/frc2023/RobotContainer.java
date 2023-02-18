@@ -17,6 +17,7 @@ import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -127,7 +128,9 @@ public class RobotContainer {
                     mDriverController.x()
                         // .onTrue(new PrintPos());
                         .onTrue(mSwerveCommands.new RotateToTarget());
-                        // .onTrue(mSwerveCommands.new RotateToYaw(Rotation2d.fromRadians(Math.PI/4)));
+                        // .onTrue(mSwerveCommands.new RotateToYaw(Rotation2d.fromRadians(Math.PI)));
+                    
+                    // mDriverController.
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
                     //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
