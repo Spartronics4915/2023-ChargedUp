@@ -220,10 +220,9 @@ public final class DebugTeleopCommands {
             // Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
             // Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.RETRACTED)).withName("0"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT)).withName("45"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.GRAB_FALLEN)).withName("90"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.LEVEL_1)).withName("180"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LEVEL)).withName("LEVEL"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_HIGH)).withName("HIGH"));
+            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
 
         }
 

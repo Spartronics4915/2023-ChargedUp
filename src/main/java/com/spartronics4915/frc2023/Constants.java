@@ -285,10 +285,22 @@ public final class Constants {
             new Rotation2d(Math.PI/4) //45
         );
 
-        public static final ArmPositionConstants kGrabFallenConstants = new ArmPositionConstants(
+        public static final ArmPositionConstants kArmLowConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI/2), //90
-            new Rotation2d(Math.PI/2) //90
+            Rotation2d.fromDegrees(-20),
+            Rotation2d.fromDegrees(0)
+        );
+
+        public static final ArmPositionConstants kArmLevelConstants = new ArmPositionConstants(
+            0,
+            Rotation2d.fromDegrees(0),
+            Rotation2d.fromDegrees(0)
+        );
+
+        public static final ArmPositionConstants kArmHighConstants = new ArmPositionConstants(
+            0,
+            Rotation2d.fromDegrees(20),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(

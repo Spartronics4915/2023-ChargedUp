@@ -21,7 +21,10 @@ public class ArmSubsystem extends SubsystemBase {
     public enum ArmState {
         RETRACTED(kRetractedConstants),
         GRAB_UPRIGHT(kGrabUprightConstants),
-        GRAB_FALLEN(kGrabFallenConstants),
+        GRAB_FALLEN(kArmLowConstants),
+        ARM_LOW(kArmLowConstants),
+        ARM_HIGH(kArmHighConstants),
+        ARM_LEVEL(kArmLevelConstants),
         LEVEL_1(kLevel1Constants),
         LEVEL_2(kLevel2Constants),
         LEVEL_3(kLevel3Constants);
