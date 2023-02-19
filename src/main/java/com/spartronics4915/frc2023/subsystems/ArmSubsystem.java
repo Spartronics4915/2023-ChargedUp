@@ -49,22 +49,22 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-
     // /**
-    //  * Represents the state of the arm. Contains the arm's position and the intake's state. 
-    //  */
+    // * Represents the state of the arm. Contains the arm's position and the
+    // intake's state.
+    // */
     // public static final class ArmState { // I wish java 11 had records :(
-    //     public final ArmPosition armPosition;
-    //     public final IntakeState intakeState;
+    // public final ArmPosition armPosition;
+    // public final IntakeState intakeState;
 
-    //     public ArmState(ArmPosition armPosition, IntakeState intakeState) {
-    //         this.armPosition = armPosition;
-    //         this.intakeState = intakeState;
-    //     }
+    // public ArmState(ArmPosition armPosition, IntakeState intakeState) {
+    // this.armPosition = armPosition;
+    // this.intakeState = intakeState;
+    // }
     // }
 
     private static ArmSubsystem mInstance;
-    
+
     private ArmState mState;
 
     private final MotorAbsEncoderComboSubsystem mPivotMotor;
@@ -80,19 +80,26 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {
         mState = ArmState.RETRACTED;
         System.out.println("arm created");
-        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true);  
-        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, false);
+        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true);
+        mWristMotor = null;
+        // mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, false);
         // mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
-        // mPivotFollower.follow(mPivotMotor.getMotor()); //TODO check if this needs to be reversed
+        // mPivotFollower.follow(mPivotMotor.getMotor()); //TODO check if this needs to
+        // be reversed
 
-    //     mExtenderMotor = configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
-    //     mExtenderPIDController = mExtenderMotor.getPIDController();
-    //     mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        // mExtenderMotor =
+        // configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
+        // mExtenderPIDController = mExtenderMotor.getPIDController();
+        // mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
     }
 
     public MotorAbsEncoderComboSubsystem[] getMotors() {
-        MotorAbsEncoderComboSubsystem[] x = {mPivotMotor, mWristMotor};
+        MotorAbsEncoderComboSubsystem[] x = { mPivotMotor, mWristMotor };
         return x;
+    }
+
+    public MotorAbsEncoderComboSubsystem getPivot() {
+        return mPivotMotor;
     }
 
     public static ArmSubsystem getInstance() {
@@ -104,35 +111,39 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmPosition getPosition() {
         return new ArmPosition(
-            0,
-            new Rotation2d(mPivotMotor.getPosition()),
-            new Rotation2d(mWristMotor.getPosition())
-            // new Rotation2d(0)
+                0,
+                mPivotMotor.getArmPosition(),
+                new Rotation2d()///new Rotation2d(mWristMotor.getPosition())
+        // new Rotation2d(0)
         );
     }
 
     public ArmState getState() {
-        return mState; //This will get the desired state
+        return mState; // This will get the desired state
     }
 
     // TODO determine zero offsets
     // TODO add extender motor
     private void setDesiredPosition(ArmPosition state) {
         mPivotMotor.setReference(state.armTheta);
-        mWristMotor.setReference(state.wristTheta);
-        mWristMotor.setReference(getCorrectAngle(state.armTheta));
-        System.out.println("testing123123");
+
+        if (mWristMotor != null) {
+            mWristMotor.setReference(state.wristTheta);
+            mWristMotor.setReference(getCorrectAngle(state.armTheta));
+        }
     }
+
     private void setDesiredState(ArmState state) {
         setDesiredPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
-    private Rotation2d getCorrectAngle(Rotation2d armAngle){
-        //assuming 0 on the arm is straight up
-        //assuming 0 on the wrist is level with arm (makes a straight line), specifically 180 is level with the arm, 0 is opposite
-        // arm ---- 0 ---- wrist 
-        //the wrist angle will be the the arm angle - 90
-        //ask val if this is unclear or not working
+    private Rotation2d getCorrectAngle(Rotation2d armAngle) {
+        // assuming 0 on the arm is straight up
+        // assuming 0 on the wrist is level with arm (makes a straight line),
+        // specifically 180 is level with the arm, 0 is opposite
+        // arm ---- 0 ---- wrist
+        // the wrist angle will be the the arm angle - 90
+        // ask val if this is unclear or not working
         return Rotation2d.fromDegrees(270).minus(armAngle);
     }
 
@@ -141,14 +152,15 @@ public class ArmSubsystem extends SubsystemBase {
         setDesiredState(mState);
     }
 
-    public Rotation2d getRef(){
+    public Rotation2d getRef() {
         return mPivotMotor.getCurrentReference();
     }
 
-    //TODO make a way 
-    public void transformState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta){
+    // TODO make a way
+    public void transformState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
         ArmState current = getState();
-        ArmPosition transformed = new ArmPosition(current.armRadius - exstensionDelta, current.armTheta.minus(armDelta), current.wristTheta.minus(wristDelta));
+        ArmPosition transformed = new ArmPosition(current.armRadius - exstensionDelta, current.armTheta.minus(armDelta),
+                current.wristTheta.minus(wristDelta));
         setDesiredPosition(transformed);
     }
 }

@@ -33,13 +33,14 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         if(useAbs){
             mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
             mAbsEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);    
-            mAbsEncoder.setZeroOffset(MotorConstants.kZeroOffset);
+            mAbsEncoder.setZeroOffset(MotorConstants.kZeroOffset.plus(Rotation2d.fromDegrees(180)).getRadians());
         } else {
             relEncoder = mMotor.getEncoder();
             relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);
         }
 
         mPIDController = initializePIDController(MotorConstants);
+        mMotor.setSmartCurrentLimit(0);
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
@@ -56,9 +57,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         
         PIDController.setSmartMotionAllowedClosedLoopError(Rotation2d.fromDegrees(5).getRotations(), 0);
         // PIDController.setOutputRange(0, kP)
-        PIDController.setPositionPIDWrappingEnabled(false);
-        PIDController.setPositionPIDWrappingMaxInput(1);
-        PIDController.setPositionPIDWrappingMinInput(0);
+        PIDController.setPositionPIDWrappingEnabled(true);
+        PIDController.setPositionPIDWrappingMaxInput(Math.PI);
+        PIDController.setPositionPIDWrappingMinInput(-Math.PI);
         if(useAbs) PIDController.setFeedbackDevice(mAbsEncoder);
         else {
             PIDController.setFeedbackDevice(mMotor.getEncoder());
@@ -69,7 +70,32 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         return PIDController;
     }
 
+/**
+   * Sets the reference.
+   *
+   * @param ref A Rotation2d.  This should be in arm coordinates where 0 points directly out from the arm
+*/  
     public void setReference(Rotation2d ref) {
+        setNativeReference(armToNative(ref));
+    }
+
+    public Rotation2d armToNative(Rotation2d armRotation) {
+        var outputRot = armRotation.unaryMinus().plus(Rotation2d.fromDegrees(180));
+
+        // To match the encoder, we want angles in [0, 2PI]
+        var radValue = outputRot.getRadians();
+        if (radValue < 0) {
+            outputRot = Rotation2d.fromRadians(radValue+2*Math.PI);
+        }
+
+        return outputRot;
+    }
+
+    public Rotation2d nativeToArm(Rotation2d nativeRotation) {
+        return nativeRotation.minus(Rotation2d.fromDegrees(180)).unaryMinus();
+    }
+
+    private void setNativeReference(Rotation2d ref) {
         System.out.println("set Ref called");
 
         mLastReference = ref;
@@ -88,7 +114,15 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         return mLastReference;
     }
 
-    public double getPosition(){
+    public Rotation2d getArmPosition(){
+        return nativeToArm(getNativePosition());
+    }
+
+    public Rotation2d getNativePosition(){
+        return Rotation2d.fromRadians(getRawPosition());
+    }
+    
+    public double getRawPosition(){
         // System.out.println("get Pos Called");
         if (useAbs) return mAbsEncoder.getPosition();
         else return(mMotor.getEncoder().getPosition());
