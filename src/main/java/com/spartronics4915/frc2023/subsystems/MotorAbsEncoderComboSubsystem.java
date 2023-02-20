@@ -40,7 +40,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         }
 
         mPIDController = initializePIDController(MotorConstants);
-        mMotor.setSmartCurrentLimit(0);
+        mMotor.setSmartCurrentLimit(10);
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {

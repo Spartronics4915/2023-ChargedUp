@@ -230,8 +230,8 @@ public final class Constants {
             15,  //actual value 15
             Math.PI * 2,
             0.05, 0, 0,
-            1, 1, 0,
-            Rotation2d.fromDegrees(250), 10
+            Math.PI/8, 1, 0,
+            Rotation2d.fromDegrees(246), 10
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
@@ -250,7 +250,7 @@ public final class Constants {
             Rotation2d.fromDegrees(0), 
             -1
         ); 
-        public static final int kPivotFollowerID = -1; //actual value: 16
+        public static final int kPivotFollowerID = 16; //actual value: 16
 
 
         // public static final int kPivotMotorID = 2;
