@@ -5,6 +5,7 @@ import com.spartronics4915.frc2023.subsystems.SwerveModule;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.ExtenderSubsystem;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -134,6 +135,26 @@ public final class DebugTeleopCommands {
         }
     }
 
+    public static class ExtenderWidget {
+        private GenericEntry extenderPos, targetRef;
+        private GenericEntry PIDSpeed;
+
+        ExtenderWidget(ShuffleboardTab tab) {
+            ShuffleboardLayout module = tab.getLayout("Extender", BuiltInLayouts.kList).withSize(2, 3)
+                    .withProperties(Map.of("Label position", "LEFT"));
+            extenderPos = module.add("ExtenderPos", 0).getEntry();
+            PIDSpeed = module.add("PID Speed", 0).getEntry();
+            targetRef = module.add("Target Reference", 0).getEntry();
+        }
+
+        public void update(ExtenderSubsystem subsystem) {
+            extenderPos.setDouble(subsystem.getPosition());
+            PIDSpeed.setDouble(subsystem.getMotor().getAppliedOutput());
+            targetRef.setDouble(subsystem.getReference());
+        }
+    }
+
+
     public static class ArmWidget {
         // private GenericEntry linActDistance,stateRadius;
         private GenericEntry wristLeveledRotation, stateWristLeveledRotation, wristSpeed;
@@ -185,6 +206,7 @@ public final class DebugTeleopCommands {
 
     public static class ArmTab {
         ArmWidget widget0;
+        ExtenderWidget extenderWidget;
         ShuffleboardTab tab;
         ArmSubsystem mArmSubsystem;
         ArmCommands mArmCommands;
@@ -197,6 +219,7 @@ public final class DebugTeleopCommands {
             // module2 = new SwerveModuleWidget(tab, "Module 2");
             // module3 = new SwerveModuleWidget(tab, "Module 3");
             widget0 = new ArmWidget(tab, "arm widget");
+            extenderWidget = new ExtenderWidget(tab);
 
             mArmSubsystem = armSubsystem;
             ShuffleboardLayout elevatorCommands = tab.getLayout("Orientation", BuiltInLayouts.kList)
@@ -223,6 +246,9 @@ public final class DebugTeleopCommands {
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LEVEL)).withName("LEVEL"));
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_HIGH)).withName("HIGH"));
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
+            elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().extendNInches(3)).withName("Extend 3 Inches"));
+            elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().extendNInches(-3)).withName("Extend -3 Inches"));
+            elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().setZero()).withName("Zero Encoder"));
 
         }
 
@@ -236,6 +262,7 @@ public final class DebugTeleopCommands {
             // module3.update(swerve_modules[3]);
 
             widget0.update(mArmSubsystem);
+            extenderWidget.update(mArmSubsystem.getExtender());
         }
     }
 

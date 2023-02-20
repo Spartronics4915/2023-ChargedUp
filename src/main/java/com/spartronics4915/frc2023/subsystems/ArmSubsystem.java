@@ -74,7 +74,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final MotorAbsEncoderComboSubsystem mWristMotor;
     private final CANSparkMax mPivotFollower;
 
-    // private final CANSparkMax mExtenderMotor;
+    private final ExtenderSubsystem mExtenderSubsystem;
     // private final SparkMaxPIDController mExtenderPIDController;
 
     // private final CANSparkMax mWristMotor;
@@ -91,12 +91,14 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
         mPivotFollower.setSmartCurrentLimit(10);
 
-        // mExtenderMotor =
-        // configureExtenderMotor(k775Constructor.apply(kExtenderMotorID));
-        // mExtenderPIDController = mExtenderMotor.getPIDController();
-        // mExtenderPIDController.setFeedbackDevice(mExtenderMotor.getAbsoluteEncoder(Type.kDutyCycle));
+        mExtenderSubsystem = new ExtenderSubsystem(17);
+
     }
 
+    public ExtenderSubsystem getExtender() {
+        return mExtenderSubsystem;
+    }
+    
     public MotorAbsEncoderComboSubsystem[] getMotors() {
         MotorAbsEncoderComboSubsystem[] x = { mPivotMotor, mWristMotor };
         return x;
