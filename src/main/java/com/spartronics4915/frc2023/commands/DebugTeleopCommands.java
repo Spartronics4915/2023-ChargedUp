@@ -246,8 +246,8 @@ public final class DebugTeleopCommands {
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LEVEL)).withName("LEVEL"));
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_HIGH)).withName("HIGH"));
             elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
-            elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().extendNInches(3)).withName("Extend 3 Inches"));
-            elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().extendNInches(-3)).withName("Extend -3 Inches"));
+            elevatorCommands.add(new ExtenderCommands.ExtendNInches(3,mArmSubsystem.getExtender()).withName("Extend 3 Inches"));
+            elevatorCommands.add(new ExtenderCommands.ExtendNInches(-3,mArmSubsystem.getExtender()).withName("Extend -3 Inches"));
             elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().setZero()).withName("Zero Encoder"));
 
         }

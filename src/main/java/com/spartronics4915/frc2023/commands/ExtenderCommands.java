@@ -20,9 +20,18 @@ public final class ExtenderCommands {
         public void initialize() {
 
             targetPos = mSubsystem.getPosition() + mDistToExtend;
-            mSubsystem.startExtending();
+            mSubsystem.targetReference = targetPos;
         }
 
+        @Override
+        public void execute() {
+            double currPos = mSubsystem.getPosition();
+            if (currPos < targetPos) {
+                mSubsystem.startExtending();
+            } else {
+                mSubsystem.startRetracting();
+            }
+        }
         @Override
         public void end(boolean isInterrupted) {
             mSubsystem.stopMotor();
@@ -30,7 +39,7 @@ public final class ExtenderCommands {
 
         @Override
         public boolean isFinished() {
-            return true;
+            return (Math.abs(mSubsystem.getPosition() - targetPos) < 0.05);
         }
     }
 }

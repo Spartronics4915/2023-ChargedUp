@@ -17,8 +17,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
     private CANSparkMax mMotor;
     private RelativeEncoder mEncoder;
     private final double kRevPerInch = 12.0;
-    private SparkMaxPIDController mPIDController;
-    private double targetReference;
+    //private SparkMaxPIDController mPIDController;
+    public double targetReference;
 
     // This is to work around a bug in the encoder class
     // The RelativeEncoder class cannot be negative. So we have to pad it out to 
@@ -33,11 +33,13 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mEncoder = mMotor.getEncoder(Type.kQuadrature, 8192);
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
-        mPIDController = mMotor.getPIDController();
-        mPIDController.setFeedbackDevice(mEncoder);
+        mMotor.setInverted(true);
+        mMotor.setSmartCurrentLimit(10);
+        //mPIDController = mMotor.getPIDController();
+        //mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        mPIDController.setP(1./60);
+        //mPIDController.setP(1./60);
 
         mEncoder.setPosition(0);
         targetReference = 0;
@@ -62,7 +64,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
 
     public SparkMaxPIDController getPIDController() {
 
-        return mPIDController;
+        return null;//mPIDController;
     }
 
     public CANSparkMax getMotor() {
@@ -71,11 +73,15 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
     
     public void startExtending() {
-        mMotor.set(0.1);
+        mMotor.set(0.3);
+    }
+
+    public void startRetracting() {
+        mMotor.set(-0.3);
     }
 
     public void extendNInches(double N) {
-        setReference(getPosition() + N);
+        //setReference(getPosition() + N);
     }
 
     public void setReference(double p) {
