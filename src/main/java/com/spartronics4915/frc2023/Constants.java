@@ -235,7 +235,7 @@ public final class Constants {
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
-            2, 
+            19, 
             Math.PI * 2,
             0.05 / 36, 0, 0,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion

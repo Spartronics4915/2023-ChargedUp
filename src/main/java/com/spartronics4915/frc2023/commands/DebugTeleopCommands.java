@@ -160,17 +160,24 @@ public final class DebugTeleopCommands {
         private GenericEntry wristLeveledRotation, stateWristLeveledRotation, wristSpeed;
         private GenericEntry shoulderRaw,  shoulderNative, shoulderArm, stateShoulderRotation, refShoulderRotation, pivotSpeed;
         private GenericEntry shoulderArmPlus30Native, shouldArmMinus30Native;
+        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, refwristRotation;
+        private GenericEntry wristArmPlus30Native, wristArmMinus30Native;
         ArmWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3)
                     .withProperties(Map.of("Label position", "LEFT"));
 
+            ShuffleboardLayout wristLayout = tab.getLayout("Wrist", BuiltInLayouts.kList).withSize(2, 3)
+            .withProperties(Map.of("Label position", "LEFT"));
             // linActDistance = armModule.add("current radius", 0).getEntry();
             // stateRadius = armModule.add("desired radius",0).getEntry();
-            if (false) {
-                wristLeveledRotation = armModule.add("current leveled wrist angle", 0).getEntry();
-                stateWristLeveledRotation = armModule.add("desired leveled wrist angle", 0).getEntry();
-                wristSpeed = armModule.add("wrist Speed", 0).getEntry();
-            }
+
+
+            wristRaw = wristLayout.add("Wrist (Raw)", 0).getEntry();
+            wristNative = wristLayout.add("Wrist (Native)", 0).getEntry();
+            wristArm = wristLayout.add("Wrist (Arm)", 0).getEntry();
+            wristArmMinus30Native = wristLayout.add("Wrist Native w Arm at -30", 0).getEntry();
+            wristArmPlus30Native = wristLayout.add("Wrist Native w Arm at +30", 0).getEntry();
+
             shoulderRaw = armModule.add("Shoulder (Raw)", 0).getEntry();
             shoulderNative = armModule.add("Shoulder (Native)", 0).getEntry();
             shoulderArm = armModule.add("Shoulder (Arm)", 0).getEntry();
