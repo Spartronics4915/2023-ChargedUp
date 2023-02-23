@@ -12,10 +12,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -154,6 +158,22 @@ public final class DebugTeleopCommands {
         }
     }
 
+    public static class PowerWidget {
+        private GenericEntry totalCurrent;
+        private PowerDistribution powerPanel;
+
+        public PowerWidget(ShuffleboardTab tab) {
+            ShuffleboardLayout layout = tab.getLayout("Power", BuiltInLayouts.kList).withSize(2, 3)
+                    .withProperties(Map.of("Label position", "LEFT"));
+            powerPanel = new PowerDistribution(1, ModuleType.kRev);
+
+            totalCurrent = layout.add("totalPower", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+        }
+
+        public void update() {
+            totalCurrent.setDouble(powerPanel.getTotalCurrent());
+        }
+    }
 
     public static class ArmWidget {
         // private GenericEntry linActDistance,stateRadius;
@@ -195,11 +215,14 @@ public final class DebugTeleopCommands {
             MotorAbsEncoderComboSubsystem[] motors = module.getMotors();
             // linActDistance.setDouble(current.armRadius);
             // stateRadius.setDouble(desired.armRadius);
-            if (false) {
-                wristLeveledRotation.setDouble(current.wristTheta.getDegrees()); // TODO edit this;
-                stateWristLeveledRotation.setDouble(desired.wristTheta.getDegrees());
-                wristSpeed.setDouble(motors[1].getMotorSpeed());
-            }
+
+
+            wristRaw.setDouble(module.getPivot().getRawPosition());
+            wristNative.setDouble(module.getPivot().getNativePosition().getDegrees());
+            wristArm.setDouble(module.getPivot().getArmPosition().getDegrees());
+            wristArmMinus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
+            wristArmPlus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
+
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
             shoulderNative.setDouble(module.getPivot().getNativePosition().getDegrees());
             shoulderArm.setDouble(module.getPivot().getArmPosition().getDegrees());
@@ -217,6 +240,7 @@ public final class DebugTeleopCommands {
         ShuffleboardTab tab;
         ArmSubsystem mArmSubsystem;
         ArmCommands mArmCommands;
+        PowerWidget powerWidget;
 
         ArmTab(ArmSubsystem armSubsystem, ArmCommands armCommands) {
             mArmCommands = armCommands;
@@ -228,6 +252,7 @@ public final class DebugTeleopCommands {
             widget0 = new ArmWidget(tab, "arm widget");
             extenderWidget = new ExtenderWidget(tab);
 
+            powerWidget = new PowerWidget(tab);
             mArmSubsystem = armSubsystem;
             ShuffleboardLayout elevatorCommands = tab.getLayout("Orientation", BuiltInLayouts.kList)
                     .withSize(2, 3)
@@ -270,6 +295,7 @@ public final class DebugTeleopCommands {
 
             widget0.update(mArmSubsystem);
             extenderWidget.update(mArmSubsystem.getExtender());
+            powerWidget.update();
         }
     }
 
