@@ -163,7 +163,7 @@ public final class DebugTeleopCommands {
         private PowerDistribution powerPanel;
 
         public PowerWidget(ShuffleboardTab tab) {
-            ShuffleboardLayout layout = tab.getLayout("Power", BuiltInLayouts.kList).withSize(2, 3)
+            ShuffleboardLayout layout = tab.getLayout("Power", BuiltInLayouts.kList).withSize(5, 3)
                     .withProperties(Map.of("Label position", "LEFT"));
             powerPanel = new PowerDistribution(1, ModuleType.kRev);
 
@@ -217,11 +217,11 @@ public final class DebugTeleopCommands {
             // stateRadius.setDouble(desired.armRadius);
 
 
-            wristRaw.setDouble(module.getPivot().getRawPosition());
-            wristNative.setDouble(module.getPivot().getNativePosition().getDegrees());
-            wristArm.setDouble(module.getPivot().getArmPosition().getDegrees());
-            wristArmMinus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
-            wristArmPlus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
+            wristRaw.setDouble(module.getWrist().getRawPosition());
+            wristNative.setDouble(module.getWrist().getNativePosition().getDegrees());
+            wristArm.setDouble(module.getWrist().getArmPosition().getDegrees());
+            wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
+            wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
 
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
             shoulderNative.setDouble(module.getPivot().getNativePosition().getDegrees());

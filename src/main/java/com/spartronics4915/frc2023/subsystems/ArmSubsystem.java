@@ -84,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
         mState = ArmState.RETRACTED;
         System.out.println("arm created");
         mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true);
-        mWristMotor = null;
+        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, true);
         // mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, false);
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();
@@ -108,6 +108,11 @@ public class ArmSubsystem extends SubsystemBase {
         return mPivotMotor;
     }
 
+    public MotorAbsEncoderComboSubsystem getWrist() {
+        return mWristMotor;
+    }
+
+
     public static ArmSubsystem getInstance() {
         if (mInstance == null) {
             mInstance = new ArmSubsystem();
@@ -119,7 +124,7 @@ public class ArmSubsystem extends SubsystemBase {
         return new ArmPosition(
                 0,
                 mPivotMotor.getArmPosition(),
-                new Rotation2d()///new Rotation2d(mWristMotor.getPosition())
+                mWristMotor.getArmPosition()
         // new Rotation2d(0)
         );
     }
