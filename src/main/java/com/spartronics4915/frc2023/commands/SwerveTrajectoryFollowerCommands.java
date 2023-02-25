@@ -54,7 +54,7 @@ public class SwerveTrajectoryFollowerCommands {
 					new PathConstraints(maxVelocity, maxAccel),
 					waypoints
 				);
-				synchronized (mTrajectory) {
+				synchronized (this) {
 					mTrajectory = traj;
 				}
 			});
@@ -71,7 +71,7 @@ public class SwerveTrajectoryFollowerCommands {
 		@Override
 		public void execute() {
 			if (mControllerCommand == null) 
-				synchronized (mTrajectory) {
+				synchronized (this) {
 					if (mTrajectory != null) {
 						mControllerCommand = new PPSwerveControllerCommand(
 							mTrajectory,
