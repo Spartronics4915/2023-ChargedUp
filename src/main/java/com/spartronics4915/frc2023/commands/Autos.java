@@ -30,14 +30,16 @@ public final class Autos {
 	private final Swerve mSwerve;
 	private final boolean mIsOpenLoop = true;
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
+	private final SwerveCommands mSwerveCommands;
 	private final double maxVelocity = 0.5;
 	private final double maxAccel = 0.4;
 	private final double maxAngularVelocity = 0.8;
 	private final double maxAngularAcceleration = 0.2;
 			
 
-    public Autos(SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
+    public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
 		mSwerve = Swerve.getInstance();
+		mSwerveCommands = swerveCommands;
 		mSwerveTrajectoryFollowerCommands = swerveTrajectoryFollowerCommands;
     }
 
@@ -91,6 +93,27 @@ public final class Autos {
 					maxVelocity, maxAccel
 				)
 			);
+		}
+	}
+
+	public class Strategy {
+		private final SequentialCommandGroup mCommands;
+		private final String mName;
+
+		public Strategy(String name, CommandBase... commands) {
+			mName = name;
+			mCommands = new SequentialCommandGroup(
+				mSwerveCommands.new ResetCommand()
+			);
+			mCommands.addCommands(commands);
+		}
+
+		public String getName() {
+			return mName;
+		}
+
+		public CommandBase getCommand() {
+			return mCommands;
 		}
 	}
 }

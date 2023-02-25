@@ -59,6 +59,7 @@ public class SwerveTrajectoryFollowerCommands {
 				}
 			});
 			mTrajectoryThread.start();
+			addRequirements(mSwerve);
 		}
 
 		@Override
@@ -79,8 +80,7 @@ public class SwerveTrajectoryFollowerCommands {
 							mXPID, mYPID,
 							mThetaPID,
 							mSwerve::setModuleStates,
-							false,
-							mSwerve
+							false
 						);
 						mControllerCommand.initialize();
 					}
