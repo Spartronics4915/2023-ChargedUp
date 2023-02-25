@@ -139,7 +139,7 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotMotor.setReference(state.armTheta);
 
         if (mWristMotor != null) {
-            mWristMotor.setReference(state.wristTheta);
+            // mWristMotor.setReference(state.wristTheta);
             mWristMotor.setReference(getCorrectAngle(state.armTheta));
         }
     }
@@ -155,7 +155,7 @@ public class ArmSubsystem extends SubsystemBase {
         // arm ---- 0 ---- wrist
         // the wrist angle will be the the arm angle - 90
         // ask val if this is unclear or not working
-        return Rotation2d.fromDegrees(270).minus(armAngle);
+        return armAngle.unaryMinus();
     }
 
     public void setState(ArmState state) {

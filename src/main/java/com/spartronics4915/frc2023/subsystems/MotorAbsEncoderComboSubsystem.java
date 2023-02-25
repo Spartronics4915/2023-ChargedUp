@@ -27,7 +27,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, boolean useAbs) {
         this.useAbs = useAbs;
         
-        mMotor = new CANSparkMax(MotorConstants.kMotorID, MotorType.kBrushless);
+        mMotor = new CANSparkMax(MotorConstants.kMotorID, MotorConstants.kMotorType);
+        mMotor.setInverted(MotorConstants.kInverted);
         mMotor.setIdleMode(IdleMode.kCoast);
 
         if(useAbs){
