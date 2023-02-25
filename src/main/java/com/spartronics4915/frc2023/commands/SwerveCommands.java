@@ -3,6 +3,7 @@ package com.spartronics4915.frc2023.commands;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -10,12 +11,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
+
+import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
+
 import static com.spartronics4915.frc2023.Constants.OI.*;
 
 public class SwerveCommands {
@@ -67,6 +74,9 @@ public class SwerveCommands {
 		}
     }
 
+    /**
+     * Mainly for debugging, probably shouldn't be used during a match
+     */
     public class ResetOdometry extends InstantCommand {
         public ResetOdometry() {
 
@@ -79,6 +89,9 @@ public class SwerveCommands {
 		}
     }
 
+    /**
+     * Mainly used to initialize robot
+     */
     public class ResetCommand extends InstantCommand {
         public ResetCommand() {
             addRequirements(mSwerve);
@@ -205,46 +218,6 @@ public class SwerveCommands {
         }
     }
 
-    public class TestInitCommand extends CommandBase {
-        public TestInitCommand() {
-            addRequirements(mSwerve);
-        }
-
-        @Override
-        public void initialize() {}
-
-        @Override
-        public void execute() {}
-
-        @Override
-        public void end(boolean interrupted) {}
-
-        @Override
-        public boolean isFinished() {
-            return true;
-        }
-    }
-
-    public class TestCommand extends CommandBase {
-        public TestCommand() {
-            addRequirements(mSwerve);
-        }
-
-        @Override
-        public void initialize() {}
-
-        @Override
-        public void execute() {}
-
-        @Override
-        public void end(boolean interrupted) {}
-
-        @Override
-        public boolean isFinished() {
-            return true;
-        }
-    }
-
     private double applyTransformations(double c) {
         return applyResponseCurve(MathUtil.applyDeadband(c, kStickDeadband));
     }
@@ -255,62 +228,96 @@ public class SwerveCommands {
 
     public class RotateDegrees extends CommandBase {
 
-        private double mDegreeRotate;
-        public RotateDegrees(double degrees) {
-            mDegreeRotate = degrees;
+        private Rotation2d mDegreeRotate;
+        public RotateDegrees(Rotation2d rot) {
+            mDegreeRotate = rot;
         }
 
         @Override
         public void initialize() {
             var yaw = mSwerve.getYaw();
 
-            Rotation2d newYaw = yaw.plus(Rotation2d.fromDegrees(mDegreeRotate));
+            Rotation2d newYaw = yaw.plus(mDegreeRotate);
             var newCommand = new RotateToYaw(newYaw);
             newCommand.schedule();
         }
     }
+    
     public class RotateToYaw extends CommandBase {
 
-        private final double kMaxSpeedDegreesSec = 15;
         private final double mYawToleranceDegrees = 2;
-        private final double ticDuration = 1.0 / 20;
+        private final double mAngularVelToleranceDegreesSec = 1;
         private Rotation2d mDestinationYaw;
-        private Swerve mSwerveSubsystem;
+        private final PIDWidget mPIDWidget;
+        private final TrapezoidProfile.Constraints motionConstraints;
+        public double mlastVelocity;
 
         public RotateToYaw(Rotation2d destinationYaw) {
+            this(destinationYaw, null);
+        
+        }
+
+        public RotateToYaw(Rotation2d destinationYaw, PIDWidget pidWidget) {
+            mPIDWidget = pidWidget;
+            motionConstraints = new TrapezoidProfile.Constraints(Math.PI / 10, Math.PI / 20);
             addRequirements(mSwerve);
-            mDestinationYaw = destinationYaw;
+            mlastVelocity = 0;
+            mDestinationYaw = destinationYaw.times(-1);
         }
 
-        private double getYawToGo() {
-            var currYaw = mSwerve.getYaw();
-
-            return currYaw.minus(mDestinationYaw).getDegrees();
+        @Override
+        public void initialize() {
         }
+        
 
         @Override
         public void execute() {
-
-            var yawToGo = getYawToGo();
-            double timeToFinish = Math.abs(yawToGo) / ticDuration;
-            double currRotationSpeed = yawToGo / timeToFinish;
-
-            if(currRotationSpeed > kMaxSpeedDegreesSec) {
-                currRotationSpeed = kMaxSpeedDegreesSec;
+            double yaw = mSwerve.getYaw().getRadians();
+            double goal = mDestinationYaw.getRadians();
+            var currState = new TrapezoidProfile.State(yaw, mlastVelocity);
+            var goalState = new TrapezoidProfile.State(goal, 0);
+            TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
+            double ticLength = 1./20; //Robot runs at 20Hz
+            var driveCommand = currMotionProfile.calculate(ticLength);
+            mlastVelocity = driveCommand.velocity;
+            if (mPIDWidget != null) {
+                mPIDWidget.update(yaw, goal, driveCommand.velocity);
             }
-
-            Translation2d zeroTranslation = new Translation2d();
-            double currRotationSpeedRadians = currRotationSpeed / 180 * Math.PI;
-
-            mSwerve.drive(zeroTranslation, currRotationSpeedRadians, true);
+            mSwerve.drive(
+                new ChassisSpeeds(0, 0, driveCommand.velocity),
+                true,
+                true
+            );
         }
 
         @Override
-        public boolean isFinished() {
 
-            return (Math.abs(getYawToGo()) < mYawToleranceDegrees);
+        public void end(boolean isInterrupted) {
+            mSwerve.stop();
+        }
+        @Override
+        public boolean isFinished() {
+            double yaw = mSwerve.getYaw().getDegrees();
+            double goal = mDestinationYaw.getDegrees();
+            boolean positionFine = (Math.abs(yaw - goal) < mYawToleranceDegrees);
+            // // boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+            boolean finished = positionFine;
+            if (finished) {
+              System.out.println("done");
+            }
+            return finished;
         }
 
     }
 
+    public class RotateYaw extends RotateToYaw {
+        public RotateYaw(Rotation2d deltaYaw) {
+            super(deltaYaw.plus(mSwerve.getYaw()));
+        }
+
+        public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
+            super(deltaYaw.plus(mSwerve.getYaw()), widget);
+        }
+
+    }
 }

@@ -37,15 +37,60 @@ public final class DebugTeleopCommands {
         System.out.println("Teleopinit called");
 
     }
+    
+    public static class PIDWidget {
+        public GenericEntry measurementEntry;
+        public GenericEntry outputEntry, goalEntry;
+
+        public PIDWidget(ShuffleboardTab tab) {
+            ShuffleboardLayout layout = tab.getLayout("PID", BuiltInLayouts.kList)
+            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
+
+            measurementEntry = layout.add("Measurement", 0).getEntry();
+            goalEntry = layout.add("Goal", 0).getEntry();
+            outputEntry = layout.add("Output", 0).getEntry();
+        }
+
+        public void update(double measurement, double goal, double output) {
+            measurementEntry.setDouble(measurement);
+            goalEntry.setDouble(goal);
+            outputEntry.setDouble(output);
+        }
+    
+    }
 
     public static class ChassisWidget {
         private GenericEntry yawEntry;
+        private GenericEntry pitchEntry;
+        private GenericEntry rollEntry;
+        
+        private GenericEntry vxEntry;
+        private GenericEntry vyEntry;
+        private GenericEntry omegaEntry;
 
         ChassisWidget(ShuffleboardTab tab) {
-            ShuffleboardLayout yawLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
-                    .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
+            ShuffleboardLayout chassisLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
+            .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
+            
+            yawEntry = chassisLayout.add("yaw (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
+            pitchEntry = chassisLayout.add("pitch (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
+            rollEntry = chassisLayout.add("roll (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
 
-            yawEntry = yawLayout.add("Yaw (Degrees)", 0).getEntry();
+            vxEntry = chassisLayout.add("vx (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            vyEntry = chassisLayout.add("vy (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            omegaEntry = chassisLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
+        }
+
+        public void update() {
+			Swerve swerve = Swerve.getInstance();
+
+            yawEntry.setDouble(swerve.getIMU().getYaw());
+            pitchEntry.setDouble(swerve.getIMU().getPitch());
+            rollEntry.setDouble(swerve.getIMU().getRoll());
+            
+            vxEntry.setDouble(swerve.getChassisSpeeds().vxMetersPerSecond);
+            vyEntry.setDouble(swerve.getChassisSpeeds().vyMetersPerSecond);
+            omegaEntry.setDouble(swerve.getChassisSpeeds().omegaRadiansPerSecond);
         }
 
         public void update(Swerve swerveSubsystem) {
@@ -54,31 +99,32 @@ public final class DebugTeleopCommands {
     }
 
     public static class SwerveModuleWidget {
-        private GenericEntry angleEntry;
-        private GenericEntry state_angle, abs_encoder, rel_encoder, rel_encoder_deg, shifted_abs_encoder;
+        private final GenericEntry mDesiredAngleEntry;
+        private final GenericEntry mCurrentAngleEntry;
+        private final GenericEntry mAbsoluteEncoderEntry;
+        private final GenericEntry mRelativeEncoderEntry;
+        private final GenericEntry mShiftedAbsoluteEncoderEntry;
 
         SwerveModuleWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout swerve_module = tab.getLayout(name, BuiltInLayouts.kList)
                     .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
 
-            angleEntry = swerve_module.add("desired.angle", 0).getEntry();
-            state_angle = swerve_module.add("current.angle", 0).getEntry();
-            abs_encoder = swerve_module.add("abs_encoder", 0).getEntry();
-            rel_encoder = swerve_module.add("rel_encoder", 0).getEntry();
-            rel_encoder_deg = swerve_module.add("rel_encoder (degrees)", 0).getEntry();
-            shifted_abs_encoder = swerve_module.add("shifted abs_encoder", 0).getEntry();
+            mDesiredAngleEntry = swerve_module.add("desired angle (deg)", 0).getEntry();
+            mCurrentAngleEntry = swerve_module.add("current angle (deg)", 0).getEntry();
+            mAbsoluteEncoderEntry = swerve_module.add("abs encoder (deg)", 0).getEntry();
+            mRelativeEncoderEntry = swerve_module.add("rel encoder (deg)", 0).getEntry();
+            mShiftedAbsoluteEncoderEntry = swerve_module.add("shifted abs encoder (deg)", 0).getEntry();
         }
 
         public void update(SwerveModule module) {
             SwerveModuleState current = module.getState();
             SwerveModuleState desired = module.getDesiredState();
-
-            angleEntry.setDouble(desired.angle.getDegrees());
-            state_angle.setDouble(current.angle.getDegrees());
-            abs_encoder.setDouble(module.getAbsoluteEncoderValue());
-            rel_encoder.setDouble(module.getRelativeEncoderValue());
-            rel_encoder_deg.setDouble(Rotation2d.fromRadians(module.getRelativeEncoderValue()).getDegrees());
-            shifted_abs_encoder.setDouble(module.getShiftedAbsoluteEncoderRotations());
+            
+            mDesiredAngleEntry.setDouble(desired.angle.getDegrees()); 
+            mCurrentAngleEntry.setDouble(current.angle.getDegrees());
+            mAbsoluteEncoderEntry.setDouble(module.getAbsoluteEncoderRotation().getDegrees()); 
+            mRelativeEncoderEntry.setDouble(module.getRelativeEncoderRotation().getDegrees());
+            mShiftedAbsoluteEncoderEntry.setDouble(module.getShiftedAbsoluteEncoderRotation().getDegrees());
 
         }
     }
@@ -86,6 +132,7 @@ public final class DebugTeleopCommands {
     public static class SwerveTab {
         SwerveModuleWidget module0, module1, module2, module3;
         ChassisWidget chassisWidget;
+        PIDWidget pidWidget;
         ShuffleboardTab tab;
         Swerve swerve_subsystem;
         SwerveCommands mSwerveCommands;
@@ -98,32 +145,27 @@ public final class DebugTeleopCommands {
             // module2 = new SwerveModuleWidget(tab, "Module 2");
             // module3 = new SwerveModuleWidget(tab, "Module 3");
             chassisWidget = new ChassisWidget(tab);
+            pidWidget = new PIDWidget(tab);
 
-            swerve_subsystem = swerve;
-            ShuffleboardLayout elevatorCommands = tab.getLayout("Orientation", BuiltInLayouts.kList)
-                    .withSize(2, 3)
-                    .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
+            swerve_subsystem = Swerve.getInstance();
+            ShuffleboardLayout commands = 
+            tab.getLayout("Orientation", BuiltInLayouts.kList)
+            .withSize(2, 3)
+            .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
+            
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(0)).withName("Orientation 0"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(90)).withName("Orientation 90"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(180)).withName("Orientation 180"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(270)).withName("Orientation 270"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(360)).withName("Orientation 360"));
+            
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
+            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem, Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
+            commands.add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
+            commands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(-45), pidWidget).withName("Rotate to 45"));
 
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(0)).withName("Orientation 0"));
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(90)).withName("Orientation 90"));
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(180)).withName("Orientation 180"));
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(270)).withName("Orientation 270"));
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(360)).withName("Orientation 360"));
-
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(-90)).withName("Orientation -90"));
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
-            // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
-            // Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
-            elevatorCommands
-                    .add(Commands.runOnce(() -> swerve_subsystem.resetToAbsolute()).withName("Reset to Absolute"));
-            elevatorCommands.add(mSwerveCommands.new RotateToYaw(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
+            commands.add(mSwerveCommands.new RotateDegrees(Rotation2d.fromDegrees(45)).withName("Rotate 45"));
         }
 
         public void update() {
