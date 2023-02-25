@@ -30,14 +30,16 @@ public final class Autos {
 	private final Swerve mSwerve;
 	private final boolean mIsOpenLoop = true;
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
+	private final SwerveCommands mSwerveCommands;
 	private final double maxVelocity = 0.5;
-	private final double maxAccel = 1;
+	private final double maxAccel = 0.4;
 	private final double maxAngularVelocity = 0.8;
 	private final double maxAngularAcceleration = 0.2;
 			
 
-    public Autos(SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
+    public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
 		mSwerve = Swerve.getInstance();
+		mSwerveCommands = swerveCommands;
 		mSwerveTrajectoryFollowerCommands = swerveTrajectoryFollowerCommands;
     }
 
@@ -56,10 +58,10 @@ public final class Autos {
 		public MoveForwardCommandFancy() {
 			addRequirements(mSwerve);
 			addCommands(
-				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
-						new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
-						new PathPoint(new Translation2d(1, 0), new Rotation2d(Math.PI / 2))
+						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
 					)),
 					maxVelocity, maxAccel
 				),
@@ -76,14 +78,14 @@ public final class Autos {
 			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
 			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
 			addCommands(
-				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag1,
 						aprilTag2
 					)),
 					maxVelocity, maxAccel
 				),
-				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag2,
 						aprilTag1
@@ -91,6 +93,27 @@ public final class Autos {
 					maxVelocity, maxAccel
 				)
 			);
+		}
+	}
+
+	public class Strategy {
+		private final SequentialCommandGroup mCommands;
+		private final String mName;
+
+		public Strategy(String name, CommandBase... commands) {
+			mName = name;
+			mCommands = new SequentialCommandGroup(
+				mSwerveCommands.new ResetCommand()
+			);
+			mCommands.addCommands(commands);
+		}
+
+		public String getName() {
+			return mName;
+		}
+
+		public CommandBase getCommand() {
+			return mCommands;
 		}
 	}
 }

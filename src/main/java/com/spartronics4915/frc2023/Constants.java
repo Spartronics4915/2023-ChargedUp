@@ -59,14 +59,15 @@ public final class Constants {
 		public static class ChassisConstants {
 			public final double driveGearRatio, angleGearRatio;
 			public final double trackWidth, wheelBase;
+			public final boolean angleInverted; 
 			public final double[] moduleOffsets;
 			public final int[] driveMotorIDs, angleMotorIDs, encoderIDs;
 			public final IntFunction<BasePigeon> pigeonConstructor;
 			public final IntFunction<AbsoluteEncoder> absoluteEncoderConstructor;
-			private final int pigeonId;
+			public final int pigeonId;
 			public ChassisConstants(
 				double driveGearRatio, double angleGearRatio,
-				double trackWidth, double wheelBase,
+				double trackWidth, double wheelBase, boolean angleInverted,
 				double[] moduleOffsets,
 				int[] driveMotorIDs, int[] angleMotorIDs, int[] encoderIDs,
 				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor,
@@ -84,23 +85,24 @@ public final class Constants {
 				this.angleMotorIDs = angleMotorIDs;
 				this.encoderIDs = encoderIDs;
 				this.pigeonId = pigeonId;
+				this.angleInverted = angleInverted;
 			}
 		}
 		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
 			6.75 / 1.0, 150.0 / 7.0,
-			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75),
+			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75), true,
 			new double[]{ 96.328, 167.431, 16.962, 118.652 },
 			new int[]{ 5, 3, 7, 9 },
 			new int[]{ 6, 4, 8, 10 },
 			new int[]{ 13, 12, 14, 11 },
 			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); },
 			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
-			2
+			9
 		);
 		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
 			8.33 / 1.0, 18.0 / 1.0,
-			0.75, 0.75,
-			new double[]{  0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
+			0.75, 0.75, false,
+			new double[]{ 0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
 			new int[]{ 1, 3, 5, 7 },
 			new int[]{ 2, 4, 6, 8 },
 			new int[]{ 0, 1, 2, 3 },
@@ -138,6 +140,8 @@ public final class Constants {
 
             public static final double kGearRatio = kChassisConstants.angleGearRatio;
             public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
+
+			public static final boolean kInverted = kChassisConstants.angleInverted;
         }
 
         public static final int kPigeonID = kChassisConstants.pigeonId;
@@ -254,7 +258,7 @@ public final class Constants {
             public final int angleMotorID;
             public final int encoderID;
             public final double angleOffset;
-            public final double absoluteOffset;
+            public final double absoluteOffset; // radians
 
             public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRadians) {
                 driveMotorID = d;
@@ -376,8 +380,10 @@ public final class Constants {
         public static final double kStickDeadband = 0.08;
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
-    }
 
+		public static final int kDefaultAutoIndex = 0;
+    }
+    
     public static final class FieldConstants {
         static final double length = Units.feetToMeters(54);
         static final double width = Units.feetToMeters(27);

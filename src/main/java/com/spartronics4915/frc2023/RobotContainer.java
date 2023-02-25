@@ -4,25 +4,34 @@
 
 package com.spartronics4915.frc2023;
 
-import static com.spartronics4915.frc2023.Constants.OI.kDriverControllerID;
-import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
-import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
-
+import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
-import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
-import com.spartronics4915.frc2023.commands.PrintPos;
+import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
+import com.spartronics4915.frc2023.commands.SwerveCommands.TeleopCommand;
+import com.spartronics4915.frc2023.subsystems.Arm;
+import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Swerve;
+import com.spartronics4915.frc2023.subsystems.Arm.ArmState;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import static com.spartronics4915.frc2023.Constants.OI.*;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -39,8 +48,6 @@ public class RobotContainer {
 
     private final CommandXboxController mDriverController;
     private final CommandXboxController mOperatorController;
-
-    private final PhotonCameraWrapper mCameraWrapper;
     
     private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     
@@ -56,7 +63,7 @@ public class RobotContainer {
     
     private final Autos mAutos;
     
-    private final Command mAutonomousCommand;
+	private final SendableChooser<CommandBase> mAutoSelector = new SendableChooser<>();
 	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
@@ -81,19 +88,31 @@ public class RobotContainer {
         // mIntake = Intake.getInstance();
         // mIntakeCommands = new IntakeCommands(mIntake);
         
-        mAutos = new Autos(mSwerveTrajectoryFollowerCommands);
-        
-        mAutonomousCommand = new SequentialCommandGroup(
-            mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardCommandFancy()
-        );
-        
+        mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
+
+		// auto chooser
+		configureAutoSelector();
+
         mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         
-        mCameraWrapper = new PhotonCameraWrapper();
         // Configure the button bindings
         configureButtonBindings();
     }
+
+	private void configureAutoSelector() {
+		Autos.Strategy[] autoStrategies = {
+			mAutos.new Strategy("Move Forward Fancy", mAutos.new MoveForwardCommand())
+		};
+		for (Autos.Strategy strat : autoStrategies) {
+			mAutoSelector.addOption(strat.getName(), strat.getCommand());
+		}
+
+		mAutoSelector.setDefaultOption(
+			autoStrategies[kDefaultAutoIndex].getName(),
+			autoStrategies[kDefaultAutoIndex].getCommand()
+		);
+		SmartDashboard.putData("Auto Strategies", mAutoSelector);        
+	}
     
     /**
     * Use this method to define your button->command mappings. Buttons can be
@@ -113,24 +132,18 @@ public class RobotContainer {
                         .onTrue(mSwerveCommands.new ResetYaw());
 
                     mDriverController.y()
-                        .onTrue(mSwerveCommands.new ResetCommand());
+                        .onTrue(mSwerveCommands.new ResetOdometry());
 
                     mDriverController.rightTrigger(kTriggerDeadband)
                         .onTrue(mSwerveCommands.new EnableSprintMode())
                         .onFalse(mSwerveCommands.new DisableSprintMode());
 
-                    mDriverController.rightBumper()
-                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+                    // mDriverController.rightBumper()
+                    //     .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
-                    mDriverController.leftBumper()
-                        .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
+                    // mDriverController.leftBumper()
+                    //     .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));
 
-                    mDriverController.x()
-                        // .onTrue(new PrintPos());
-                        .onTrue(mSwerveCommands.new RotateToTarget());
-                        // .onTrue(mSwerveCommands.new RotateToYaw(Rotation2d.fromRadians(Math.PI)));
-                    
-                    // mDriverController.
                     // OPERATOR CONTROLS
                     // mOperatorController.povUp()
                     //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
@@ -157,8 +170,6 @@ public class RobotContainer {
                     // mOperatorController.leftTrigger(kTriggerDeadband)
                     //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
                     //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-
-                    
                 }
             }
             
@@ -168,7 +179,7 @@ public class RobotContainer {
             * @return the command to run in autonomous
             */
             public Command getAutonomousCommand() {
-                return mAutonomousCommand;
+                return mAutoSelector.getSelected();
             }
             
             public Command getTeleopInitCommand() {
@@ -176,7 +187,7 @@ public class RobotContainer {
             }
             
             public Command getTestingCommand() {
-                return new PrintPos();
+                return null;
             }
 
             public void initRobot() {
@@ -186,4 +197,5 @@ public class RobotContainer {
                 mSwerve.resetToAbsolute();
                 mSwerve.setFieldRelative(true);
             }
-}
+        }
+        
