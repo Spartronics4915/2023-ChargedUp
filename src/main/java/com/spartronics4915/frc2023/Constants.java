@@ -231,7 +231,7 @@ public final class Constants {
             Math.PI * 2,
             0.05, 0, 0,
             Math.PI/8, 1, 0,
-            Rotation2d.fromDegrees(246), 10
+            Rotation2d.fromDegrees(66), 10
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
@@ -239,7 +239,7 @@ public final class Constants {
             Math.PI * 2,
             0.05 / 36, 0, 0,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
-            Rotation2d.fromDegrees(0),-1
+            Rotation2d.fromDegrees(136),-1
         ); 
 
         public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(

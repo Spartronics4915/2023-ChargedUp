@@ -33,7 +33,13 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         if(useAbs){
             mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
             mAbsEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);    
-            mAbsEncoder.setZeroOffset(MotorConstants.kZeroOffset.plus(Rotation2d.fromDegrees(180)).getRadians());
+            double radianOffset = MotorConstants.kZeroOffset.getRadians();
+            if (radianOffset < 0) {
+                radianOffset += Math.PI*2;
+            }
+            System.out.println("radianOffset: " + radianOffset);
+            mAbsEncoder.setZeroOffset(radianOffset);
+            System.out.println("ZeroOffset:"+MotorConstants.kZeroOffset.plus(Rotation2d.fromDegrees(180)));
         } else {
             relEncoder = mMotor.getEncoder();
             relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);

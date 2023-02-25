@@ -192,9 +192,9 @@ public final class DebugTeleopCommands {
             // stateRadius = armModule.add("desired radius",0).getEntry();
 
 
-            wristRaw = wristLayout.add("Wrist (Raw)", 0).getEntry();
-            wristNative = wristLayout.add("Wrist (Native)", 0).getEntry();
-            wristArm = wristLayout.add("Wrist (Arm)", 0).getEntry();
+            wristRaw = wristLayout.add("Wrist (Raw rad)", 0).getEntry();
+            wristNative = wristLayout.add("Wrist (Native deg)", 0).getEntry();
+            wristArm = wristLayout.add("Wrist (Arm deg)", 0).getEntry();
             wristArmMinus30Native = wristLayout.add("Wrist Native w Arm at -30", 0).getEntry();
             wristArmPlus30Native = wristLayout.add("Wrist Native w Arm at +30", 0).getEntry();
 
