@@ -6,6 +6,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -83,8 +84,8 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {
         mState = ArmState.RETRACTED;
         System.out.println("arm created");
-        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true);
-        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, true);
+        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true, MotorType.kBrushless);
+        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, true, MotorType.kBrushed);
         // mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, false);
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();

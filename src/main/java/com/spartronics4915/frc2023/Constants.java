@@ -207,10 +207,11 @@ public final class Constants {
             public final double kSmartMotionMinOutputVelocity;
             public final Rotation2d kZeroOffset;
             public final int kFollowerMotorID;
+            public final boolean kInvertMotor;
 
             public ArmMotorConstants(int MotorID, double PositionConversionFactor, double P, double I, double D, 
             double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, Rotation2d zeroOffset, 
-            int followerMotorID) {
+            int followerMotorID, boolean motorInverted) {
                 super();
                 this.kMotorID = MotorID;
                 this.kPositionConversionFactor = PositionConversionFactor;
@@ -222,6 +223,7 @@ public final class Constants {
                 this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
                 this.kZeroOffset = zeroOffset;
                 this.kFollowerMotorID = followerMotorID;
+                this.kInvertMotor = motorInverted;
             }
         }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
@@ -232,15 +234,15 @@ public final class Constants {
             Math.PI * 2,
             0.05, 0, 0,
             Math.PI/8, 1, 0,
-            Rotation2d.fromDegrees(66), 10
+            Rotation2d.fromDegrees(66), 10, false
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
             Math.PI * 2,
-            0.05 / 36, 0, 0,
+            0.1, 0, 0,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
-            Rotation2d.fromDegrees(136),-1
+            Rotation2d.fromDegrees(136),-1, true
         ); 
 
         public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
@@ -249,7 +251,7 @@ public final class Constants {
             0, 0, 0,
             0, 0, 0,
             Rotation2d.fromDegrees(0), 
-            -1
+            -1, true
         ); 
         public static final int kPivotFollowerID = 16; //actual value: 16
 

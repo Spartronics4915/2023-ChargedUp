@@ -24,10 +24,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     private Rotation2d mLastReference = new Rotation2d(0);
     private boolean useAbs;
 
-    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, boolean useAbs) {
+    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, boolean useAbs, MotorType motorType) {
         this.useAbs = useAbs;
         
-        mMotor = new CANSparkMax(MotorConstants.kMotorID, MotorType.kBrushless);
+        mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
         mMotor.setIdleMode(IdleMode.kCoast);
 
         if(useAbs){
@@ -42,7 +42,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
             relEncoder = mMotor.getEncoder();
             relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);
         }
-
+        if(MotorConstants.kInvertMotor) {
+            mMotor.setInverted(true);
+        }
         mPIDController = initializePIDController(MotorConstants);
         mMotor.setSmartCurrentLimit(10);
     }

@@ -14,6 +14,8 @@ import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStat
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Swerve;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -56,7 +58,7 @@ public class RobotContainer {
     private final Command mAutonomousCommand;
     private final Command mTeleopInitCommand;
     
-    private final boolean useJoystick = false;
+    private final boolean useJoystick = true;
     private final boolean useSwerveChassis = false;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
@@ -109,6 +111,8 @@ public class RobotContainer {
     private void configureButtonBindings() {
         if (useJoystick) {
             // DRIVER CONTROLS
+            
+            if(useSwerveChassis) {
             mDriverController.a()
             .onTrue(mSwerveCommands.new ToggleFieldRelative());
             
@@ -127,10 +131,12 @@ public class RobotContainer {
             
             mDriverController.leftBumper()
             .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
-            
+            }
             mDriverController.povRight().whileTrue(mArm.getExtender().getExtendCommand());
             mDriverController.povLeft().whileFalse(mArm.getExtender().getRetractCommand());
 
+            mOperatorController.rightTrigger(kTriggerDeadband).whileTrue(Commands.runEnd(()->mIntake.setState(IntakeState.OUT),
+            ()->mIntake.setState(IntakeState.OFF)));
 
             // OPERATOR CONTROLS
             // mOperatorController.povUp()
