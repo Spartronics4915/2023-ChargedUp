@@ -72,6 +72,25 @@ public final class Autos {
 			);
 		}
 	}
+	
+	public class MoveForwardCommandDynamic extends SequentialCommandGroup {
+		public MoveForwardCommandDynamic() {
+			addRequirements(mSwerve);
+			addCommands(
+				mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
+					new ArrayList<>(List.of(
+						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+					)),
+					maxVelocity, maxAccel
+				),
+				new InstantCommand(() -> {
+					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+					for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+				})
+			);
+		}
+	}
 
 	public class MoveBackAndForthFancy extends SequentialCommandGroup {
 		public MoveBackAndForthFancy() {
