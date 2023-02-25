@@ -37,9 +37,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
             if (radianOffset < 0) {
                 radianOffset += Math.PI*2;
             }
-            System.out.println("radianOffset: " + radianOffset);
             mAbsEncoder.setZeroOffset(radianOffset);
-            System.out.println("ZeroOffset:"+MotorConstants.kZeroOffset.plus(Rotation2d.fromDegrees(180)));
         } else {
             relEncoder = mMotor.getEncoder();
             relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);

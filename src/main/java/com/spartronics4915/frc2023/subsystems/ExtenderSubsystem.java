@@ -9,6 +9,8 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 import com.revrobotics.SparkMaxAlternateEncoder;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ExtenderSubsystem extends SubsystemBase  {
@@ -24,8 +26,9 @@ public class ExtenderSubsystem extends SubsystemBase  {
     // The RelativeEncoder class cannot be negative. So we have to pad it out to 
     // a large value.
     private final double kPositionPad = 24;
-    private final double kNegThreshold = 200;
-
+    private final double kMinDist = 0.5;
+    private final double kMaxDist = 12;
+    private final double kPosTolerance = 0.2;
 
     public ExtenderSubsystem(int motorID) {
         kMotorID = motorID;
@@ -73,15 +76,44 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
     
     public void startExtending() {
-        mMotor.set(0.3);
+
+        if(getPosition() >= kMaxDist) {
+            mMotor.stopMotor();
+        }
+        else {
+            mMotor.set(0.3);
+        }
+
+    }
+
+    public void stopExtender() {
+        mMotor.stopMotor();
+    }
+
+    public CommandBase getExtendCommand() {
+
+        return Commands.runEnd(() -> this.startExtending(), () -> this.stopMotor());
+    }
+
+    public CommandBase getRetractCommand() {
+        return Commands.runEnd(() -> this.startRetracting(), () -> this.stopMotor());
     }
 
     public void startRetracting() {
-        mMotor.set(-0.3);
+        if(getPosition() < kMinDist) {
+            mMotor.stopMotor();
+        }
+        else {
+            mMotor.set(-0.3);
+        }
     }
 
-    public void extendNInches(double N) {
-        //setReference(getPosition() + N);
+    public boolean atPos(double pos) {
+        return (Math.abs(getPosition() - pos) < kPosTolerance);
+    }
+
+    public CommandBase extendToNInches(double N) {
+        return Commands.runEnd(()->this.startExtending(), () -> this.stopMotor()).until(() -> atPos(N));
     }
 
     public void setReference(double p) {

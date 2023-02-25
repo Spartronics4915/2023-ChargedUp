@@ -16,6 +16,7 @@ import com.spartronics4915.frc2023.subsystems.Swerve;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import static com.spartronics4915.frc2023.Constants.OI.*;
@@ -124,6 +125,10 @@ public class RobotContainer {
             mDriverController.leftBumper()
             .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
             
+            mDriverController.povRight().whileTrue(mArm.getExtender().getExtendCommand());
+            mDriverController.povLeft().whileFalse(mArm.getExtender().getRetractCommand());
+
+
             // OPERATOR CONTROLS
             // mOperatorController.povUp()
             //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
