@@ -56,7 +56,7 @@ public final class Autos {
 		public MoveForwardCommandFancy() {
 			addRequirements(mSwerve);
 			addCommands(
-				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
 						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
@@ -76,14 +76,14 @@ public final class Autos {
 			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
 			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
 			addCommands(
-				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag1,
 						aprilTag2
 					)),
 					maxVelocity, maxAccel
 				),
-				mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag2,
 						aprilTag1
