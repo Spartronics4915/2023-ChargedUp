@@ -335,7 +335,7 @@ public final class Constants {
     }
 
     public static final class Intake {
-        public static final int kIntakeMotorID = -1;
+        public static final int kIntakeMotorID = 18;
 
         public static final boolean kIsInverted = false;
 

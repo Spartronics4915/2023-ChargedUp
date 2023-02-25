@@ -12,6 +12,7 @@ import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -45,6 +46,7 @@ public class RobotContainer {
     
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
+    private final Intake mIntake;
     
     // private final Intake mIntake;
     // private final IntakeCommands mIntakeCommands;
@@ -93,6 +95,7 @@ public class RobotContainer {
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
             mArmCommands = new ArmCommands(mArm);
+            mIntake = Intake.getInstance();
             
         }
         // mIntake = Intake.getInstance();

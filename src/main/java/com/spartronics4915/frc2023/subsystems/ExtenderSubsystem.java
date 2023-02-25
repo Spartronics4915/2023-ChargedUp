@@ -44,7 +44,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
         //mPIDController.setP(1./60);
 
-        mEncoder.setPosition(0);
+        mEncoder.setPosition(kPositionPad);
         targetReference = 0;
     }
 
@@ -122,7 +122,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public boolean closeEnough() {
-        return ((Math.abs(getPosition() - targetReference)) < 0.1);
+        return ((Math.abs(getPosition() - targetReference)) < kPosTolerance);
     }
     public double getReference() {
 
