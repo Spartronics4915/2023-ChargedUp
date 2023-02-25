@@ -219,10 +219,10 @@ public final class DebugTeleopCommands {
 
     public static class ArmWidget {
         // private GenericEntry linActDistance,stateRadius;
-        private GenericEntry wristLeveledRotation, stateWristLeveledRotation, wristSpeed;
+        private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
         private GenericEntry shoulderRaw,  shoulderNative, shoulderArm, stateShoulderRotation, refShoulderRotation, pivotSpeed;
         private GenericEntry shoulderArmPlus30Native, shouldArmMinus30Native;
-        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, refwristRotation;
+        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, refwristRotation, wristSpeed;
         private GenericEntry wristArmPlus30Native, wristArmMinus30Native;
         ArmWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3)
@@ -239,6 +239,7 @@ public final class DebugTeleopCommands {
             wristArm = wristLayout.add("Wrist (Arm deg)", 0).getEntry();
             wristArmMinus30Native = wristLayout.add("Wrist Native w Arm at -30", 0).getEntry();
             wristArmPlus30Native = wristLayout.add("Wrist Native w Arm at +30", 0).getEntry();
+            wristSpeed = wristLayout.add("Wrist Speed Command",0).getEntry();
 
             shoulderRaw = armModule.add("Shoulder (Raw)", 0).getEntry();
             shoulderNative = armModule.add("Shoulder (Native)", 0).getEntry();
@@ -264,6 +265,7 @@ public final class DebugTeleopCommands {
             wristArm.setDouble(module.getWrist().getArmPosition().getDegrees());
             wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
             wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
+            wristSpeed.setDouble(module.getWrist().getMotor().getAppliedOutput());
 
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
             shoulderNative.setDouble(module.getPivot().getNativePosition().getDegrees());

@@ -76,6 +76,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
     
     public void startExtending() {
+        System.out.println("Extending Position: " + getPosition());
+        System.out.println("speed: " + mMotor.getAppliedOutput());
 
         if(getPosition() >= kMaxDist) {
             mMotor.stopMotor();

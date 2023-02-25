@@ -26,6 +26,8 @@ import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.Swerve;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
+
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -66,7 +68,7 @@ public class RobotContainer {
     private final Command mAutonomousCommand;
     private final Command mTeleopInitCommand;
     
-    private final boolean useJoystick = false;
+    private final boolean useJoystick = true;
     private final boolean useSwerveChassis = false;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
@@ -118,26 +120,27 @@ public class RobotContainer {
     private void configureButtonBindings() {
         if (useJoystick) {
             // DRIVER CONTROLS
-            mDriverController.a()
-            .onTrue(mSwerveCommands.new ToggleFieldRelative());
             
-            mDriverController.b()
-            .onTrue(mSwerveCommands.new ResetYaw());
-            
-            mDriverController.y()
-            .onTrue(mSwerveCommands.new ResetOdometry());
-            
-            mDriverController.rightTrigger(kTriggerDeadband)
-            .onTrue(mSwerveCommands.new EnableSprintMode())
-            .onFalse(mSwerveCommands.new DisableSprintMode());
-            
-            mDriverController.rightBumper()
-            .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
-            
-            mDriverController.leftBumper()
-            .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
-            
-            
+            if(useSwerveChassis) {
+                mDriverController.a()
+                .onTrue(mSwerveCommands.new ToggleFieldRelative());
+                
+                mDriverController.b()
+                .onTrue(mSwerveCommands.new ResetYaw());
+                
+                mDriverController.y()
+                .onTrue(mSwerveCommands.new ResetOdometry());
+                
+                mDriverController.rightTrigger(kTriggerDeadband)
+                .onTrue(mSwerveCommands.new EnableSprintMode())
+                .onFalse(mSwerveCommands.new DisableSprintMode());
+                
+                mDriverController.rightBumper()
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+                
+                mDriverController.leftBumper()
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));    
+            }
             
             // OPERATOR CONTROLS
             // mOperatorController.button(7) //window
@@ -146,75 +149,76 @@ public class RobotContainer {
             // mOperatorController.povDown() //menu
             //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
             
-            /**
-             * presets button bindings:
-             * Extend to floor position		    Window
-             * Extend to Double substation		Menu
-             * Extend to Middle tier - cube		A
-             * Extend to Middle tier - cone		X
-             * Extend to High tier - cube		B
-             * Extend to High tier - cone		Y   
-             * */
+           
+            if (useArm){
+                    /**
+                    * presets button bindings:
+                    * Extend to floor position		    Window
+                    * Extend to Double substation		Menu
+                    * Extend to Middle tier - cube		A
+                    * Extend to Middle tier - cone		X
+                    * Extend to High tier - cube		B
+                    * Extend to High tier - cone		Y   
+                    * */
+                mOperatorController.button(kWindowButtonId) //should be window
+                    .onTrue(mArmCommands.new SetArmState(ArmState.FLOOR_POS));
 
-            mOperatorController.button(kWindowButtonId) //should be window
-                .onTrue(mArmCommands.new SetArmState(ArmState.FLOOR_POS));
-
-            mOperatorController.button(kMenuButtonId) //should be menu
-                .onTrue(mArmCommands.new SetArmState(ArmState.DOUBLE_SUBSTATION));
-            
-            mOperatorController.a()
-                .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_1));
-            
-            mOperatorController.x()
-                .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_1));
-            
-            mOperatorController.b()
-                .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_2));
-            
-            mOperatorController.y()
-                .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_2));
-
-            /**
-             * Eject game piece		    RT
-             * Intake game piece		LT
-             */
-            mOperatorController.rightTrigger(kTriggerDeadband)
-                .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
-                .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-            
-            mOperatorController.leftTrigger(kTriggerDeadband)
-                .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
-                .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-
-            /**
-             * Relative button bindings:
-             * Manual Pivot up		    D pad up
-             * Manual Pivot down		D pad down
-             * Manual Extend out		D pad left
-             * Manual Extend In		    D pad right
-             * Manual wrist up		    LS in
-             * Manual wrist down		RS in
-             */
-
-            mOperatorController.povUp()
-                .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
-
-            mOperatorController.povDown()
-                .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                mOperatorController.button(kMenuButtonId) //should be menu
+                    .onTrue(mArmCommands.new SetArmState(ArmState.DOUBLE_SUBSTATION));
                 
-            mOperatorController.povLeft()
-                .whileTrue(mArm.getExtender().getExtendCommand());
+                mOperatorController.a()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_1));
+                
+                mOperatorController.x()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_1));
+                
+                mOperatorController.b()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_2));
+                
+                mOperatorController.y()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_2));
 
-            mOperatorController.povRight()
-                .whileTrue(mArm.getExtender().getRetractCommand());
+                /**
+                 * Eject game piece		    RT
+                 * Intake game piece		LT
+                 */
+                mOperatorController.rightTrigger(kTriggerDeadband)
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
+                    .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+                
+                mOperatorController.leftTrigger(kTriggerDeadband)
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
+                    .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
 
-            mOperatorController.leftBumper()
-                .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+                /**
+                 * Relative button bindings:
+                 * Manual Pivot up		    D pad up
+                 * Manual Pivot down		D pad down
+                 * Manual Extend out		D pad left
+                 * Manual Extend In		    D pad right
+                 * Manual wrist up		    LS in
+                 * Manual wrist down		RS in
+                 */
 
-            mOperatorController.rightBumper()
-                .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
-          
+                mOperatorController.povUp()
+                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
 
+                mOperatorController.povDown()
+                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    
+                mOperatorController.povLeft()
+                    .whileTrue(mArm.getExtender().getExtendCommand());
+
+                mOperatorController.povRight()
+                    .whileTrue(mArm.getExtender().getRetractCommand());
+
+                mOperatorController.leftBumper()
+                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+
+                mOperatorController.rightBumper()
+                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                
+            }
 
         }
     }
