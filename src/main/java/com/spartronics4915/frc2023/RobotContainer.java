@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -101,7 +102,10 @@ public class RobotContainer {
 
 	private void configureAutoSelector() {
 		Autos.Strategy[] autoStrategies = {
-			mAutos.new Strategy("Move Forward Fancy", mAutos.new MoveForwardCommand())
+			mAutos.new Strategy("Move Forward Static", mAutos.new MoveForwardCommandFancy()),
+			mAutos.new Strategy("Move Forward Dynamic", new InstantCommand(() -> {
+				mAutos.new MoveForwardCommandDynamic().schedule();
+			}))
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat.getCommand());
