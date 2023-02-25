@@ -21,7 +21,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     private RelativeEncoder relEncoder;
     private SparkMaxAbsoluteEncoder mAbsEncoder;
     private SparkMaxPIDController mPIDController;
-    private Rotation2d mLastReference = new Rotation2d(0);
+    private Rotation2d mCurrentReference = new Rotation2d(0);
     private boolean useAbs;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, boolean useAbs) {
@@ -103,7 +103,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     private void setNativeReference(Rotation2d ref) {
         System.out.println("set Ref called");
 
-        mLastReference = ref;
+        mCurrentReference = ref;
         System.out.println(ref + ": also this was called");
         mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion);
     }
@@ -116,7 +116,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     }
     public Rotation2d getCurrentReference() 
     {
-        return mLastReference;
+        return mCurrentReference;
     }
 
     public Rotation2d getArmPosition(){
@@ -137,4 +137,5 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     public double getMotorSpeed(){
         return mMotor.getAppliedOutput();
     }
+    
 }

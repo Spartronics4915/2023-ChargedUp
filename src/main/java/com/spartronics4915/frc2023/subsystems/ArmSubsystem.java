@@ -10,6 +10,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.spartronics4915.frc2023.Constants.Arm.*;
@@ -20,14 +21,19 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public enum ArmState {
         RETRACTED(kRetractedConstants),
-        GRAB_UPRIGHT(kGrabUprightConstants),
-        GRAB_FALLEN(kArmLowConstants),
-        ARM_LOW(kArmLowConstants),
-        ARM_HIGH(kArmHighConstants),
-        ARM_LEVEL(kArmLevelConstants),
-        LEVEL_1(kLevel1Constants),
-        LEVEL_2(kLevel2Constants),
-        LEVEL_3(kLevel3Constants);
+        // GRAB_UPRIGHT(kGrabUprightConstants),
+        // GRAB_FALLEN(kArmLowConstants),
+        // ARM_LOW(kArmLowConstants),
+        // ARM_HIGH(kArmHighConstants),
+        // ARM_LEVEL(kArmLevelConstants),
+        FLOOR_POS(kFloorPositionConstants),
+        DOUBLE_SUBSTATION(kDoubleSubstationConstants),
+        CONE_LEVEL_1(kConeLevel1Constants),
+        CONE_LEVEL_2(kConeLevel2Constants),
+        CUBE_LEVEL_1(kCubeLevel1Constants),
+        CUBE_LEVEL_2(kCubeLevel2Constants);
+
+        // CONE_LEVEL_3(kConeLevel3Constants);
 
         public final double armRadius;
         public final Rotation2d armTheta;
@@ -122,7 +128,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmPosition getPosition() {
         return new ArmPosition(
-                0,
+                mExtenderSubsystem.getPosition(),
                 mPivotMotor.getArmPosition(),
                 mWristMotor.getArmPosition()
         // new Rotation2d(0)
@@ -136,11 +142,12 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO determine zero offsets
     // TODO add extender motor
     private void setDesiredPosition(ArmPosition state) {
+        mExtenderSubsystem.extendToNInches(state.armRadius);
         mPivotMotor.setReference(state.armTheta);
 
         if (mWristMotor != null) {
             // mWristMotor.setReference(state.wristTheta);
-            mWristMotor.setReference(getCorrectAngle(state.armTheta));
+            mWristMotor.setReference(getCorrectAngle(state.armTheta).minus(state.wristTheta));
         }
     }
 
@@ -167,11 +174,27 @@ public class ArmSubsystem extends SubsystemBase {
         return mPivotMotor.getCurrentReference();
     }
 
+    public CommandBase getTransformCommand(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
+        return Commands.run(() -> transformState(exstensionDelta, armDelta, wristDelta));
+    }
+
     // TODO make a way
     public void transformState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
-        ArmState current = getState();
-        ArmPosition transformed = new ArmPosition(current.armRadius - exstensionDelta, current.armTheta.minus(armDelta),
-                current.wristTheta.minus(wristDelta));
+        ArmPosition current = getPosition();
+        ArmPosition transformed = new ArmPosition(
+            current.armRadius + exstensionDelta, 
+            current.armTheta.plus(armDelta),
+            current.wristTheta.plus(wristDelta));
         setDesiredPosition(transformed);
     }
+    
+    // public void transformState(Rotation2d armDelta, Rotation2d wristDelta) {
+    //     ArmPosition current = getPosition();
+        
+    //     mPivotMotor.setReference(current.armTheta.minus(armDelta));
+
+    //     if (mWristMotor != null) {
+    //         mWristMotor.setReference(getCorrectAngle(current.armTheta).minus(wristDelta));
+    //     }
+    // }
 }
