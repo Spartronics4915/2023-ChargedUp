@@ -90,7 +90,7 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
-        mPivotFollower.setSmartCurrentLimit(10);
+        mPivotFollower.setSmartCurrentLimit(20);
 
         mExtenderSubsystem = new ExtenderSubsystem(17);
 

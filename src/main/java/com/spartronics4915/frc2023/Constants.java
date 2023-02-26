@@ -236,7 +236,7 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             15,  //actual value 15
             Math.PI * 2, false,
-            0.05, 0, 0,
+            2, 0, 0,
             Math.PI/8, 1, 0,
             Rotation2d.fromDegrees(66), 10, false,
             MotorType.kBrushless
@@ -245,7 +245,7 @@ public final class Constants {
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
             Math.PI * 2, true,
-            0.05 / 36, 0, 0,
+            0.3, 0, 0,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
             Rotation2d.fromDegrees(136),-1, true,
             MotorType.kBrushed

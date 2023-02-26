@@ -319,12 +319,16 @@ public final class DebugTeleopCommands {
             // Rotation2d.fromDegrees(-180)).withName("Orientation -180"));
             // elevatorCommands.add(SimpleAutos.forceOrientation(swerve_subsystem,
             // Rotation2d.fromDegrees(-270)).withName("Orientation -270"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LEVEL)).withName("LEVEL"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_HIGH)).withName("HIGH"));
-            elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setReference(Rotation2d.fromDegrees(40))).withName("Wrist+40"));
-            elevatorCommands.add(new ExtenderCommands.ExtendNInches(3,mArmSubsystem.getExtender()).withName("Extend 3 Inches"));
-            elevatorCommands.add(new ExtenderCommands.ExtendNInches(-3,mArmSubsystem.getExtender()).withName("Extend -3 Inches"));
+            // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LEVEL)).withName("LEVEL"));
+            // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_HIGH)).withName("HIGH"));
+            // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
+
+            // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setReference(Rotation2d.fromDegrees(40))).withName("Wrist+40"));
+            // elevatorCommands.add(new ExtenderCommands.ExtendNInches(3,mArmSubsystem.getExtender()).withName("Extend 3 Inches"));
+            // elevatorCommands.add(new ExtenderCommands.ExtendNInches(-3,mArmSubsystem.getExtender()).withName("Extend -3 Inches"));
             elevatorCommands.add(Commands.runOnce(() -> mArmSubsystem.getExtender().setZero()).withName("Zero Encoder"));
 
         }

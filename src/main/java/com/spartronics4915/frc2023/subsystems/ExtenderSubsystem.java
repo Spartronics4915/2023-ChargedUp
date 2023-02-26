@@ -37,7 +37,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
-        mMotor.setSmartCurrentLimit(10);
+        mMotor.setSmartCurrentLimit(30);
         //mPIDController = mMotor.getPIDController();
         //mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
@@ -83,7 +83,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
             mMotor.stopMotor();
         }
         else {
-            mMotor.set(0.3);
+            mMotor.set(0.8);
         }
 
     }
@@ -102,11 +102,11 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public void startRetracting() {
-        if(getPosition() < kMinDist) {
+        if(false){//getPosition() < kMinDist) {
             mMotor.stopMotor();
         }
         else {
-            mMotor.set(-0.3);
+            mMotor.set(-0.8);
         }
     }
 
