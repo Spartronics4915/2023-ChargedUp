@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem.AngleWithEarthProvider;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -17,6 +18,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.spartronics4915.frc2023.Constants.Arm.*;
 
 public class ArmSubsystem extends SubsystemBase {
+
+    private class WristAngleProvider implements AngleWithEarthProvider {
+        MotorAbsEncoderComboSubsystem mPivot, mWrist;
+        public WristAngleProvider(MotorAbsEncoderComboSubsystem pivot, MotorAbsEncoderComboSubsystem wrist)
+        {
+            mPivot = pivot;
+            mWrist = wrist;
+        }
+
+        public Rotation2d getAngleWithEarth() {
+
+            Rotation2d pivotArmAngle = mPivot.getArmPosition();
+            Rotation2d wristArmAngle = mWrist.getArmPosition();
+
+            Rotation2d wristAngleWithEarth = pivotArmAngle.plus(wristArmAngle);
+            return  wristAngleWithEarth;
+        }
+    }
+    
     /**
      * Represents the position of the arm and wrist.
      */
@@ -91,13 +111,17 @@ public class ArmSubsystem extends SubsystemBase {
         mState = ArmState.RETRACTED;
         System.out.println("arm created");
         mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, MotorType.kBrushless);
-        mWristMotor = null;//new MotorAbsEncoderComboSubsystem(kWristMotorConstants, MotorType.kBrushed);
+        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, MotorType.kBrushed);
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
         mPivotFollower.setSmartCurrentLimit(20);
 
         mExtenderSubsystem = new ExtenderSubsystem(17);
+
+        if(mWristMotor != null) {
+            mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
+        }
 
     }
 

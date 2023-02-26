@@ -18,6 +18,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
+    public interface AngleWithEarthProvider {
+        Rotation2d getAngleWithEarth();
+    }
+
     private CANSparkMax mMotor;
     private RelativeEncoder relEncoder;
     private SparkMaxAbsoluteEncoder mAbsEncoder;
@@ -28,7 +32,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private boolean mReferenceSet;
     private double mReferenceRadians;
     private double mLastSpeedOutput;
-    private ArmFeedforward tmp;
+    private AngleWithEarthProvider mAngleProvider;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
 
@@ -51,6 +55,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mReferenceSet = false;
         mReferenceRadians = 0;
         mLastSpeedOutput = 0;
+        mAngleProvider = null;
+    }
+
+    public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
+        mAngleProvider = angleProvider;
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
@@ -143,14 +152,24 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-            double currPosArm = getArmPosition().getRadians();
+            double angleWithEarth;
+            
+            if(mAngleProvider==null) {
+
+              angleWithEarth = getArmPosition().getRadians();
+            }
+            else {
+                angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
+            }
+
+
             double currPosNative = getNativePosition().getRadians();
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 
             final double kFF = 0.04;
             final double kP = 0.2;
-            double ffComponent = -kFF * Math.cos(currPosArm);
+            double ffComponent = -kFF * Math.cos(angleWithEarth);
             double err = kP*(mReferenceRadians - currPosNative);
 
             double total_output = ffComponent + err;

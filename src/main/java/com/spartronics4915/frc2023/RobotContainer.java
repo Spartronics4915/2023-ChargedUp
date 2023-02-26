@@ -69,7 +69,7 @@ public class RobotContainer {
     private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
-    private final boolean useSwerveChassis = false;
+    private final boolean useSwerveChassis = true;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
     
@@ -90,7 +90,7 @@ public class RobotContainer {
             
             mAutonomousCommand = new SequentialCommandGroup(
             mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardCommandFancy()
+            new ChargeStationCommands.AutoChargeStationClimb(mSwerve)
             );
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand();
