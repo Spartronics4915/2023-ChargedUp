@@ -26,35 +26,41 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private boolean mActive;
     private boolean mReferenceSet;
     private double mReferenceRadians;
+    private ArmMotorConstants constants;
 
-    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
+    public MotorAbsEncoderComboSubsystem(ArmMotorConstants motorConstants, MotorType motorType) {
+        constants = motorConstants;
 
-        mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
+        mMotor = new CANSparkMax(constants.kMotorID, motorType);
         mMotor.setIdleMode(IdleMode.kCoast);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
-        double radianOffset = MotorConstants.kZeroOffset.getRadians();
-        if (radianOffset < 0) {
-            radianOffset += Math.PI * 2;
-        }
-        mAbsEncoder.setZeroOffset(radianOffset);
-        if (MotorConstants.kInvertMotor) {
+        mAbsEncoder.setPositionConversionFactor(constants.kPositionConversionFactor);
+        
+        if (constants.kInvertMotor) {
             mMotor.setInverted(true);
         }
-        mPIDController = null; //initializePIDController(MotorConstants);
+        mPIDController = initializePIDController();
         mMotor.setSmartCurrentLimit(20);
         mActive = true;
         mReferenceSet = false;
         mReferenceRadians = 0;
     }
 
-    private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
+    private SparkMaxPIDController initializePIDController() {
         SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(MotorConstants.kP);
-        PIDController.setI(MotorConstants.kI);
-        PIDController.setD(MotorConstants.kD);
-
+        PIDController.setP(constants.kP);
+        PIDController.setI(constants.kI);
+        PIDController.setD(constants.kD);
+        
+        mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        mAbsEncoder.setPositionConversionFactor(constants.kPositionConversionFactor);    
+        double radianOffset = constants.kZeroOffset.getRadians();
+        if (radianOffset < 0) {
+            radianOffset += Math.PI*2;
+        }
+        
+        mAbsEncoder.setZeroOffset(radianOffset);
         PIDController.setFeedbackDevice(mAbsEncoder);
         return PIDController;
     }
@@ -130,26 +136,25 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public void periodic() {
 
         System.out.println(mActive + " " + mReferenceSet + " " + (mActive && mReferenceSet));
-            double currPos = getArmPosition().getRadians();
-            final double kFF = 0.3;
-            final double kP = 0.2;
-            double ffComponent = kFF * Math.cos(currPos);
-            double err = kP*(mReferenceRadians - currPos);
+        double currPos = getArmPosition().getRadians();
+        // final double kFF = 0.3;
+        // final double kP = 0.2;
+        double ffComponent = constants.kFF * Math.cos(currPos);
+        mPIDController.setFF(ffComponent);
+        // double err = kP*(mReferenceRadians - currPos);
 
-            double total_output = ffComponent + err;
+        // double total_output = ffComponent + err;
 
-            if(total_output > 1.0) {
-                total_output = 1;
-            } else if (total_output < -1.0) {
-                total_output = -1.0;
-            }
+        // if(total_output > 1.0) {
+        //     total_output = 1;
+        // } else if (total_output < -1.0) {
+        //     total_output = -1.0;
+        // }
 
-            System.out.println("Periodic Called " + total_output + " " + err + " " + ffComponent);
-            if(mActive && mReferenceSet) {
-                mMotor.set(total_output);
-
-
-        }
+        // System.out.println("Periodic Called " + total_output + " " + err + " " + ffComponent);
+        // if(mActive && mReferenceSet) {
+        //     mMotor.set(total_output);
+        // }
     }
 
 }
