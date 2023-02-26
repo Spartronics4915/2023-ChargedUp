@@ -121,8 +121,8 @@ public class RobotContainer {
 			mAutos.new Strategy("Move Forward Static", mAutos.new MoveForwardCommandFancy()),
 			mAutos.new Strategy("Move Forward Dynamic", new InstantCommand(() -> {
 				mAutos.new MoveForwardCommandDynamic().schedule();
-			}))//,
-			// mAutos.new Strategy("Charge Station Climb", m)
+			})),
+			mAutos.new Strategy("Charge Station Climb", new ChargeStationCommands.AutoChargeStationClimb())
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat.getCommand());
@@ -154,10 +154,10 @@ public class RobotContainer {
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
                 mDriverController.rightBumper()
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
                 
                 mDriverController.leftBumper()
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));    
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));    
             }
             
             // OPERATOR CONTROLS

@@ -110,7 +110,7 @@ public class SwerveTrajectoryFollowerCommands {
 				mControllerCommand.end(interrupted);
 		}
 	}
-
+	
 	class FollowStaticTrajectory extends PPSwerveControllerCommand {
 		public FollowStaticTrajectory(
 			ArrayList<PathPoint> waypoints, // meters
@@ -118,27 +118,18 @@ public class SwerveTrajectoryFollowerCommands {
 			double maxAccel // meters per second squared
 		) {
 			super(
-				TrajectoryGenerator.generateTrajectory( // FIXME: will possibly take longer than 1 cycle (don't worry 'bout it)
-					waypoints,
-					new TrajectoryConfig(maxVelocity, maxAccel)
-						.setStartVelocity(startVelocity)
-						.setEndVelocity(endVelocity)
+				PathPlanner.generatePath(
+					new PathConstraints(maxVelocity, maxAccel),
+					waypoints
 				),
 				mSwerve::getPose,
 				kKinematics,
 				mXPID, mYPID,
 				mThetaPID,
 				mSwerve::setModuleStates,
+				false,
 				mSwerve
 			);
-			mConstraints = new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration);
-		}
-
-		@Override
-		public void initialize() {
-			mThetaPID.setConstraints(mConstraints);
-			mThetaPID.reset(mSwerve.getYaw().getRadians());
-			super.initialize();
 		}
 
 		@Override
@@ -152,7 +143,7 @@ public class SwerveTrajectoryFollowerCommands {
 			SmartDashboard.putNumber("Swerve yPID Setpoint", mYPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve yPID Position Error", mYPID.getPositionError());
 			
-			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint().velocity);
+			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve thetaPID Position Error", mThetaPID.getPositionError());
 		}
 	}
