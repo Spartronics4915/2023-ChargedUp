@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,6 +27,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private boolean mActive;
     private boolean mReferenceSet;
     private double mReferenceRadians;
+    private double mLastSpeedOutput;
+    private ArmFeedforward tmp;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
 
@@ -47,6 +50,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mActive = true;
         mReferenceSet = false;
         mReferenceRadians = 0;
+        mLastSpeedOutput = 0;
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
@@ -118,7 +122,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     public double getRawPosition() {
         // System.out.println("get Pos Called");
-            return (mMotor.getEncoder().getPosition());
+
+            return mAbsEncoder.getPosition();
         // return 123;
     }
 
@@ -126,15 +131,27 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         return mMotor.getAppliedOutput();
     }
 
+    public double getLastSpeedOutput() {
+        return mLastSpeedOutput;
+    }
+
+    public void setMotor(double setting) {
+        mMotor.set(setting);
+
+    }
+
     @Override
     public void periodic() {
 
-        System.out.println(mActive + " " + mReferenceSet + " " + (mActive && mReferenceSet));
-            double currPos = getArmPosition().getRadians();
-            final double kFF = 0.3;
+            double currPosArm = getArmPosition().getRadians();
+            double currPosNative = getNativePosition().getRadians();
+            // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
+            // currPosNative = Rotation2d.fromDegrees(180).getRadians();
+
+            final double kFF = 0.04;
             final double kP = 0.2;
-            double ffComponent = kFF * Math.cos(currPos);
-            double err = kP*(mReferenceRadians - currPos);
+            double ffComponent = -kFF * Math.cos(currPosArm);
+            double err = kP*(mReferenceRadians - currPosNative);
 
             double total_output = ffComponent + err;
 
@@ -144,9 +161,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
                 total_output = -1.0;
             }
 
-            System.out.println("Periodic Called " + total_output + " " + err + " " + ffComponent);
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
+                mLastSpeedOutput = total_output;
 
 
         }

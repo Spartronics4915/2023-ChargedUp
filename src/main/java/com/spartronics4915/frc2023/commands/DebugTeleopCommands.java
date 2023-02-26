@@ -224,6 +224,7 @@ public final class DebugTeleopCommands {
         private GenericEntry shoulderArmPlus30Native, shouldArmMinus30Native;
         private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, refwristRotation, wristSpeed;
         private GenericEntry wristArmPlus30Native, wristArmMinus30Native;
+        private GenericEntry shoulderArmSpeedOutput;
         ArmWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3)
                     .withProperties(Map.of("Label position", "LEFT"));
@@ -246,7 +247,7 @@ public final class DebugTeleopCommands {
             shoulderArm = armModule.add("Shoulder (Arm)", 0).getEntry();
             shouldArmMinus30Native = armModule.add("Native w Arm at -30", 0).getEntry();
             shoulderArmPlus30Native = armModule.add("Native w Arm at +30", 0).getEntry();
-            
+            shoulderArmSpeedOutput = armModule.add("Arm Speed Output", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle", 0).getEntry();
             refShoulderRotation = armModule.add("current refrence", 0).getEntry();
             pivotSpeed = armModule.add("pivot speed", 0).getEntry();
@@ -277,6 +278,7 @@ public final class DebugTeleopCommands {
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
             refShoulderRotation.setDouble(module.getRef().getDegrees());
             pivotSpeed.setDouble(motors[0].getMotorSpeed());
+            shoulderArmSpeedOutput.setDouble(module.getPivot().getLastSpeedOutput());
         }
     }
 
@@ -326,9 +328,11 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
             
 
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setMotor(-0.3)).withName("Set -0.3"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setMotor(0.3)).withName("Set +0.3"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setArmReference(Rotation2d.fromDegrees(30))).withName("ARM +30"));
-            // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
-            // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
 
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setReference(Rotation2d.fromDegrees(40))).withName("Wrist+40"));
