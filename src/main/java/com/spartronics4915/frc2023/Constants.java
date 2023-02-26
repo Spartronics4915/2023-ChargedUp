@@ -10,6 +10,7 @@ import java.util.function.IntFunction;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -252,7 +253,7 @@ public final class Constants {
         ); 
 
         public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
-            -1, 
+            17, 
             0, false,
             0, 0, 0,
             0, 0, 0,
@@ -312,23 +313,49 @@ public final class Constants {
             Rotation2d.fromDegrees(0)
         );
 
-        public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
+        public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
             new Rotation2d(Math.PI), //180
             new Rotation2d(Math.PI) //180
         );
 
-        public static final ArmPositionConstants kLevel2Constants = new ArmPositionConstants(
+        public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
+            0,
+            new Rotation2d(Math.PI), //180
+            new Rotation2d(Math.PI) //180
+        );
+        
+        public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
+            0,
+            new Rotation2d(Math.PI), //180
+            new Rotation2d(Math.PI) //180
+        );
+
+        public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
             -1,
             new Rotation2d(),
             new Rotation2d()
         );
 
-        public static final ArmPositionConstants kLevel3Constants = new ArmPositionConstants(
+        public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(
+            0,
+            new Rotation2d(Math.PI), //180
+            new Rotation2d(Math.PI) //180
+        );
+
+        public static final ArmPositionConstants kCubeLevel2Constants = new ArmPositionConstants(
             -1,
             new Rotation2d(),
             new Rotation2d()
         );
+
+        public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
+
+        // public static final ArmPositionConstants kConeLevel3Constants = new ArmPositionConstants(
+        //     -1,
+        //     new Rotation2d(),
+        //     new Rotation2d()
+        // );
 
         // used to store target measurements for different arm states
         // arm constants assume pivot axle is origin and wrist axle is point
@@ -370,6 +397,9 @@ public final class Constants {
     public static final class OI {
         public static final int kDriverControllerID = 2;
         public static final int kOperatorControllerID = 4;
+
+        public static final int kWindowButtonId = 7;
+        public static final int kMenuButtonId = 8;
 
         public static final int kToggleFieldRelativeButton = 1;
         public static final int kResetYawButton = 8;

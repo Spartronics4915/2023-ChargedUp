@@ -4,25 +4,36 @@
 
 package com.spartronics4915.frc2023;
 
+import static com.spartronics4915.frc2023.Constants.OI.kDriverControllerID;
+import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
+import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
+import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
+
+import com.spartronics4915.frc2023.Constants.Arm;
+
+import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
+
+import com.spartronics4915.frc2023.Constants.OI;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
+import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
-import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import static com.spartronics4915.frc2023.Constants.OI.*;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -49,9 +60,8 @@ public class RobotContainer {
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     private final Intake mIntake;
-    
-    // private final Intake mIntake;
-    // private final IntakeCommands mIntakeCommands;
+
+    private final IntakeCommands mIntakeCommands;
     
     private final Autos mAutos;
     
@@ -98,10 +108,9 @@ public class RobotContainer {
             mArm = ArmSubsystem.getInstance();
             mArmCommands = new ArmCommands(mArm);
             mIntake = Intake.getInstance();
-            
+            mIntakeCommands = new IntakeCommands(mIntake);
+
         }
-        // mIntake = Intake.getInstance();
-        // mIntakeCommands = new IntakeCommands(mIntake);
         
         
         // Configure the button bindings
@@ -113,57 +122,104 @@ public class RobotContainer {
             // DRIVER CONTROLS
             
             if(useSwerveChassis) {
-            mDriverController.a()
-            .onTrue(mSwerveCommands.new ToggleFieldRelative());
-            
-            mDriverController.b()
-            .onTrue(mSwerveCommands.new ResetYaw());
-            
-            mDriverController.y()
-            .onTrue(mSwerveCommands.new ResetOdometry());
-            
-            mDriverController.rightTrigger(kTriggerDeadband)
-            .onTrue(mSwerveCommands.new EnableSprintMode())
-            .onFalse(mSwerveCommands.new DisableSprintMode());
-            
-            mDriverController.rightBumper()
-            .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
-            
-            mDriverController.leftBumper()
-            .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
+                mDriverController.a()
+                .onTrue(mSwerveCommands.new ToggleFieldRelative());
+                
+                mDriverController.b()
+                .onTrue(mSwerveCommands.new ResetYaw());
+                
+                mDriverController.y()
+                .onTrue(mSwerveCommands.new ResetOdometry());
+                
+                mDriverController.rightTrigger(kTriggerDeadband)
+                .onTrue(mSwerveCommands.new EnableSprintMode())
+                .onFalse(mSwerveCommands.new DisableSprintMode());
+                
+                mDriverController.rightBumper()
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+                
+                mDriverController.leftBumper()
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));    
             }
-            mDriverController.povRight().whileTrue(mArm.getExtender().getExtendCommand());
-            mDriverController.povLeft().whileFalse(mArm.getExtender().getRetractCommand());
-
-            mOperatorController.rightTrigger(kTriggerDeadband).whileTrue(Commands.runEnd(()->mIntake.setState(IntakeState.OUT),
-            ()->mIntake.setState(IntakeState.OFF)));
-
+            
             // OPERATOR CONTROLS
-            // mOperatorController.povUp()
+            // mOperatorController.button(7) //window
             //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
             
-            // mOperatorController.povDown()
+            // mOperatorController.povDown() //menu
             //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
             
-            // mOperatorController.b()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.RETRACTED));
-            
-            // mOperatorController.a()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_1));
-            
-            // mOperatorController.x()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_2));
-            
-            // mOperatorController.y()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_3));
-            
-            // mOperatorController.rightTrigger(kTriggerDeadband)
-            //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
-            //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-            
-            // mOperatorController.leftTrigger(kTriggerDeadband)
-            //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
-            //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+           
+            if (useArm){
+                    /**
+                    * presets button bindings:
+                    * Extend to floor position		    Window
+                    * Extend to Double substation		Menu
+                    * Extend to Middle tier - cube		A
+                    * Extend to Middle tier - cone		X
+                    * Extend to High tier - cube		B
+                    * Extend to High tier - cone		Y   
+                    * */
+                mOperatorController.button(kWindowButtonId) //should be window
+                    .onTrue(mArmCommands.new SetArmState(ArmState.FLOOR_POS));
+
+                mOperatorController.button(kMenuButtonId) //should be menu
+                    .onTrue(mArmCommands.new SetArmState(ArmState.DOUBLE_SUBSTATION));
+                
+                mOperatorController.a()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_1));
+                
+                mOperatorController.x()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_1));
+                
+                mOperatorController.b()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_2));
+                
+                mOperatorController.y()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_2));
+
+                /**
+                 * Eject game piece		    RT
+                 * Intake game piece		LT
+                 */
+                mOperatorController.rightTrigger(kTriggerDeadband)
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
+                    .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+                
+                mOperatorController.leftTrigger(kTriggerDeadband)
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
+                    .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+
+                /**
+                 * Relative button bindings:
+                 * Manual Pivot up		    D pad up
+                 * Manual Pivot down		D pad down
+                 * Manual Extend out		D pad left
+                 * Manual Extend In		    D pad right
+                 * Manual wrist up		    LS in
+                 * Manual wrist down		RS in
+                 */
+
+                mOperatorController.povUp()
+                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
+
+                mOperatorController.povDown()
+                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    
+                mOperatorController.povLeft()
+                    .whileTrue(mArm.getExtender().getExtendCommand());
+
+                mOperatorController.povRight()
+                    .whileTrue(mArm.getExtender().getRetractCommand());
+
+                mOperatorController.leftBumper()
+                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+
+                mOperatorController.rightBumper()
+                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                
+            }
+
         }
     }
     
