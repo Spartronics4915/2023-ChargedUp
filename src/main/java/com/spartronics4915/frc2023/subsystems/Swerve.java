@@ -72,6 +72,8 @@ public class Swerve extends SubsystemBase {
 		resetToAbsolute();
 
 		mModuleCount = mModules.length;
+
+		mIMU.setYaw(kInitialPose.getRotation().getDegrees());
         
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
@@ -79,12 +81,18 @@ public class Swerve extends SubsystemBase {
             getPositions(),
             kInitialPose,
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9)
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
         );
     }
 
-    private void configurePigeon(Pigeon2 pigeon2) {
-        pigeon2.configMountPose(kPigeonMountPoseYaw, kPigeonMountPosePitch, kPigeonMountPoseRoll);
+    private void configurePigeon(BasePigeon pigeon) {
+		if (mIMU instanceof Pigeon2) {
+			((Pigeon2)pigeon).configMountPose(
+				kPigeonMountPoseYaw,
+				kPigeonMountPosePitch,
+				kPigeonMountPoseRoll
+			);
+		}
     }
 
 	public int getModuleCount() {
