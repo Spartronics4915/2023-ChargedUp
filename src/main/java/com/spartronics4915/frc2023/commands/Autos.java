@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.sound.midi.Sequence;
 
+import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -81,9 +82,7 @@ public final class Autos {
 						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
 						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
 					)),
-					0, 0,
-					maxVelocity, maxAccel,
-					maxAngularVelocity, maxAngularAcceleration
+					maxVelocity, maxAccel
 				),
 				new InstantCommand(() -> {
 					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
@@ -95,24 +94,22 @@ public final class Autos {
 
 	public class MoveBackAndForthFancy extends SequentialCommandGroup {
 		public MoveBackAndForthFancy() {
-			Pose2d aprilTag1 = new Pose2d(0, 0, new Rotation2d(Math.PI / 2));
-			Pose2d aprilTag2 = new Pose2d(0, 6, new Rotation2d(-Math.PI / 2));
+			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
+			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
 			addCommands(
 				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag1,
 						aprilTag2
 					)),
-					0.0, 0.0, maxVelocity, maxAccel,
-					maxAngularVelocity, maxAngularAcceleration
+					maxVelocity, maxAccel
 				),
 				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag2,
 						aprilTag1
 					)),
-					0.0, 0.0, maxVelocity, maxAccel,
-					maxAngularVelocity, maxAngularAcceleration
+					maxVelocity, maxAccel
 				)
 			);
 		}

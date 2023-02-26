@@ -33,9 +33,7 @@ public class SwerveTrajectoryFollowerCommands {
 		mSwerve = Swerve.getInstance();
 		mXPID = new PIDController(kLinearP, 0, 0);
 		mYPID = new PIDController(kLinearP, 0, 0);
-		mThetaPID = new ProfiledPIDController(
-			kThetaP, 0, 0, new TrapezoidProfile.Constraints(kMaxAngularSpeed, 1) // FIXME: 1 is a placeholder
-		);
+		mThetaPID = new PIDController(kLinearP, 0, 0);
 		mThetaPID.enableContinuousInput(-Math.PI, Math.PI);
 	}
 

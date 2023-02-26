@@ -7,10 +7,16 @@ package com.spartronics4915.frc2023;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+import com.ctre.phoenix.sensors.BasePigeon;
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;

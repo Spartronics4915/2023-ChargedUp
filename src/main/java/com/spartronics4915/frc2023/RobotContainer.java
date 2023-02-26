@@ -90,17 +90,11 @@ public class RobotContainer {
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
             
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
-            mAutos = new Autos(mSwerveTrajectoryFollowerCommands);
-            
-            mAutonomousCommand = new SequentialCommandGroup(
-            mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardCommandFancy()
-            );
+            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         }
         else {
-            mAutonomousCommand = null;
             mTeleopInitCommand = null;
             mAutos = null;
             mSwerve = null;
@@ -115,7 +109,8 @@ public class RobotContainer {
             mIntakeCommands = new IntakeCommands(mIntake);
 
         }
-        
+
+        configureAutoSelector();
         
         // Configure the button bindings
         configureButtonBindings();
@@ -126,15 +121,16 @@ public class RobotContainer {
 			mAutos.new Strategy("Move Forward Static", mAutos.new MoveForwardCommandFancy()),
 			mAutos.new Strategy("Move Forward Dynamic", new InstantCommand(() -> {
 				mAutos.new MoveForwardCommandDynamic().schedule();
-			}))
+			}))//,
+			// mAutos.new Strategy("Charge Station Climb", m)
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat.getCommand());
 		}
 
 		mAutoSelector.setDefaultOption(
-			autoStrategies[kDefaultAutoIndex].getName(),
-			autoStrategies[kDefaultAutoIndex].getCommand()
+			autoStrategies[OI.kDefaultAutoIndex].getName(),
+			autoStrategies[OI.kDefaultAutoIndex].getCommand()
 		);
 		SmartDashboard.putData("Auto Strategies", mAutoSelector);        
 	}
@@ -251,7 +247,7 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutonomousCommand;
+        return mAutoSelector.getSelected();
     }
     
     public Command getTeleopInitCommand() {
