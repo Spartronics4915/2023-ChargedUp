@@ -90,9 +90,8 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {
         mState = ArmState.RETRACTED;
         System.out.println("arm created");
-        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, true, MotorType.kBrushless);
-        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, true, MotorType.kBrushed);
-        // mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, false);
+        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, MotorType.kBrushless);
+        mWristMotor = null;//new MotorAbsEncoderComboSubsystem(kWristMotorConstants, MotorType.kBrushed);
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
@@ -128,6 +127,15 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public ArmPosition getPosition() {
+        
+        if(mWristMotor == null) {
+            return new ArmPosition(
+                mExtenderSubsystem.getPosition(),
+                mPivotMotor.getArmPosition(),
+                new Rotation2d(0)
+        );
+
+        }
         return new ArmPosition(
                 mExtenderSubsystem.getPosition(),
                 mPivotMotor.getArmPosition(),
@@ -144,11 +152,11 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO add extender motor
     private void setDesiredPosition(ArmPosition state) {
         mExtenderSubsystem.extendToNInches(state.armRadius);
-        mPivotMotor.setReference(state.armTheta);
+        mPivotMotor.setArmReference(state.armTheta);
 
         if (mWristMotor != null) {
             // mWristMotor.setReference(state.wristTheta);
-            mWristMotor.setReference(getCorrectAngle(state.armTheta).minus(state.wristTheta));
+            mWristMotor.setArmReference(getCorrectAngle(state.armTheta).minus(state.wristTheta));
         }
     }
 

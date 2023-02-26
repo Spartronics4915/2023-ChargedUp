@@ -260,12 +260,14 @@ public final class DebugTeleopCommands {
             // stateRadius.setDouble(desired.armRadius);
 
 
+            if (module.getWrist() != null) {
             wristRaw.setDouble(module.getWrist().getRawPosition());
             wristNative.setDouble(module.getWrist().getNativePosition().getDegrees());
             wristArm.setDouble(module.getWrist().getArmPosition().getDegrees());
             wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
             wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
             wristSpeed.setDouble(module.getWrist().getMotor().getAppliedOutput());
+            } 
 
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
             shoulderNative.setDouble(module.getPivot().getNativePosition().getDegrees());
@@ -322,9 +324,12 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LEVEL)).withName("LEVEL"));
             // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_HIGH)).withName("HIGH"));
             // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
+            
+
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setArmReference(Rotation2d.fromDegrees(30))).withName("ARM +30"));
+            // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
+            // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
+            // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
 
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setReference(Rotation2d.fromDegrees(40))).withName("Wrist+40"));
             // elevatorCommands.add(new ExtenderCommands.ExtendNInches(3,mArmSubsystem.getExtender()).withName("Extend 3 Inches"));

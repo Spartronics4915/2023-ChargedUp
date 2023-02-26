@@ -15,38 +15,38 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
-    
+public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
+
     private CANSparkMax mMotor;
     private RelativeEncoder relEncoder;
     private SparkMaxAbsoluteEncoder mAbsEncoder;
     private SparkMaxPIDController mPIDController;
     private Rotation2d mCurrentReference = new Rotation2d(0);
-    private boolean useAbs;
 
-    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, boolean useAbs, MotorType motorType) {
-        this.useAbs = useAbs;
-        
+    private boolean mActive;
+    private boolean mReferenceSet;
+    private double mReferenceRadians;
+
+    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
+
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
         mMotor.setIdleMode(IdleMode.kCoast);
 
-        if(useAbs){
-            mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-            mAbsEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);    
-            double radianOffset = MotorConstants.kZeroOffset.getRadians();
-            if (radianOffset < 0) {
-                radianOffset += Math.PI*2;
-            }
-            mAbsEncoder.setZeroOffset(radianOffset);
-        } else {
-            relEncoder = mMotor.getEncoder();
-            relEncoder.setPositionConversionFactor(MotorConstants.kPositionConversionFactor);
+        mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
+        double radianOffset = MotorConstants.kZeroOffset.getRadians();
+        if (radianOffset < 0) {
+            radianOffset += Math.PI * 2;
         }
-        if(MotorConstants.kInvertMotor) {
+        mAbsEncoder.setZeroOffset(radianOffset);
+        if (MotorConstants.kInvertMotor) {
             mMotor.setInverted(true);
         }
-        mPIDController = initializePIDController(MotorConstants);
+        mPIDController = null; //initializePIDController(MotorConstants);
         mMotor.setSmartCurrentLimit(20);
+        mActive = true;
+        mReferenceSet = false;
+        mReferenceRadians = 0;
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
@@ -55,34 +55,22 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         PIDController.setI(MotorConstants.kI);
         PIDController.setD(MotorConstants.kD);
 
-        PIDController.setSmartMotionMaxAccel(MotorConstants.kSmartMotionMaxAccel, 0); //20
- 
-        PIDController.setSmartMotionMaxVelocity(MotorConstants.kSmartMotionMaxVelocity, 0);
-
-        PIDController.setSmartMotionMinOutputVelocity(MotorConstants.kSmartMotionMinOutputVelocity, 0);
-        
-        PIDController.setSmartMotionAllowedClosedLoopError(Rotation2d.fromDegrees(5).getRotations(), 0);
-        // PIDController.setOutputRange(0, kP)
-        PIDController.setPositionPIDWrappingEnabled(true);
-        PIDController.setPositionPIDWrappingMaxInput(Math.PI);
-        PIDController.setPositionPIDWrappingMinInput(-Math.PI);
-        if(useAbs) PIDController.setFeedbackDevice(mAbsEncoder);
-        else {
-            PIDController.setFeedbackDevice(mMotor.getEncoder());
-        }
-        System.out.println(PIDController.getP());
-        System.out.println(PIDController.getI());
-        System.out.println(PIDController.getD());
+        PIDController.setFeedbackDevice(mAbsEncoder);
         return PIDController;
     }
 
-/**
-   * Sets the reference.
-   *
-   * @param ref A Rotation2d.  This should be in arm coordinates where 0 points directly out from the arm
-*/  
-    public void setReference(Rotation2d ref) {
+    /**
+     * Sets the reference.
+     *
+     * @param ref A Rotation2d. This should be in arm coordinates where 0 points
+     *            directly out from the arm
+     */
+    public void setArmReference(Rotation2d ref) {
         setNativeReference(armToNative(ref));
+    }
+
+    public void setActive(boolean active) {
+        mActive = active;
     }
 
     public Rotation2d armToNative(Rotation2d armRotation) {
@@ -91,7 +79,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
         // To match the encoder, we want angles in [0, 2PI]
         var radValue = outputRot.getRadians();
         if (radValue < 0) {
-            outputRot = Rotation2d.fromRadians(radValue+2*Math.PI);
+            outputRot = Rotation2d.fromRadians(radValue + 2 * Math.PI);
         }
 
         return outputRot;
@@ -102,41 +90,66 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase{
     }
 
     private void setNativeReference(Rotation2d ref) {
-        System.out.println("set Ref called");
 
         mCurrentReference = ref;
-        System.out.println(ref + ": also this was called");
-        mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion);
+        mReferenceRadians = ref.getRadians();
+        mReferenceSet = true;
     }
-    public void resetToZero(){
+
+    public void resetToZero() {
         mAbsEncoder.setZeroOffset(-mAbsEncoder.getPosition());
     }
 
-    public CANSparkMax getMotor(){
+    public CANSparkMax getMotor() {
         return mMotor;
     }
-    public Rotation2d getCurrentReference() 
-    {
+
+    public Rotation2d getCurrentReference() {
         return mCurrentReference;
     }
 
-    public Rotation2d getArmPosition(){
+    public Rotation2d getArmPosition() {
         return nativeToArm(getNativePosition());
     }
 
-    public Rotation2d getNativePosition(){
+    public Rotation2d getNativePosition() {
         return Rotation2d.fromRadians(getRawPosition());
     }
-    
-    public double getRawPosition(){
+
+    public double getRawPosition() {
         // System.out.println("get Pos Called");
-        if (useAbs) return mAbsEncoder.getPosition();
-        else return(mMotor.getEncoder().getPosition());
+            return (mMotor.getEncoder().getPosition());
         // return 123;
     }
 
-    public double getMotorSpeed(){
+    public double getMotorSpeed() {
         return mMotor.getAppliedOutput();
     }
-    
+
+    @Override
+    public void periodic() {
+
+        System.out.println(mActive + " " + mReferenceSet + " " + (mActive && mReferenceSet));
+            double currPos = getArmPosition().getRadians();
+            final double kFF = 0.3;
+            final double kP = 0.2;
+            double ffComponent = kFF * Math.cos(currPos);
+            double err = kP*(mReferenceRadians - currPos);
+
+            double total_output = ffComponent + err;
+
+            if(total_output > 1.0) {
+                total_output = 1;
+            } else if (total_output < -1.0) {
+                total_output = -1.0;
+            }
+
+            System.out.println("Periodic Called " + total_output + " " + err + " " + ffComponent);
+            if(mActive && mReferenceSet) {
+                mMotor.set(total_output);
+
+
+        }
+    }
+
 }
