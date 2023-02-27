@@ -9,17 +9,24 @@ import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
 import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
 import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
 
 import com.spartronics4915.frc2023.Constants.OI;
+import com.spartronics4915.frc2023.Constants.Trajectory;
+import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
+import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
@@ -31,6 +38,7 @@ import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -104,9 +112,9 @@ public class RobotContainer {
         
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
-            mArmCommands = new ArmCommands(mArm);
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
+            mArmCommands = new ArmCommands(mArm, mIntakeCommands);
 
         }
 
@@ -118,11 +126,38 @@ public class RobotContainer {
 
 	private void configureAutoSelector() {
 		Autos.Strategy[] autoStrategies = {
-			mAutos.new Strategy("Move Forward Static", mAutos.new MoveForwardCommandFancy()),
-			mAutos.new Strategy("Move Forward Dynamic", new InstantCommand(() -> {
-				mAutos.new MoveForwardCommandDynamic().schedule();
-			})),
-			mAutos.new Strategy("Charge Station Climb", new ChargeStationCommands.AutoChargeStationClimb())
+			mAutos.new Strategy(
+				"Move Forward Static",
+				mAutos.new MoveForwardCommandFancy()
+			),
+			mAutos.new Strategy(
+				"Move Forward Dynamic", new InstantCommand(() -> {
+					mAutos.new MoveForwardCommandDynamic().schedule();
+				})
+			),
+			mAutos.new Strategy(
+				"Charge Station Climb",
+				new ChargeStationCommands.AutoChargeStationClimb()
+			),
+			mAutos.new Strategy(
+				"Move Backward and Pick Up",
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						new PathPoint(
+							kInitialPose.getTranslation(),
+							new Rotation2d(0),
+							kInitialPose.getRotation()
+						),
+						new PathPoint(
+							kInitialPose.getTranslation().plus(new Translation2d(-Trajectory.kBackUpDistance, 0)),
+							new Rotation2d(0),
+							kInitialPose.getRotation()
+						)
+					))
+				),
+				mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
+
+			)
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat.getCommand());

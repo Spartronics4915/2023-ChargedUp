@@ -51,6 +51,9 @@ public final class Constants {
 	public static final class Trajectory {
 		public static final double kLinearP = 0.01;
 		public static final double kThetaP = 0.01;
+		public static final double kMaxVelocity = 0.5;
+		public static final double kMaxAccel = 0.4;
+		public static final double kBackUpDistance = 1;
 	}
 
     public static final class Swerve {
@@ -506,6 +509,10 @@ public final class Constants {
         //         this.angleOffset = angleOffset;
         //     }
         // }
+		public static class Auto {
+			public static final double kArmStateChangeDuration = 3; // seconds
+			public static final double kGrabDuration = 2; // seconds
+		}
         public static class SparkMaxAbsoluteEncoderConstants{
             public final double offset;
 

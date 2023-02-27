@@ -7,13 +7,19 @@ import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import static com.spartronics4915.frc2023.Constants.ArmConstants.Auto.*;
 
 public class ArmCommands {
     private final ArmSubsystem mArm;
+	private final IntakeCommands mIntakeCommands;
     
-    public ArmCommands(ArmSubsystem mArm2) {
-        mArm = mArm2;
+    public ArmCommands(ArmSubsystem arm, IntakeCommands intakeCommands) {
+        mArm = arm;
+		mIntakeCommands = intakeCommands;
     }
 
     public class SetArmState extends InstantCommand {
@@ -36,4 +42,28 @@ public class ArmCommands {
             );
         }
     }
+
+	public class PieceInteractCommand extends SequentialCommandGroup {
+		public PieceInteractCommand(ArmState armState, IntakeState intakeState) {
+			super(
+				new SetArmState(armState),
+				new WaitCommand(kArmStateChangeDuration),
+				mIntakeCommands.new SetIntakeState(intakeState),
+				new WaitCommand(kGrabDuration),
+				mIntakeCommands.new SetIntakeState(IntakeState.OFF)
+			);
+		}
+	}
+
+	public class GrabPiece extends PieceInteractCommand {
+		public GrabPiece(ArmState armState) {
+			super(armState, IntakeState.IN);
+		}
+	}
+	
+	public class ReleasePiece extends PieceInteractCommand {
+		public ReleasePiece(ArmState armState) {
+			super(armState, IntakeState.OFF);
+		}
+	}
 }
