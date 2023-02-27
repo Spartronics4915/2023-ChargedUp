@@ -303,6 +303,7 @@ public final class Constants {
             public final double kP;
             public final double kI;
             public final double kD;
+            public final double kFF;
             public final double kSmartMotionMaxAccel;
             public final double kSmartMotionMaxVelocity;
             public final double kSmartMotionMinOutputVelocity;
@@ -311,7 +312,7 @@ public final class Constants {
             public final boolean kInvertMotor;
             public final MotorType kMotorType;
 
-            public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, 
+            public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, double FF, 
             double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, Rotation2d zeroOffset, 
             int followerMotorID, boolean motorInverted, MotorType motorType) {
                 super();
@@ -328,6 +329,7 @@ public final class Constants {
                 this.kFollowerMotorID = followerMotorID;
                 this.kInvertMotor = motorInverted;
                 this.kMotorType = motorType;
+                this.kFF = FF;
             }
         }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
@@ -336,7 +338,7 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             15,  //actual value 15
             Math.PI * 2, false,
-            2, 0, 0,
+            0.2, 0, 0, 0.04,
             Math.PI/8, 1, 0,
             Rotation2d.fromDegrees(66), 10, false,
             MotorType.kBrushless
@@ -345,20 +347,12 @@ public final class Constants {
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
             Math.PI * 2, true,
-            0.3, 0, 0,
+            0.3, 0, 0, 0.03,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
             Rotation2d.fromDegrees(136),-1, true,
             MotorType.kBrushed
         ); 
 
-        public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
-            17, 
-            0, false,
-            0, 0, 0,
-            0, 0, 0,
-            Rotation2d.fromDegrees(0), -1, false,
-            MotorType.kBrushless
-        ); 
         public static final int kPivotFollowerID = 16; //actual value: 16
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(

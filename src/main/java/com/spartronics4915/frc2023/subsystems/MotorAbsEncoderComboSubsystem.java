@@ -33,7 +33,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private double mReferenceRadians;
     private double mLastSpeedOutput;
     private AngleWithEarthProvider mAngleProvider;
-
+    private double kP, kFF;
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
@@ -56,6 +56,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mReferenceRadians = 0;
         mLastSpeedOutput = 0;
         mAngleProvider = null;
+
+        kP = MotorConstants.kP;
+        kFF = MotorConstants.kFF;
     }
 
     public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
@@ -167,8 +170,6 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 
-            final double kFF = 0.04;
-            final double kP = 0.2;
             double ffComponent = -kFF * Math.cos(angleWithEarth);
             double err = kP*(mReferenceRadians - currPosNative);
 

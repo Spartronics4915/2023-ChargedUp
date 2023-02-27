@@ -83,7 +83,7 @@ public class RobotContainer {
 	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
-    private final boolean useSwerveChassis = true;
+    private final boolean useSwerveChassis = false;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
     
@@ -121,7 +121,7 @@ public class RobotContainer {
 
         }
 
-        configureAutoSelector();
+        //configureAutoSelector();
         
         // Configure the button bindings
         configureButtonBindings();
