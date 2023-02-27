@@ -387,38 +387,38 @@ public final class Constants {
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
         
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
             -1,
-            new Rotation2d(),
-            new Rotation2d()
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kCubeLevel2Constants = new ArmPositionConstants(
             -1,
-            new Rotation2d(),
-            new Rotation2d()
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
@@ -446,8 +446,8 @@ public final class Constants {
 
         public static final boolean kIsInverted = false;
 
-        public static final double kInSpeed = 0.3;
-        public static final double kOutSpeed = 0.3;
+        public static final double kInSpeed = 0.8;
+        public static final double kOutSpeed = -0.95;
 
         public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
     }

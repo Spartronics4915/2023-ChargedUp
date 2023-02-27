@@ -93,7 +93,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public void startRetracting() {
-        if(getPosition() < kMinDist){
+        if(false){//(getPosition() < kMinDist){
             mMotor.stopMotor();
         }
         else {
