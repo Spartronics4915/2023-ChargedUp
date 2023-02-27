@@ -31,10 +31,6 @@ public final class Autos {
 	private final boolean mIsOpenLoop = true;
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
 	private final SwerveCommands mSwerveCommands;
-	private final double maxVelocity = 0.5;
-	private final double maxAccel = 0.4;
-	private final double maxAngularVelocity = 0.8;
-	private final double maxAngularAcceleration = 0.2;
 			
 
     public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
@@ -62,8 +58,7 @@ public final class Autos {
 					new ArrayList<>(List.of(
 						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
 						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
-					)),
-					maxVelocity, maxAccel
+					))
 				),
 				new InstantCommand(() -> {
 					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
@@ -81,8 +76,7 @@ public final class Autos {
 					new ArrayList<>(List.of(
 						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
 						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
-					)),
-					maxVelocity, maxAccel
+					))
 				),
 				new InstantCommand(() -> {
 					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
@@ -101,15 +95,13 @@ public final class Autos {
 					new ArrayList<>(List.of(
 						aprilTag1,
 						aprilTag2
-					)),
-					maxVelocity, maxAccel
+					))
 				),
 				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
 						aprilTag2,
 						aprilTag1
-					)),
-					maxVelocity, maxAccel
+					))
 				)
 			);
 		}

@@ -37,7 +37,7 @@ public class SwerveTrajectoryFollowerCommands {
 		mThetaPID.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
-	class FollowDynamicTrajectory extends CommandBase {
+	public class FollowDynamicTrajectory extends CommandBase {
 		private PathPlannerTrajectory mTrajectory;
 		private PPSwerveControllerCommand mControllerCommand;
 		private Thread mTrajectoryThread;
@@ -58,6 +58,12 @@ public class SwerveTrajectoryFollowerCommands {
 			});
 			mTrajectoryThread.start();
 			addRequirements(mSwerve);
+		}
+		
+		public FollowDynamicTrajectory(
+			ArrayList<PathPoint> waypoints // meters
+		) {
+			this(waypoints, kMaxVelocity, kMaxAccel);
 		}
 
 		@Override
@@ -111,7 +117,7 @@ public class SwerveTrajectoryFollowerCommands {
 		}
 	}
 	
-	class FollowStaticTrajectory extends PPSwerveControllerCommand {
+	public class FollowStaticTrajectory extends PPSwerveControllerCommand {
 		public FollowStaticTrajectory(
 			ArrayList<PathPoint> waypoints, // meters
 			double maxVelocity, // meters per second
@@ -130,6 +136,12 @@ public class SwerveTrajectoryFollowerCommands {
 				false,
 				mSwerve
 			);
+		}
+
+		public FollowStaticTrajectory(
+			ArrayList<PathPoint> waypoints // meters
+		) {
+			this(waypoints, kMaxVelocity, kMaxAccel);
 		}
 
 		@Override
