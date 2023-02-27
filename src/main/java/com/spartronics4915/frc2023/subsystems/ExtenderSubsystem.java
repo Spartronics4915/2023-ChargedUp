@@ -92,17 +92,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mMotor.stopMotor();
     }
 
-    public CommandBase getExtendCommand() {
-
-        return Commands.runEnd(() -> this.startExtending(), () -> this.stopMotor());
-    }
-
-    public CommandBase getRetractCommand() {
-        return Commands.runEnd(() -> this.startRetracting(), () -> this.stopMotor());
-    }
-
     public void startRetracting() {
-        if(false){//getPosition() < kMinDist) {
+        if(getPosition() < kMinDist){
             mMotor.stopMotor();
         }
         else {
@@ -120,7 +111,6 @@ public class ExtenderSubsystem extends SubsystemBase  {
 
     public void setReference(double p) {
         targetReference = p;
-        //mPIDController.setReference(p, ControlType.kPosition);
     }
 
     public boolean closeEnough() {

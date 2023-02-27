@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 
@@ -79,7 +80,7 @@ public class SwerveCommands {
      */
     public class ResetOdometry extends InstantCommand {
         public ResetOdometry() {
-
+			
 		}
 		
 		@Override
@@ -101,8 +102,6 @@ public class SwerveCommands {
 		public void initialize() {
 			super.initialize();
 			mSwerve.resetToAbsolute();
-            mSwerve.resetYaw();
-			mSwerve.resetOdometry(new Pose2d(0, 0, new Rotation2d(0))); // for odometry testing
             mSwerve.stop();
 			mSwerve.alignModules();
 		}

@@ -19,6 +19,33 @@ import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.ctre.phoenix.sensors.CANCoder;
 
 public class SwerveModule {
+	public interface AbsoluteEncoder {
+		// degrees
+		public double getAbsolutePosition();
+	}
+
+	public static class AbsoluteCANCoder implements AbsoluteEncoder {
+		private final CANCoder mCANCoder;
+		public AbsoluteCANCoder(int id) {
+			mCANCoder = new CANCoder(id);
+		}
+
+		public double getAbsolutePosition() {
+			return mCANCoder.getAbsolutePosition();
+		}
+	}
+
+	public static class AbsoluteAnalogEncoder implements AbsoluteEncoder {
+		private final AnalogEncoder mAnalogEncoder;
+		public AbsoluteAnalogEncoder(int id) {
+			mAnalogEncoder = new AnalogEncoder(new AnalogInput(id));
+		}
+
+		public double getAbsolutePosition() {
+			return 360 * (1.0 - mAnalogEncoder.getAbsolutePosition());
+		}
+	}
+
     private final int mModuleNumber;
     private final Rotation2d mAbsoluteOffset;
     private double mLastAngle;
@@ -75,7 +102,7 @@ public class SwerveModule {
         this.setDesiredState(newState, isOpenLoop, true);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningForLowError) {
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningAtLowSpeed) {
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         mDesiredState = desiredState;
 
@@ -90,9 +117,12 @@ public class SwerveModule {
             );
         }
 
-        if (Math.abs(desiredState.angle.getRadians() - getState().angle.getRadians()) > 0.02) {
-            mAngleController.setReference(desiredState.angle.getRadians(), ControlType.kPosition);
-        }
+		double angle = (suppressTurningAtLowSpeed && Math.abs(desiredState.speedMetersPerSecond) < kMaxSpeed * 0.01) ?
+			mLastAngle :
+			desiredState.angle.getRadians();
+
+		mAngleController.setReference(angle, ControlType.kPosition);
+		mLastAngle = angle;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -122,7 +152,7 @@ public class SwerveModule {
     }
 
     public void resetToAbsolute() {
-        mIntegratedAngleEncoder.setPosition(getShiftedAbsoluteEncoderRotation().getRadians());
+		mIntegratedAngleEncoder.setPosition(getShiftedAbsoluteEncoderRotation().getRadians());
     }
 
     public double getAbsoluteEncoderValue() {
@@ -165,7 +195,7 @@ public class SwerveModule {
         mAngleMotor.restoreFactoryDefaults();
         mAngleMotor.setSmartCurrentLimit(Angle.kContinuousCurrentLimit);
         mAngleMotor.setIdleMode(kAngleIdleMode);
-        mAngleMotor.setInverted(true);
+        mAngleMotor.setInverted(Angle.kInverted);
         mIntegratedAngleEncoder.setPositionConversionFactor(Angle.kPositionConversionFactor);
         mAngleController.setP(Angle.kP);
         mAngleController.setI(Angle.kI);

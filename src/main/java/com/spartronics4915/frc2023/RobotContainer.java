@@ -19,6 +19,7 @@ import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
+import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
@@ -31,7 +32,11 @@ import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -60,13 +65,14 @@ public class RobotContainer {
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     private final Intake mIntake;
+    private final ExtenderCommands mExtenderCommands;
 
     private final IntakeCommands mIntakeCommands;
     
     private final Autos mAutos;
     
-    private final Command mAutonomousCommand;
-    private final Command mTeleopInitCommand;
+	private final SendableChooser<CommandBase> mAutoSelector = new SendableChooser<>();
+	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
     private final boolean useSwerveChassis = false;
@@ -86,17 +92,11 @@ public class RobotContainer {
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
             
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
-            mAutos = new Autos(mSwerveTrajectoryFollowerCommands);
-            
-            mAutonomousCommand = new SequentialCommandGroup(
-            mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardCommandFancy()
-            );
+            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         }
         else {
-            mAutonomousCommand = null;
             mTeleopInitCommand = null;
             mAutos = null;
             mSwerve = null;
@@ -107,15 +107,36 @@ public class RobotContainer {
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
             mArmCommands = new ArmCommands(mArm);
+            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
 
         }
-        
+
+        configureAutoSelector();
         
         // Configure the button bindings
         configureButtonBindings();
     }
+
+	private void configureAutoSelector() {
+		Autos.Strategy[] autoStrategies = {
+			mAutos.new Strategy("Move Forward Static", mAutos.new MoveForwardCommandFancy()),
+			mAutos.new Strategy("Move Forward Dynamic", new InstantCommand(() -> {
+				mAutos.new MoveForwardCommandDynamic().schedule();
+			})),
+			mAutos.new Strategy("Charge Station Climb", new ChargeStationCommands.AutoChargeStationClimb())
+		};
+		for (Autos.Strategy strat : autoStrategies) {
+			mAutoSelector.addOption(strat.getName(), strat.getCommand());
+		}
+
+		mAutoSelector.setDefaultOption(
+			autoStrategies[OI.kDefaultAutoIndex].getName(),
+			autoStrategies[OI.kDefaultAutoIndex].getCommand()
+		);
+		SmartDashboard.putData("Auto Strategies", mAutoSelector);        
+	}
     
     private void configureButtonBindings() {
         if (useJoystick) {
@@ -136,10 +157,10 @@ public class RobotContainer {
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
                 mDriverController.rightBumper()
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
                 
                 mDriverController.leftBumper()
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));    
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));    
             }
             
             // OPERATOR CONTROLS
@@ -201,22 +222,22 @@ public class RobotContainer {
                  */
 
                 mOperatorController.povUp()
-                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
 
                 mOperatorController.povDown()
-                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
                 mOperatorController.povLeft()
-                    .whileTrue(mArm.getExtender().getExtendCommand());
+                    .whileTrue(mExtenderCommands.new Extend());
 
                 mOperatorController.povRight()
-                    .whileTrue(mArm.getExtender().getRetractCommand());
+                    .whileTrue(mExtenderCommands.new Retract());
 
                 mOperatorController.leftBumper()
-                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
 
                 mOperatorController.rightBumper()
-                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
                 
             }
 
@@ -229,7 +250,7 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutonomousCommand;
+        return mAutoSelector.getSelected();
     }
     
     public Command getTeleopInitCommand() {
