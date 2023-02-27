@@ -37,7 +37,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
-        mMotor.setIdleMode(IdleMode.kCoast);
+        mMotor.setIdleMode(IdleMode.kBrake);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         mAbsEncoder.setPositionConversionFactor(Math.PI * 2);

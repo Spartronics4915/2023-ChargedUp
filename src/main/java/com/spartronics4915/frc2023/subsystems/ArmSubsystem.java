@@ -113,7 +113,7 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotFollower.restoreFactoryDefaults();
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
         mPivotFollower.setSmartCurrentLimit(20);
-
+        mPivotFollower.setIdleMode(IdleMode.kBrake);
         mExtenderSubsystem = new ExtenderSubsystem(17, mPivotMotor);
 
         mIntake = null;
