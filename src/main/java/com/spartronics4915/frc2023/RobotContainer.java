@@ -19,6 +19,7 @@ import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
+import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
@@ -64,6 +65,7 @@ public class RobotContainer {
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     private final Intake mIntake;
+    private final ExtenderCommands mExtenderCommands;
 
     private final IntakeCommands mIntakeCommands;
     
@@ -105,6 +107,7 @@ public class RobotContainer {
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
             mArmCommands = new ArmCommands(mArm);
+            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
 
@@ -219,22 +222,22 @@ public class RobotContainer {
                  */
 
                 mOperatorController.povUp()
-                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
 
                 mOperatorController.povDown()
-                    .whileTrue(mArm.getTransformCommand(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
                 mOperatorController.povLeft()
-                    .whileTrue(mArm.getExtender().getExtendCommand());
+                    .whileTrue(mExtenderCommands.new Extend());
 
                 mOperatorController.povRight()
-                    .whileTrue(mArm.getExtender().getRetractCommand());
+                    .whileTrue(mExtenderCommands.new Retract());
 
                 mOperatorController.leftBumper()
-                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
 
                 mOperatorController.rightBumper()
-                    .whileTrue(mArm.getTransformCommand(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
                 
             }
 

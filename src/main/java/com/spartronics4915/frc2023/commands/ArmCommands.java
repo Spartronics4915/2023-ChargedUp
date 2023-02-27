@@ -26,8 +26,8 @@ public class ArmCommands {
             );
         }
     }
-    public class trasnformArmState extends InstantCommand {
-        public trasnformArmState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
+    public class TransformArmState extends InstantCommand {
+        public TransformArmState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
             super(
                 () -> {
                     mArm.transformState(exstensionDelta, armDelta, wristDelta);

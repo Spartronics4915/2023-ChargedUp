@@ -183,10 +183,6 @@ public class ArmSubsystem extends SubsystemBase {
         return mPivotMotor.getCurrentReference();
     }
 
-    public CommandBase getTransformCommand(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
-        return Commands.run(() -> transformState(exstensionDelta, armDelta, wristDelta));
-    }
-
     // TODO make a way
     public void transformState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
         ArmPosition current = getPosition();
