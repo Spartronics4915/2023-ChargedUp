@@ -11,7 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.spartronics4915.frc2023.Constants.ArmConstants.ClawConstants;
+import com.spartronics4915.frc2023.Constants.Arm.ClawConstants;
 
 public class ClawSubsystem extends SubsystemBase {
     private CANSparkMax mClawMotor;

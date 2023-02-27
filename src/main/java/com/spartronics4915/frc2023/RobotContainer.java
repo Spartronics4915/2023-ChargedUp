@@ -4,22 +4,49 @@
 
 package com.spartronics4915.frc2023;
 
+import static com.spartronics4915.frc2023.Constants.OI.kDriverControllerID;
+import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
+import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
+import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.pathplanner.lib.PathPoint;
+import com.spartronics4915.frc2023.Constants.Arm;
+
+import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
+
+import com.spartronics4915.frc2023.Constants.OI;
+import com.spartronics4915.frc2023.Constants.Trajectory;
+import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
+import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
+import com.spartronics4915.frc2023.commands.ExtenderCommands;
+import com.spartronics4915.frc2023.commands.IntakeCommands;
+import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
-import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.Intake;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.Swerve;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
+
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import static com.spartronics4915.frc2023.Constants.OI.*;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -45,16 +72,17 @@ public class RobotContainer {
     
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
-    
-    // private final Intake mIntake;
-    // private final IntakeCommands mIntakeCommands;
+    private final Intake mIntake;
+    private final ExtenderCommands mExtenderCommands;
+
+    private final IntakeCommands mIntakeCommands;
     
     private final Autos mAutos;
     
-    private final Command mAutonomousCommand;
-    private final Command mTeleopInitCommand;
+	private final SendableChooser<CommandBase> mAutoSelector = new SendableChooser<>();
+	private final Command mTeleopInitCommand;
     
-    private final boolean useJoystick = false;
+    private final boolean useJoystick = true;
     private final boolean useSwerveChassis = false;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
@@ -72,17 +100,11 @@ public class RobotContainer {
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
             
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
-            mAutos = new Autos(mSwerveTrajectoryFollowerCommands);
-            
-            mAutonomousCommand = new SequentialCommandGroup(
-            mSwerveCommands.new ResetCommand(),
-            mAutos.new MoveForwardCommandFancy()
-            );
+            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand();
         }
         else {
-            mAutonomousCommand = null;
             mTeleopInitCommand = null;
             mAutos = null;
             mSwerve = null;
@@ -92,69 +114,168 @@ public class RobotContainer {
         
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
-            mArmCommands = new ArmCommands(mArm);
-            
+            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
+            mIntake = Intake.getInstance();
+            mIntakeCommands = new IntakeCommands(mIntake);
+            mArmCommands = new ArmCommands(mArm, mIntakeCommands);
+
         }
-        // mIntake = Intake.getInstance();
-        // mIntakeCommands = new IntakeCommands(mIntake);
-        
+
+        configureAutoSelector();
         
         // Configure the button bindings
         configureButtonBindings();
     }
+
+	private void configureAutoSelector() {
+		Autos.Strategy[] autoStrategies = {
+			mAutos.new Strategy(
+				"Move Forward Static",
+				mAutos.new MoveForwardCommandFancy()
+			),
+			mAutos.new Strategy(
+				"Move Forward Dynamic", new InstantCommand(() -> {
+					mAutos.new MoveForwardCommandDynamic().schedule();
+				})
+			),
+			mAutos.new Strategy(
+				"Charge Station Climb",
+				new ChargeStationCommands.AutoChargeStationClimb()
+			),
+			mAutos.new Strategy(
+				"Move Backward and Pick Up",
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						new PathPoint(
+							kInitialPose.getTranslation(),
+							new Rotation2d(0),
+							kInitialPose.getRotation()
+						),
+						new PathPoint(
+							kInitialPose.getTranslation().plus(new Translation2d(-Trajectory.kBackUpDistance, 0)),
+							new Rotation2d(0),
+							kInitialPose.getRotation()
+						)
+					))
+				),
+				mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
+
+			)
+		};
+		for (Autos.Strategy strat : autoStrategies) {
+			mAutoSelector.addOption(strat.getName(), strat.getCommand());
+		}
+
+		mAutoSelector.setDefaultOption(
+			autoStrategies[OI.kDefaultAutoIndex].getName(),
+			autoStrategies[OI.kDefaultAutoIndex].getCommand()
+		);
+		SmartDashboard.putData("Auto Strategies", mAutoSelector);        
+	}
     
     private void configureButtonBindings() {
         if (useJoystick) {
             // DRIVER CONTROLS
-            mDriverController.a()
-            .onTrue(mSwerveCommands.new ToggleFieldRelative());
             
-            mDriverController.b()
-            .onTrue(mSwerveCommands.new ResetYaw());
+            if(useSwerveChassis) {
+                mDriverController.a()
+                .onTrue(mSwerveCommands.new ToggleFieldRelative());
+                
+                mDriverController.b()
+                .onTrue(mSwerveCommands.new ResetYaw());
+                
+                mDriverController.y()
+                .onTrue(mSwerveCommands.new ResetOdometry());
+                
+                mDriverController.rightTrigger(kTriggerDeadband)
+                .onTrue(mSwerveCommands.new EnableSprintMode())
+                .onFalse(mSwerveCommands.new DisableSprintMode());
+                
+                mDriverController.rightBumper()
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                
+                mDriverController.leftBumper()
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));    
+            }
             
-            mDriverController.y()
-            .onTrue(mSwerveCommands.new ResetOdometry());
-            
-            mDriverController.rightTrigger(kTriggerDeadband)
-            .onTrue(mSwerveCommands.new EnableSprintMode())
-            .onFalse(mSwerveCommands.new DisableSprintMode());
-            
-            mDriverController.rightBumper()
-            .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve));
-            
-            mDriverController.leftBumper()
-            .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(mSwerve, ClimbState.LEVEL_ROBOT_SETUP));
-            
-            mDriverController.povRight().whileTrue(mArm.getExtender().getExtendCommand());
-            mDriverController.povLeft().whileFalse(mArm.getExtender().getRetractCommand());
-
-
             // OPERATOR CONTROLS
-            // mOperatorController.povUp()
+            // mOperatorController.button(7) //window
             //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_UPRIGHT));
             
-            // mOperatorController.povDown()
+            // mOperatorController.povDown() //menu
             //     .onTrue(mArmCommands.new SetArmState(ArmState.GRAB_FALLEN));
             
-            // mOperatorController.b()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.RETRACTED));
-            
-            // mOperatorController.a()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_1));
-            
-            // mOperatorController.x()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_2));
-            
-            // mOperatorController.y()
-            //     .onTrue(mArmCommands.new SetArmState(ArmState.LEVEL_3));
-            
-            // mOperatorController.rightTrigger(kTriggerDeadband)
-            //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
-            //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
-            
-            // mOperatorController.leftTrigger(kTriggerDeadband)
-            //     .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
-            //     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+           
+            if (useArm){
+                    /**
+                    * presets button bindings:
+                    * Extend to floor position		    Window
+                    * Extend to Double substation		Menu
+                    * Extend to Middle tier - cube		A
+                    * Extend to Middle tier - cone		X
+                    * Extend to High tier - cube		B
+                    * Extend to High tier - cone		Y   
+                    * */
+                mOperatorController.button(kWindowButtonId) //should be window
+                    .onTrue(mArmCommands.new SetArmState(ArmState.FLOOR_POS));
+
+                mOperatorController.button(kMenuButtonId) //should be menu
+                    .onTrue(mArmCommands.new SetArmState(ArmState.DOUBLE_SUBSTATION));
+                
+                mOperatorController.a()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_1));
+                
+                mOperatorController.x()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_1));
+                
+                mOperatorController.b()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_2));
+                
+                mOperatorController.y()
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_2));
+
+                /**
+                 * Eject game piece		    RT
+                 * Intake game piece		LT
+                 */
+                mOperatorController.rightTrigger(kTriggerDeadband)
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
+                    .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+                
+                mOperatorController.leftTrigger(kTriggerDeadband)
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.IN))
+                    .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
+
+                /**
+                 * Relative button bindings:
+                 * Manual Pivot up		    D pad up
+                 * Manual Pivot down		D pad down
+                 * Manual Extend out		D pad left
+                 * Manual Extend In		    D pad right
+                 * Manual wrist up		    LS in
+                 * Manual wrist down		RS in
+                 */
+
+                mOperatorController.povUp()
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
+
+                mOperatorController.povDown()
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    
+                mOperatorController.povLeft()
+                    .whileTrue(mExtenderCommands.new Extend());
+
+                mOperatorController.povRight()
+                    .whileTrue(mExtenderCommands.new Retract());
+
+                mOperatorController.leftBumper()
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+
+                mOperatorController.rightBumper()
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                
+            }
+
         }
     }
     
@@ -164,7 +285,7 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutonomousCommand;
+        return mAutoSelector.getSelected();
     }
     
     public Command getTeleopInitCommand() {

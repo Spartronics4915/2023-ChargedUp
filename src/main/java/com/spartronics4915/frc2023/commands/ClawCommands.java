@@ -4,7 +4,7 @@
 
 package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc2023.Constants.ArmConstants.ClawConstants;
+import com.spartronics4915.frc2023.Constants.Arm.ClawConstants;
 import com.spartronics4915.frc2023.subsystems.ClawSubsystem;
 
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;

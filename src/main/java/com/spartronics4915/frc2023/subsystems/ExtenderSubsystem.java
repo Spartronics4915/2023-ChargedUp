@@ -37,14 +37,14 @@ public class ExtenderSubsystem extends SubsystemBase  {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
-        mMotor.setSmartCurrentLimit(10);
+        //mMotor.setSmartCurrentLimit(30);
         //mPIDController = mMotor.getPIDController();
         //mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
         //mPIDController.setP(1./60);
 
-        mEncoder.setPosition(0);
+        mEncoder.setPosition(kPositionPad);
         targetReference = 0;
     }
 
@@ -76,12 +76,14 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
     
     public void startExtending() {
+        System.out.println("Extending Position: " + getPosition());
+        System.out.println("speed: " + mMotor.getAppliedOutput());
 
         if(getPosition() >= kMaxDist) {
             mMotor.stopMotor();
         }
         else {
-            mMotor.set(0.3);
+            mMotor.set(0.4);
         }
 
     }
@@ -90,21 +92,12 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mMotor.stopMotor();
     }
 
-    public CommandBase getExtendCommand() {
-
-        return Commands.runEnd(() -> this.startExtending(), () -> this.stopMotor());
-    }
-
-    public CommandBase getRetractCommand() {
-        return Commands.runEnd(() -> this.startRetracting(), () -> this.stopMotor());
-    }
-
     public void startRetracting() {
-        if(getPosition() < kMinDist) {
+        if(getPosition() < kMinDist){
             mMotor.stopMotor();
         }
         else {
-            mMotor.set(-0.3);
+            mMotor.set(-0.4);
         }
     }
 
@@ -118,11 +111,10 @@ public class ExtenderSubsystem extends SubsystemBase  {
 
     public void setReference(double p) {
         targetReference = p;
-        //mPIDController.setReference(p, ControlType.kPosition);
     }
 
     public boolean closeEnough() {
-        return ((Math.abs(getPosition() - targetReference)) < 0.1);
+        return ((Math.abs(getPosition() - targetReference)) < kPosTolerance);
     }
     public double getReference() {
 

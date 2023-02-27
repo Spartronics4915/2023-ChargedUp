@@ -7,9 +7,15 @@ package com.spartronics4915.frc2023;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+import com.ctre.phoenix.sensors.BasePigeon;
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
+import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,10 +50,71 @@ public final class Constants {
 	public static final class Trajectory {
 		public static final double kLinearP = 0.01;
 		public static final double kThetaP = 0.01;
+		public static final double kMaxVelocity = 0.5;
+		public static final double kMaxAccel = 0.4;
+		public static final double kBackUpDistance = 1;
 	}
 
     public static final class Swerve {
-        public static final class Drive {
+        
+		public static class ChassisConstants {
+			public final double driveGearRatio, angleGearRatio;
+			public final double trackWidth, wheelBase;
+			public final boolean angleInverted; 
+			public final double[] moduleOffsets;
+			public final int[] driveMotorIDs, angleMotorIDs, encoderIDs;
+			public final IntFunction<BasePigeon> pigeonConstructor;
+			public final IntFunction<AbsoluteEncoder> absoluteEncoderConstructor;
+			public final int pigeonId;
+			public ChassisConstants(
+				double driveGearRatio, double angleGearRatio,
+				double trackWidth, double wheelBase, boolean angleInverted,
+				double[] moduleOffsets,
+				int[] driveMotorIDs, int[] angleMotorIDs, int[] encoderIDs,
+				IntFunction<AbsoluteEncoder> absoluteEncoderConstructor,
+				IntFunction<BasePigeon> pigeonConstructor,
+				int pigeonId
+			) {
+				this.driveGearRatio = driveGearRatio;
+				this.angleGearRatio = angleGearRatio;
+				this.trackWidth = trackWidth;
+				this.wheelBase = wheelBase;
+				this.moduleOffsets = moduleOffsets;
+				this.pigeonConstructor = pigeonConstructor;
+				this.absoluteEncoderConstructor = absoluteEncoderConstructor;
+				this.driveMotorIDs = driveMotorIDs;
+				this.angleMotorIDs = angleMotorIDs;
+				this.encoderIDs = encoderIDs;
+				this.pigeonId = pigeonId;
+				this.angleInverted = angleInverted;
+			}
+		}
+		public static final ChassisConstants kMk4iChassisConstants = new ChassisConstants(
+			6.75 / 1.0, 150.0 / 7.0,
+			Units.inchesToMeters(18.75), Units.inchesToMeters(23.75), true,
+			new double[]{ 96.328, 167.431, 16.962, 118.652 },
+			new int[]{ 5, 3, 7, 9 },
+			new int[]{ 6, 4, 8, 10 },
+			new int[]{ 13, 12, 14, 11 },
+			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); },
+			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
+			9
+		);
+		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
+			8.33 / 1.0, 18.0 / 1.0,
+			0.75, 0.75, false,
+			new double[]{ 0.016 * 360, 0.511 * 360, 0.278 * 360, 0.802 * 360 },
+			new int[]{ 1, 3, 5, 7 },
+			new int[]{ 2, 4, 6, 8 },
+			new int[]{ 0, 1, 2, 3 },
+			(int id) -> { return (AbsoluteEncoder)(new AbsoluteAnalogEncoder(id)); },
+			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
+			12
+		);
+		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
+
+
+		public static final class Drive {
             public static final double kP = 0.0; // placeholder
             public static final double kI = 0.0; // placeholder
             public static final double kD = 0.0; // placeholder
@@ -74,9 +141,14 @@ public final class Constants {
 
             public static final double kGearRatio =  150.0 / 7.0;
             public static final double kPositionConversionFactor = (2 * Math.PI) / (kGearRatio);
+
+			public static final boolean kInverted = kChassisConstants.angleInverted;
         }
 
-        public static final int kPigeonID = 2;
+        public static final int kPigeonID = kChassisConstants.pigeonId;
+		public static final IntFunction<BasePigeon> kPigeonConstructor = kChassisConstants.pigeonConstructor;
+
+		public static final IntFunction<AbsoluteEncoder> kAbsoluteEncoderConstructor = kChassisConstants.absoluteEncoderConstructor;
 
         public static final double kPigeonMountPoseYaw = -90;
         public static final double kPigeonMountPosePitch = 0;
@@ -108,10 +180,11 @@ public final class Constants {
         public static final double kVoltageCompensation = 12.0;
 
         public static final class Module0 {
-            public static final int kDriveMotorID = 5;
-            public static final int kAngleMotorID = 6;
-            public static final int kEncoderID = 13;
-            public static final double kRawAngleOffsetDegrees = 96.328125;
+			public static final int kIndex = 0;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -119,10 +192,11 @@ public final class Constants {
         }
 
         public static final class Module1 {
-            public static final int kDriveMotorID = 3;
-            public static final int kAngleMotorID = 4;
-            public static final int kEncoderID = 12;
-            public static final double kRawAngleOffsetDegrees = 167.431640625;
+			public static final int kIndex = 1;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -130,10 +204,11 @@ public final class Constants {
         }
 
         public static final class Module2 {
-            public static final int kDriveMotorID = 7;
-            public static final int kAngleMotorID = 8;
-            public static final int kEncoderID = 14;
-            public static final double kRawAngleOffsetDegrees = 16.962890625;
+			public static final int kIndex = 2;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -141,10 +216,11 @@ public final class Constants {
         }
 
         public static final class Module3 {
-            public static final int kDriveMotorID = 9;
-            public static final int kAngleMotorID = 10;
-            public static final int kEncoderID = 11;
-            public static final double kRawAngleOffsetDegrees = 118.65234375;
+			public static final int kIndex = 3;
+            public static final int kDriveMotorID = kChassisConstants.driveMotorIDs[kIndex];
+            public static final int kAngleMotorID = kChassisConstants.angleMotorIDs[kIndex];
+            public static final int kEncoderID = kChassisConstants.encoderIDs[kIndex];
+            public static final double kRawAngleOffsetDegrees = kChassisConstants.moduleOffsets[kIndex];
             public static final double kRawAngleOffsetRotations = kRawAngleOffsetDegrees / 360;
 			public static final double kAngleOffset = Math.PI * 2 * kRawAngleOffsetRotations;
             public static final SwerveModuleConstants kConstants = 
@@ -183,22 +259,47 @@ public final class Constants {
             public final int angleMotorID;
             public final int encoderID;
             public final double angleOffset;
-            public final double absoluteOffset;
+            public final double absoluteOffset; // radians
 
-            public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRotations) {
+            public SwerveModuleConstants(int d, int a, int e, double o, double _absoluteOffsetRadians) {
                 driveMotorID = d;
                 angleMotorID = a;
                 encoderID = e;
                 angleOffset = o;
-                absoluteOffset = _absoluteOffsetRotations;
+                absoluteOffset = _absoluteOffsetRadians;
             }
         }
     }
 
     public static final class Arm {
+		public static class Auto {
+			public static final double kArmStateChangeDuration = 3; // seconds
+			public static final double kGrabDuration = 2; // seconds
+		}
+        public static class PIDConstants {
+            public final double kP;
+            public final double kI;
+            public final double kD;
+            public PIDConstants(double kP, double kI, double kD) {
+                super();
+                this.kP = kP;
+                this.kI = kI;
+                this.kD = kD;
+            } 
+        }
+        public static class ClawConstants{
+            public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
+            public static final int klimitSwitchID = 0; //PlaceHolder Value
+            public static final int kClawMotorID = 0; //PlaceHolder Value
+            public static final double kInSpeed = 0.25; //PlaceHolder Value
+            public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
+            public static final double kGrabTimerLength = 1; //seconds
+            public static final double kReleaseTimerLength = 1; //seconds
+        }
         public static final class ArmMotorConstants{
             public final int kMotorID;
             public final double kPositionConversionFactor;
+            public final boolean kInverted;
             public final double kP;
             public final double kI;
             public final double kD;
@@ -207,13 +308,16 @@ public final class Constants {
             public final double kSmartMotionMinOutputVelocity;
             public final Rotation2d kZeroOffset;
             public final int kFollowerMotorID;
+            public final boolean kInvertMotor;
+            public final MotorType kMotorType;
 
-            public ArmMotorConstants(int MotorID, double PositionConversionFactor, double P, double I, double D, 
+            public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, 
             double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, Rotation2d zeroOffset, 
-            int followerMotorID) {
+            int followerMotorID, boolean motorInverted, MotorType motorType) {
                 super();
                 this.kMotorID = MotorID;
                 this.kPositionConversionFactor = PositionConversionFactor;
+                this.kInverted = Inverted;
                 this.kP = P;
                 this.kI = I;
                 this.kD = D;
@@ -222,6 +326,8 @@ public final class Constants {
                 this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
                 this.kZeroOffset = zeroOffset;
                 this.kFollowerMotorID = followerMotorID;
+                this.kInvertMotor = motorInverted;
+                this.kMotorType = motorType;
             }
         }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
@@ -229,50 +335,31 @@ public final class Constants {
 
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             15,  //actual value 15
-            Math.PI * 2,
-            0.05, 0, 0,
+            Math.PI * 2, false,
+            2, 0, 0,
             Math.PI/8, 1, 0,
-            Rotation2d.fromDegrees(66), 10
+            Rotation2d.fromDegrees(66), 10, false,
+            MotorType.kBrushless
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
-            Math.PI * 2,
-            0.05 / 36, 0, 0,
+            Math.PI * 2, true,
+            0.3, 0, 0,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
-            Rotation2d.fromDegrees(136),-1
+            Rotation2d.fromDegrees(136),-1, true,
+            MotorType.kBrushed
         ); 
 
         public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
-            -1, 
-            0,
+            17, 
+            0, false,
             0, 0, 0,
             0, 0, 0,
-            Rotation2d.fromDegrees(0), 
-            -1
+            Rotation2d.fromDegrees(0), -1, false,
+            MotorType.kBrushless
         ); 
         public static final int kPivotFollowerID = 16; //actual value: 16
-
-
-        // public static final int kPivotMotorID = 2;
-        // public static final int kExtenderMotorID = -1;
-        // public static final int kWristMotorID = -1;
-
-        // public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
-        // public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
-        // public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
-
-        // public static final double kPivotP = 0.05;
-        // public static final double kPivotI = 0.0;
-        // public static final double kPivotD = 0.0;
-
-        // public static final double kExtenderP = 0.0;
-        // public static final double kExtenderI = 0.0;
-        // public static final double kExtenderD = 0.0;
-
-        // public static final double kWristP = 0.0;
-        // public static final double kWristI = 0.0;
-        // public static final double kWristD = 0.0;
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,
@@ -304,23 +391,49 @@ public final class Constants {
             Rotation2d.fromDegrees(0)
         );
 
-        public static final ArmPositionConstants kLevel1Constants = new ArmPositionConstants(
+        public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
             new Rotation2d(Math.PI), //180
             new Rotation2d(Math.PI) //180
         );
 
-        public static final ArmPositionConstants kLevel2Constants = new ArmPositionConstants(
+        public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
+            0,
+            new Rotation2d(Math.PI), //180
+            new Rotation2d(Math.PI) //180
+        );
+        
+        public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
+            0,
+            new Rotation2d(Math.PI), //180
+            new Rotation2d(Math.PI) //180
+        );
+
+        public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
             -1,
             new Rotation2d(),
             new Rotation2d()
         );
 
-        public static final ArmPositionConstants kLevel3Constants = new ArmPositionConstants(
+        public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(
+            0,
+            new Rotation2d(Math.PI), //180
+            new Rotation2d(Math.PI) //180
+        );
+
+        public static final ArmPositionConstants kCubeLevel2Constants = new ArmPositionConstants(
             -1,
             new Rotation2d(),
             new Rotation2d()
         );
+
+        public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
+
+        // public static final ArmPositionConstants kConeLevel3Constants = new ArmPositionConstants(
+        //     -1,
+        //     new Rotation2d(),
+        //     new Rotation2d()
+        // );
 
         // used to store target measurements for different arm states
         // arm constants assume pivot axle is origin and wrist axle is point
@@ -335,7 +448,7 @@ public final class Constants {
     }
 
     public static final class Intake {
-        public static final int kIntakeMotorID = -1;
+        public static final int kIntakeMotorID = 18;
 
         public static final boolean kIsInverted = false;
 
@@ -363,6 +476,9 @@ public final class Constants {
         public static final int kDriverControllerID = 2;
         public static final int kOperatorControllerID = 4;
 
+        public static final int kWindowButtonId = 7;
+        public static final int kMenuButtonId = 8;
+
         public static final int kToggleFieldRelativeButton = 1;
         public static final int kResetYawButton = 8;
         public static final int kResetOdometryButton = 3;
@@ -371,65 +487,8 @@ public final class Constants {
         public static final double kStickDeadband = 0.08;
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
-    }
-    public static class ArmConstants{
-        public static class PIDConstants {
-            public final double kP;
-            public final double kI;
-            public final double kD;
-            public PIDConstants(double kP, double kI, double kD) {
-                super();
-                this.kP = kP;
-                this.kI = kI;
-                this.kD = kD;
-            } 
-        }
-        // public static class AnologAbsEncoderConstants{
-        //     public final int channel; 
-        //     public final double angleOffset;
-        //     public AnologAbsEncoderConstants(int channel, double angleOffset) {
-        //         this.channel = channel;
-        //         this.angleOffset = angleOffset;
-        //     }
-        // }
-        public static class SparkMaxAbsoluteEncoderConstants{
-            public final double offset;
 
-            public SparkMaxAbsoluteEncoderConstants(double offset) {
-                this.offset = offset;
-            } 
-        }
-        public static class MotorSetupConstants{
-            public static final int kShoulderMotorId = 0; //PlaceHolder Value
-            public static final int kWristMotorId = 1; //PlaceHolder Value
-            public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-            public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-            public static final SparkMaxAbsoluteEncoderConstants kShoulderAbsEncoder = new SparkMaxAbsoluteEncoderConstants(0); //PlaceHolder Value
-            public static final SparkMaxAbsoluteEncoderConstants kWristAbsEncoder = new SparkMaxAbsoluteEncoderConstants(0); //PlaceHolder Value
+		public static final int kDefaultAutoIndex = 0;
 
-
-            
-        }
-        public static class LinearActuatorConstants{
-            public static final int kLinearActuatorMotorId = 0; //PlaceHolder Value
-            public static final PIDConstants kLinearActuatorPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-        }
-        public static class ClawConstants{
-            public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
-            public static final int klimitSwitchID = 0; //PlaceHolder Value
-            public static final int kClawMotorID = 0; //PlaceHolder Value
-            public static final double kInSpeed = 0.25; //PlaceHolder Value
-            public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
-            public static final double kGrabTimerLength = 1; //seconds
-            public static final double kReleaseTimerLength = 1; //seconds
-        }
-        public static class ArmDesiredStates{
-            public static class RelativePos{
-                //insert relative translations 2ds here for movments like going .5 feet down or .5 feet back
-            }
-            public static class AbsolutePos{
-                //insert absolute translations 2ds here for movments like going to above the 1st layer of cones
-            }
-        }
     }
 }
