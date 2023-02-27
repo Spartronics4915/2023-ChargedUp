@@ -17,6 +17,7 @@ public class IntakeCommands {
         public SetIntakeState(IntakeState state) {
             super(
                 () -> {
+                    System.out.println(state);
                     mIntake.setState(state);
                 },
                 mIntake
