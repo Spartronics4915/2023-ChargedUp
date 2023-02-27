@@ -17,9 +17,9 @@ public class ExtenderSubsystem extends SubsystemBase  {
 
     private final int kMotorID;
     private CANSparkMax mMotor;
-    private RelativeEncoder mEncoder;
+    public RelativeEncoder mEncoder;
     private final double kRevPerInch = 12.0;
-    //private SparkMaxPIDController mPIDController;
+    public SparkMaxPIDController mPIDController;
     public double targetReference;
 
     // This is to work around a bug in the encoder class
@@ -29,22 +29,25 @@ public class ExtenderSubsystem extends SubsystemBase  {
     private final double kMinDist = 0.5;
     private final double kMaxDist = 12;
     private final double kPosTolerance = 0.2;
+    private MotorAbsEncoderComboSubsystem mPivot;
 
-    public ExtenderSubsystem(int motorID) {
+    public ExtenderSubsystem(int motorID, MotorAbsEncoderComboSubsystem pivot) {
         kMotorID = motorID;
         mMotor = new CANSparkMax(kMotorID, MotorType.kBrushed);
         mEncoder = mMotor.getEncoder(Type.kQuadrature, 8192);
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
-        //mMotor.setSmartCurrentLimit(30);
-        //mPIDController = mMotor.getPIDController();
-        //mPIDController.setFeedbackDevice(mEncoder);
+        mMotor.setSmartCurrentLimit(60);
+        mPIDController = mMotor.getPIDController();
+        mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        //mPIDController.setP(1./60);
+        mPIDController.setP(0.0001);
+        mPIDController.setFF(0.00008);
 
         mEncoder.setPosition(kPositionPad);
+        mPivot = pivot;
         targetReference = 0;
     }
 
@@ -79,11 +82,18 @@ public class ExtenderSubsystem extends SubsystemBase  {
         System.out.println("Extending Position: " + getPosition());
         System.out.println("speed: " + mMotor.getAppliedOutput());
 
+        mPIDController.setReference(75*60, ControlType.kVelocity);
+
         if(getPosition() >= kMaxDist) {
             mMotor.stopMotor();
         }
         else {
-            mMotor.set(0.4);
+
+            // double extendSpeed = 0.5;
+
+            // if(mPivot.getArmPosition().getDegrees()> -20)
+            //     extendSpeed = 0.8;    
+            // mMotor.set(extendSpeed);
         }
 
     }
@@ -97,7 +107,12 @@ public class ExtenderSubsystem extends SubsystemBase  {
             mMotor.stopMotor();
         }
         else {
-            mMotor.set(-0.4);
+            mPIDController.setReference(-75*60, ControlType.kVelocity);
+            // double retractSpeed = -0.4;
+
+            // if(mPivot.getArmPosition().getDegrees()< -20)
+            //     retractSpeed = -0.8;    
+            // mMotor.set(retractSpeed);
         }
     }
 

@@ -183,7 +183,7 @@ public final class DebugTeleopCommands {
 
     public static class ExtenderWidget {
         private GenericEntry extenderPos, targetRef;
-        private GenericEntry PIDSpeed;
+        private GenericEntry PIDSpeed, velocity;
 
         ExtenderWidget(ShuffleboardTab tab) {
             ShuffleboardLayout module = tab.getLayout("Extender", BuiltInLayouts.kList).withSize(2, 3)
@@ -191,12 +191,15 @@ public final class DebugTeleopCommands {
             extenderPos = module.add("ExtenderPos", 0).getEntry();
             PIDSpeed = module.add("PID Speed", 0).getEntry();
             targetRef = module.add("Target Reference", 0).getEntry();
+            velocity = module.add("Velocity", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+
         }
 
         public void update(ExtenderSubsystem subsystem) {
             extenderPos.setDouble(subsystem.getPosition());
             PIDSpeed.setDouble(subsystem.getMotor().getAppliedOutput());
             targetRef.setDouble(subsystem.getReference());
+            velocity.setDouble(subsystem.mEncoder.getVelocity());
         }
     }
 
@@ -225,6 +228,7 @@ public final class DebugTeleopCommands {
         private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, wristRef, wristSpeed;
         private GenericEntry wristArmPlus30Native, wristArmMinus30Native;
         private GenericEntry shoulderArmSpeedOutput;
+        private GenericEntry exOutput;
         ArmWidget(ShuffleboardTab tab, String name) {
             ShuffleboardLayout armModule = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 3)
                     .withProperties(Map.of("Label position", "LEFT"));
@@ -255,6 +259,7 @@ public final class DebugTeleopCommands {
 
             wristRef = combinedLayout.add("Wrist Reference",0).getEntry();
             shoulderRef = combinedLayout.add("Shoulder Reference", 0).getEntry();
+            exOutput = combinedLayout.add("Ex Output", 0).getEntry();
         }
 
         public void update(ArmSubsystem module) {
@@ -284,6 +289,8 @@ public final class DebugTeleopCommands {
             shoulderRef.setDouble(module.getPivot().getCurrentReference().getDegrees());
             pivotSpeed.setDouble(motors[0].getMotorSpeed());
             shoulderArmSpeedOutput.setDouble(module.getPivot().getLastSpeedOutput());
+
+            exOutput.setDouble(module.getExtender().getMotor().getAppliedOutput());
         }
     }
 
@@ -337,6 +344,7 @@ public final class DebugTeleopCommands {
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(0))).withName("Wrist +0"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Motor"));
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
 
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setReference(Rotation2d.fromDegrees(40))).withName("Wrist+40"));
