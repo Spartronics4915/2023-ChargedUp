@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import static com.spartronics4915.frc2023.Constants.ArmConstants.Auto.*;
+import static com.spartronics4915.frc2023.Constants.Arm.Auto.*;
 
 public class ArmCommands {
     private final ArmSubsystem mArm;
@@ -32,8 +32,8 @@ public class ArmCommands {
             );
         }
     }
-    public class trasnformArmState extends InstantCommand {
-        public trasnformArmState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
+    public class TransformArmState extends InstantCommand {
+        public TransformArmState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
             super(
                 () -> {
                     mArm.transformState(exstensionDelta, armDelta, wristDelta);

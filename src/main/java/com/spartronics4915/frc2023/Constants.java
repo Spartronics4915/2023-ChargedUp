@@ -13,7 +13,6 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
@@ -273,6 +272,30 @@ public final class Constants {
     }
 
     public static final class Arm {
+		public static class Auto {
+			public static final double kArmStateChangeDuration = 3; // seconds
+			public static final double kGrabDuration = 2; // seconds
+		}
+        public static class PIDConstants {
+            public final double kP;
+            public final double kI;
+            public final double kD;
+            public PIDConstants(double kP, double kI, double kD) {
+                super();
+                this.kP = kP;
+                this.kI = kI;
+                this.kD = kD;
+            } 
+        }
+        public static class ClawConstants{
+            public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
+            public static final int klimitSwitchID = 0; //PlaceHolder Value
+            public static final int kClawMotorID = 0; //PlaceHolder Value
+            public static final double kInSpeed = 0.25; //PlaceHolder Value
+            public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
+            public static final double kGrabTimerLength = 1; //seconds
+            public static final double kReleaseTimerLength = 1; //seconds
+        }
         public static final class ArmMotorConstants{
             public final int kMotorID;
             public final double kPositionConversionFactor;
@@ -337,27 +360,6 @@ public final class Constants {
             MotorType.kBrushless
         ); 
         public static final int kPivotFollowerID = 16; //actual value: 16
-
-
-        // public static final int kPivotMotorID = 2;
-        // public static final int kExtenderMotorID = -1;
-        // public static final int kWristMotorID = -1;
-
-        // public static final double kPivotPositionConversionFactor = 1.0 / 1.0; // placeholder
-        // public static final double kExtenderPositionConversionFactor = 1.0 / 1.0; // placeholder
-        // public static final double kWristPositionConversionFactor = 1.0 / 1.0; // placeholder
-
-        // public static final double kPivotP = 0.05;
-        // public static final double kPivotI = 0.0;
-        // public static final double kPivotD = 0.0;
-
-        // public static final double kExtenderP = 0.0;
-        // public static final double kExtenderI = 0.0;
-        // public static final double kExtenderD = 0.0;
-
-        // public static final double kWristP = 0.0;
-        // public static final double kWristI = 0.0;
-        // public static final double kWristD = 0.0;
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,
@@ -488,69 +490,5 @@ public final class Constants {
 
 		public static final int kDefaultAutoIndex = 0;
 
-    }
-    public static class ArmConstants{
-        public static class PIDConstants {
-            public final double kP;
-            public final double kI;
-            public final double kD;
-            public PIDConstants(double kP, double kI, double kD) {
-                super();
-                this.kP = kP;
-                this.kI = kI;
-                this.kD = kD;
-            } 
-        }
-        // public static class AnologAbsEncoderConstants{
-        //     public final int channel; 
-        //     public final double angleOffset;
-        //     public AnologAbsEncoderConstants(int channel, double angleOffset) {
-        //         this.channel = channel;
-        //         this.angleOffset = angleOffset;
-        //     }
-        // }
-		public static class Auto {
-			public static final double kArmStateChangeDuration = 3; // seconds
-			public static final double kGrabDuration = 2; // seconds
-		}
-        public static class SparkMaxAbsoluteEncoderConstants{
-            public final double offset;
-
-            public SparkMaxAbsoluteEncoderConstants(double offset) {
-                this.offset = offset;
-            } 
-        }
-        public static class MotorSetupConstants{
-            public static final int kShoulderMotorId = 0; //PlaceHolder Value
-            public static final int kWristMotorId = 1; //PlaceHolder Value
-            public static final PIDConstants kShoulderPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-            public static final PIDConstants kWristPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-            public static final SparkMaxAbsoluteEncoderConstants kShoulderAbsEncoder = new SparkMaxAbsoluteEncoderConstants(0); //PlaceHolder Value
-            public static final SparkMaxAbsoluteEncoderConstants kWristAbsEncoder = new SparkMaxAbsoluteEncoderConstants(0); //PlaceHolder Value
-
-
-            
-        }
-        public static class LinearActuatorConstants{
-            public static final int kLinearActuatorMotorId = 0; //PlaceHolder Value
-            public static final PIDConstants kLinearActuatorPID = new PIDConstants(0.01, 0, 0); //PlaceHolder Value
-        }
-        public static class ClawConstants{
-            public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
-            public static final int klimitSwitchID = 0; //PlaceHolder Value
-            public static final int kClawMotorID = 0; //PlaceHolder Value
-            public static final double kInSpeed = 0.25; //PlaceHolder Value
-            public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
-            public static final double kGrabTimerLength = 1; //seconds
-            public static final double kReleaseTimerLength = 1; //seconds
-        }
-        public static class ArmDesiredStates{
-            public static class RelativePos{
-                //insert relative translations 2ds here for movments like going .5 feet down or .5 feet back
-            }
-            public static class AbsolutePos{
-                //insert absolute translations 2ds here for movments like going to above the 1st layer of cones
-            }
-        }
     }
 }
