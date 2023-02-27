@@ -220,9 +220,9 @@ public final class DebugTeleopCommands {
     public static class ArmWidget {
         // private GenericEntry linActDistance,stateRadius;
         private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
-        private GenericEntry shoulderRaw,  shoulderNative, shoulderArm, stateShoulderRotation, refShoulderRotation, pivotSpeed;
+        private GenericEntry shoulderRaw,  shoulderNative, shoulderArm, stateShoulderRotation, shoulderRef, pivotSpeed;
         private GenericEntry shoulderArmPlus30Native, shouldArmMinus30Native;
-        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, refwristRotation, wristSpeed;
+        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, wristRef, wristSpeed;
         private GenericEntry wristArmPlus30Native, wristArmMinus30Native;
         private GenericEntry shoulderArmSpeedOutput;
         ArmWidget(ShuffleboardTab tab, String name) {
@@ -230,6 +230,8 @@ public final class DebugTeleopCommands {
                     .withProperties(Map.of("Label position", "LEFT"));
 
             ShuffleboardLayout wristLayout = tab.getLayout("Wrist", BuiltInLayouts.kList).withSize(2, 3)
+            .withProperties(Map.of("Label position", "LEFT"));
+            ShuffleboardLayout combinedLayout = tab.getLayout("COmbined", BuiltInLayouts.kList).withSize(2, 3)
             .withProperties(Map.of("Label position", "LEFT"));
             // linActDistance = armModule.add("current radius", 0).getEntry();
             // stateRadius = armModule.add("desired radius",0).getEntry();
@@ -249,8 +251,10 @@ public final class DebugTeleopCommands {
             shoulderArmPlus30Native = armModule.add("Native w Arm at +30", 0).getEntry();
             shoulderArmSpeedOutput = armModule.add("Arm Speed Output", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle", 0).getEntry();
-            refShoulderRotation = armModule.add("current refrence", 0).getEntry();
             pivotSpeed = armModule.add("pivot speed", 0).getEntry();
+
+            wristRef = combinedLayout.add("Wrist Reference",0).getEntry();
+            shoulderRef = combinedLayout.add("Shoulder Reference", 0).getEntry();
         }
 
         public void update(ArmSubsystem module) {
@@ -268,6 +272,7 @@ public final class DebugTeleopCommands {
             wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
             wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
             wristSpeed.setDouble(module.getWrist().getMotor().getAppliedOutput());
+            wristRef.setDouble(module.getWrist().getCurrentReference().getDegrees());
             } 
 
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
@@ -276,7 +281,7 @@ public final class DebugTeleopCommands {
             shouldArmMinus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
             shoulderArmPlus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
-            refShoulderRotation.setDouble(module.getRef().getDegrees());
+            shoulderRef.setDouble(module.getPivot().getCurrentReference().getDegrees());
             pivotSpeed.setDouble(motors[0].getMotorSpeed());
             shoulderArmSpeedOutput.setDouble(module.getPivot().getLastSpeedOutput());
         }

@@ -102,10 +102,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final CANSparkMax mPivotFollower;
 
     private final ExtenderSubsystem mExtenderSubsystem;
-    // private final SparkMaxPIDController mExtenderPIDController;
-
-    // private final CANSparkMax mWristMotor;
-    // private final SparkMaxPIDController mWristPIDController;
+    private final Intake mIntake;
 
     public ArmSubsystem() {
         mState = ArmState.RETRACTED;
@@ -119,6 +116,8 @@ public class ArmSubsystem extends SubsystemBase {
 
         mExtenderSubsystem = new ExtenderSubsystem(17);
 
+        mIntake = null;
+        
         if(mWristMotor != null) {
             mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
         }
@@ -180,7 +179,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         if (mWristMotor != null) {
             // mWristMotor.setReference(state.wristTheta);
-            mWristMotor.setArmReference(getCorrectAngle(state.armTheta).minus(state.wristTheta));
+            mWristMotor.setArmReference(state.wristTheta.minus(state.armTheta));
         }
     }
 
@@ -188,7 +187,7 @@ public class ArmSubsystem extends SubsystemBase {
         setDesiredPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
-    private Rotation2d getCorrectAngle(Rotation2d armAngle) {
+    private Rotation2d getCorrectAngleDEPRECATE(Rotation2d armAngle) {
         // assuming 0 on the arm is straight up
         // assuming 0 on the wrist is level with arm (makes a straight line),
         // specifically 180 is level with the arm, 0 is opposite
