@@ -43,7 +43,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        mPIDController.setP(0.0001);
+        mPIDController.setP(0.00007);
         mPIDController.setFF(0.00008);
 
         mEncoder.setPosition(kPositionPad);
@@ -82,7 +82,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         System.out.println("Extending Position: " + getPosition());
         System.out.println("speed: " + mMotor.getAppliedOutput());
 
-        mPIDController.setReference(75*60, ControlType.kVelocity);
+        mPIDController.setReference(90*60, ControlType.kVelocity);
 
         if(getPosition() >= kMaxDist) {
             mMotor.stopMotor();
@@ -107,7 +107,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
             mMotor.stopMotor();
         }
         else {
-            mPIDController.setReference(-75*60, ControlType.kVelocity);
+            mPIDController.setReference(-90*60, ControlType.kVelocity);
             // double retractSpeed = -0.4;
 
             // if(mPivot.getArmPosition().getDegrees()< -20)
