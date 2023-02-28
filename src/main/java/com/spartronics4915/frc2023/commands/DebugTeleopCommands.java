@@ -263,8 +263,9 @@ public final class DebugTeleopCommands {
         }
 
         public void update(ArmSubsystem module) {
-            ArmPosition current = module.getPosition();
-            ArmState desired = module.getState();
+            ArmPosition current = module.getLocalPosition();
+            
+            ArmState desired = module.getDesiredGlobalState();
             MotorAbsEncoderComboSubsystem[] motors = module.getMotors();
             // linActDistance.setDouble(current.armRadius);
             // stateRadius.setDouble(desired.armRadius);

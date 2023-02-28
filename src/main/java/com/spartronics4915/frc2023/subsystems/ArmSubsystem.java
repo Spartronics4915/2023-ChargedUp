@@ -95,7 +95,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private static ArmSubsystem mInstance;
 
-    private ArmState mState;
+    private ArmState mDesiredState;
 
     private final MotorAbsEncoderComboSubsystem mPivotMotor;
     private final MotorAbsEncoderComboSubsystem mWristMotor;
@@ -167,8 +167,31 @@ public class ArmSubsystem extends SubsystemBase {
         );
     }
 
-    public ArmState getState() {
-        return mState; // This will get the desired state
+    public ArmState getDesiredGlobalState() {
+        // Global state has all of the angles in global coordinates (0 is the horizon)
+        return mDesiredState; // This will get the desired state
+    }
+
+    public ArmPositionConstants localToGlobalState(ArmPositionConstants localArmState) {
+        // localArmState are the actual angles that wrists are at.
+        // Global state has all of the angles in global coordinates (0 is the horizon)
+
+        Rotation2d newPivotAngle = localArmState.armTheta;
+        Rotation2d newWristAngle = localArmState.wristTheta.plus(localArmState.armTheta);
+        var newExtension = localArmState.armRadius;
+
+        return new ArmPositionConstants(newExtension, newPivotAngle, newWristAngle);
+    }
+
+    public ArmPositionConstants globalToLocalState(ArmPositionConstants localArmState) {
+        // localArmState are the actual angles that wrists are at.
+        // Global state has all of the angles in global coordinates (0 is the horizon)
+
+        Rotation2d newPivotAngle = localArmState.armTheta;
+        Rotation2d newWristAngle = localArmState.wristTheta.minus(localArmState.armTheta);
+        var newExtension = localArmState.armRadius;
+
+        return new ArmPositionConstants(newExtension, newPivotAngle, newWristAngle);
     }
 
     // TODO determine zero offsets
@@ -183,7 +206,8 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    private void setDesiredState(ArmState state) {
+    private void setDesiredGlobalState(ArmState state) {
+        // Global state has all of the angles in global coordinates (0 is the horizon)
         setDesiredPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
@@ -197,10 +221,6 @@ public class ArmSubsystem extends SubsystemBase {
         return armAngle.unaryMinus();
     }
 
-    public void setState(ArmState state) {
-        mState = state;
-        setDesiredState(mState);
-    }
 
     public Rotation2d getRef() {
         return mPivotMotor.getCurrentReference();
