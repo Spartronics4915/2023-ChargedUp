@@ -14,6 +14,7 @@ import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
@@ -34,7 +35,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private double mLastSpeedOutput;
     private AngleWithEarthProvider mAngleProvider;
     private double kP, kFF;
+    private final TrapezoidProfile.Constraints motionConstraints;
+
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
+
+        motionConstraints = new TrapezoidProfile.Constraints(Math.PI *20/180, Math.PI *20/180*3);
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
         mMotor.setIdleMode(IdleMode.kBrake);
@@ -152,6 +157,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     }
 
+    public Rotation2d getVelocity() {
+        return Rotation2d.fromRadians(mAbsEncoder.getVelocity());
+    }
+
     @Override
     public void periodic() {
 
@@ -165,13 +174,22 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
                 angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
             }
 
-
+            double currVelocity = mAbsEncoder.getVelocity();
             double currPosNative = getNativePosition().getRadians();
+
+            var currState = new TrapezoidProfile.State(currPosNative, currVelocity);
+            var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
+            TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
+            double ticLength = 1./50; // Robot runs at 50Hz
+            var state = currMotionProfile.calculate(ticLength);
+
+            double pidReferenceRadians = state.position;
+
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 
             double ffComponent = -kFF * Math.cos(angleWithEarth);
-            double err = kP*(mReferenceRadians - currPosNative);
+            double err = kP*(pidReferenceRadians - currPosNative);
 
             double total_output = ffComponent + err;
 
