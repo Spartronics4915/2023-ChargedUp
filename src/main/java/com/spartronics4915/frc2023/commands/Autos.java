@@ -6,9 +6,12 @@ package com.spartronics4915.frc2023.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.sound.midi.Sequence;
 
+import com.fasterxml.jackson.databind.introspect.AccessorNamingStrategy.Provider;
 import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
@@ -108,23 +111,23 @@ public final class Autos {
 	}
 
 	public class Strategy {
-		private final SequentialCommandGroup mCommands;
+		private final Function<Pose2d, CommandBase> mGetCommand;
 		private final String mName;
 
-		public Strategy(String name, CommandBase... commands) {
+		public Strategy(String name, Function<Pose2d, CommandBase> getCommand) {
 			mName = name;
-			mCommands = new SequentialCommandGroup(
-				mSwerveCommands.new ResetCommand()
-			);
-			mCommands.addCommands(commands);
+			mGetCommand = getCommand;
 		}
 
 		public String getName() {
 			return mName;
 		}
 
-		public CommandBase getCommand() {
-			return mCommands;
+		public CommandBase getCommand(Pose2d initialPose) {
+			return new SequentialCommandGroup(
+				mSwerveCommands.new ResetCommand(initialPose),
+				mGetCommand.apply(initialPose)
+			);
 		}
 	}
 }
