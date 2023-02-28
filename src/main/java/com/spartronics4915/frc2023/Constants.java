@@ -4,6 +4,7 @@
 
 package com.spartronics4915.frc2023;
 
+import java.util.HashMap;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -157,7 +158,25 @@ public final class Constants {
         public static final double kTrackWidth = Units.inchesToMeters(18.75);
         public static final double kWheelBase = Units.inchesToMeters(23.75);
         public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
-		public static final Pose2d kInitialPose = new Pose2d();
+		// public static final Pose2d kInitialPose = new Pose2d();
+
+		public static class InitialPose {
+			public String name;
+			public Pose2d pose;
+
+			public InitialPose(String name, Pose2d pose) {
+				this.name = name;
+				this.pose = pose;
+			}
+		}
+		
+		public static final InitialPose[] kInitialPoses = {
+			new InitialPose("Left", new Pose2d()),
+			new InitialPose("Center", new Pose2d()),
+			new InitialPose("Right", new Pose2d())
+		};
+
+		public static final int kDefaultInitialPoseIndex = 0;
 
         public static final double kMaxSpeed = Units.feetToMeters(14.5);
         public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s

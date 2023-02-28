@@ -74,13 +74,11 @@ public class Swerve extends SubsystemBase {
 
 		mModuleCount = mModules.length;
 
-		mIMU.setYaw(kInitialPose.getRotation().getDegrees());
-        
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
             getYaw(),
             getPositions(),
-            kInitialPose,
+            new Pose2d(),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
         );
@@ -182,6 +180,10 @@ public class Swerve extends SubsystemBase {
         return mPoseEstimator.getEstimatedPosition();
     }
 
+	public void setYaw(Rotation2d yaw) {
+		mIMU.setYaw(yaw.getDegrees());
+	}
+
     public Rotation2d getYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
     }
@@ -210,7 +212,7 @@ public class Swerve extends SubsystemBase {
         mIMU.setYaw(0);
     }
 
-    public void resetOdometry(Pose2d pose) {
+    public void setPose(Pose2d pose) {
         mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
     }
 
