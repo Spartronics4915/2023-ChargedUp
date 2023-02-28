@@ -271,6 +271,7 @@ public final class Constants {
         }
     }
 
+
     public static final class Arm {
 		public static class Auto {
 			public static final double kArmStateChangeDuration = 3; // seconds
@@ -287,6 +288,13 @@ public final class Constants {
                 this.kD = kD;
             } 
         }
+
+        public static final class ExtenderConstants{
+            public static final int kMotorID = 17;
+            public static final int kLimitSwitchZeroPort = 9; 
+            public static final int kLimitSwitch2Port = -1;
+        }
+
         public static class ClawConstants{
             public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
             public static final int klimitSwitchID = 0; //PlaceHolder Value
@@ -357,8 +365,8 @@ public final class Constants {
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(0), //0
-            new Rotation2d(0) //0
+            new Rotation2d(-20), //0
+            new Rotation2d(30) //0
         );
 
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
