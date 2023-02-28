@@ -174,7 +174,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
                 angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
             }
 
-            double currVelocity = mAbsEncoder.getVelocity();
+            double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
 
             var currState = new TrapezoidProfile.State(currPosNative, currVelocity);
