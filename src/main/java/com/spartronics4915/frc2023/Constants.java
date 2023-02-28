@@ -156,7 +156,7 @@ public final class Constants {
         public static final double kTrackWidth = kChassisConstants.trackWidth;
         public static final double kWheelBase = kChassisConstants.wheelBase;
         public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
-		public static final Pose2d kInitialPose = new Pose2d();
+		public static final Pose2d kInitialPose = new Pose2d(new Translation2d(12.5, 3.0), new Rotation2d());
 
         public static final double kMaxSpeed = Units.feetToMeters(14.5);
         public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s

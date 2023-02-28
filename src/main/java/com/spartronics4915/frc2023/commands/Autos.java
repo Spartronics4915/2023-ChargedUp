@@ -115,6 +115,29 @@ public final class Autos {
 		}
 	}
 
+	public class MoveBetweenTags extends SequentialCommandGroup {
+		public MoveBetweenTags() {
+			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
+			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
+			addCommands(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						aprilTag1,
+						aprilTag2
+					)),
+					maxVelocity, maxAccel
+				),
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						aprilTag2,
+						aprilTag1
+					)),
+					maxVelocity, maxAccel
+				)
+			);
+		}
+	}
+
 	public class Strategy {
 		private final SequentialCommandGroup mCommands;
 		private final String mName;

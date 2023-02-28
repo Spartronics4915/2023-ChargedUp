@@ -3,6 +3,7 @@ package com.spartronics4915.frc2023.commands;
 import org.photonvision.PhotonCamera;
 
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,19 +30,29 @@ public class PrintPos extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        // System.out.println("epic test print");
+        // VisionMeasurement result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
+        // if(result != null) {
+        //     System.out.println("(" + result.mPose.getX() + "," + result.mPose.getY() + ")");
+        //     SmartDashboard.putNumber("Pose2D X", result.mPose.getX());
+        //     SmartDashboard.putNumber("Pose2D Y", result.mPose.getY());
+        // }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        while(true) {
-            Pose2d result = mSwerve.mCameraWrapper.getEstimatedGlobalPose().getFirst();
-            if(result != null) {
-                SmartDashboard.putNumber("Pose2D X", result.getX());
-                SmartDashboard.putNumber("Pose2D Y", result.getY());
+        System.out.println("epic test print");
+        VisionMeasurement result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
+        if(result != null) {
+            System.out.println("(" + result.mPose.getX() + "," + result.mPose.getY() + ")");
+            SmartDashboard.putNumber("Vision X", result.mPose.getX());
+            SmartDashboard.putNumber("Vision Y", result.mPose.getY());
+            SmartDashboard.putNumber("Vision Rotation", result.mPose.getRotation().getRadians());
         }
-        }
-        
+        SmartDashboard.putNumber("Swerve X", mSwerve.getPose().getX());
+        SmartDashboard.putNumber("Swerve Y", mSwerve.getPose().getX());
+        SmartDashboard.putNumber("Swerve Rotation", mSwerve.getPose().getRotation().getRadians());
     }
 
     // Called once the command ends or is interrupted.

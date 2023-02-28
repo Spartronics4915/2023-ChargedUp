@@ -35,6 +35,7 @@
  import edu.wpi.first.wpilibj.Timer;
  import com.spartronics4915.frc2023.Constants.FieldConstants;
  import com.spartronics4915.frc2023.Constants.VisionConstants;
+ import com.spartronics4915.frc2023.Constants.Swerve;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +44,8 @@ import java.util.ArrayList;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
  import org.photonvision.PhotonPoseEstimator;
- import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.RobotPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.common.hardware.VisionLEDMode;
  
  public class PhotonCameraWrapper {
@@ -64,7 +66,7 @@ import org.photonvision.common.hardware.VisionLEDMode;
                          VisionConstants
                                  .cameraName); // Change the name of your camera here to whatever it is in the
          // PhotonVision UI.
-         photonCamera.setLED(VisionLEDMode.kOn);
+         photonCamera.setLED(VisionLEDMode.kOff);
         //  System.out.println("LED thing");
          // ... Add other cameras here
  
@@ -72,24 +74,36 @@ import org.photonvision.common.hardware.VisionLEDMode;
          var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
          camList.add(new Pair<PhotonCamera, Transform3d>(photonCamera, VisionConstants.robotToCam));
  
-         robotPoseEstimator =
-                 new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, photonCamera, VisionConstants.robotToCam);
+        robotPoseEstimator =
+                new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, photonCamera, VisionConstants.robotToCam);
+        // robotPoseEstimator.setLastPose(Swerve.kInitialPose);
+          
      }
  
+    public class VisionMeasurement {
+		public Pose2d mPose;
+		public double mTime;
+
+		public VisionMeasurement(Pose2d pose, double time) {
+			mPose = pose;
+			mTime = time;
+		}
+	};
      /**
       * @param estimatedRobotPose The current best guess at robot pose
       * @return A pair of the fused camera observations to a single Pose2d on the field, and the time
       *     of the observation. Assumes a planar field and the robot is always firmly on the ground
       */
-     public Pair<Pose2d, Double> getEstimatedGlobalPose() {
- 
-         double currentTime = Timer.getFPGATimestamp();
-         Optional<EstimatedRobotPose> result = robotPoseEstimator.update();
-         if (result.isPresent()) {
-             return new Pair<Pose2d, Double>(
-                     result.get().estimatedPose.toPose2d(), currentTime - result.get().timestampSeconds);
-         } else {
-             return new Pair<Pose2d, Double>(null, 0.0);
-         }
-     }
+    public VisionMeasurement getEstimatedGlobalPose() {
+        double currentTime = Timer.getFPGATimestamp();
+        Optional<EstimatedRobotPose> result = robotPoseEstimator.update();
+        if (result.isPresent()) {
+            return new VisionMeasurement(
+                result.get().estimatedPose.toPose2d(),
+                currentTime - result.get().timestampSeconds
+            );
+        } else {
+            return null;
+        }
+    }
  }

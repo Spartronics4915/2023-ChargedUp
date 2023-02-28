@@ -5,6 +5,7 @@ import org.photonvision.common.hardware.VisionLEDMode;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.MatBuilder;
@@ -74,6 +75,8 @@ public class Swerve extends SubsystemBase {
 		resetToAbsolute();
 
 		mModuleCount = mModules.length;
+
+        mIMU.setYaw(kInitialPose.getRotation().getDegrees());
         
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
@@ -81,7 +84,7 @@ public class Swerve extends SubsystemBase {
             getPositions(),
             kInitialPose,
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9)
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
         );
     }
 
@@ -257,43 +260,12 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-	private class VisionMeasurement {
-		public Pose2d mPose;
-		public double mTime;
-
-		public VisionMeasurement(Pose2d pose, double time) {
-			mPose = pose;
-			mTime = time;
-		}
-	};
-
-	private VisionMeasurement getVisionMeasurement() {
-        // if (!useCamera) {
-        //     return null;
-        // }
-        // var frontLatestResult = mFrontCamera.getLatestResult();
-        // if (frontLatestResult.hasTargets()) {
-        //     double imageCaptureTime = (Timer.getFPGATimestamp() * 1000) - frontLatestResult.getLatencyMillis();
-        //     var bestTarget = frontLatestResult.getBestTarget();
-        //     int bestTargetID = bestTarget.getFiducialId();
-        //     var camToTargetTransform3d = bestTarget.getBestCameraToTarget();
-        //     var camToTargetTransform2d = new Transform2d(
-        //         camToTargetTransform3d.getTranslation().toTranslation2d(),
-        //         camToTargetTransform3d.getRotation().toRotation2d()
-        //     );
-        //     Pose2d camPose = kTagPoses[bestTargetID].transformBy(camToTargetTransform2d.inverse());
-        //     SmartDashboard.putNumber("x to tag", camPose.getX());
-        //     SmartDashboard.putNumber("y to tag", camPose.getY());
-		// 	return new VisionMeasurement(camPose.transformBy(kFrontCameraToRobot), imageCaptureTime);
-		// }
-        return null;
-	}
 
     public void updatePoseEstimator() {
-		VisionMeasurement vision = getVisionMeasurement();
+		VisionMeasurement vision = mCameraWrapper.getEstimatedGlobalPose();
+        mPoseEstimator.update(getYaw(), getPositions());
 		if (vision != null)
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-        mPoseEstimator.update(getYaw(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 

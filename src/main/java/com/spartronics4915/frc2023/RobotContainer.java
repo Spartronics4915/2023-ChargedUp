@@ -9,6 +9,7 @@ import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
+import com.spartronics4915.frc2023.commands.PrintPos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
@@ -142,6 +143,8 @@ public class RobotContainer {
                         .onTrue(mSwerveCommands.new EnableSprintMode())
                         .onFalse(mSwerveCommands.new DisableSprintMode());
 
+                    mDriverController.leftTrigger(kTriggerDeadband)
+                        .onTrue(new PrintPos());
                     // mDriverController.rightBumper()
                     //     .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
