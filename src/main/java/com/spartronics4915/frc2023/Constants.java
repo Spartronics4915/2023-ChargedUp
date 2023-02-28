@@ -394,57 +394,57 @@ public final class Constants {
             new Rotation2d(Math.PI/4) //45
         );
 
-        public static final ArmPositionConstants kArmLowConstants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(-20),
-            Rotation2d.fromDegrees(0)
-        );
+        // public static final ArmPositionConstants kArmLowConstants = new ArmPositionConstants(
+        //     0,
+        //     Rotation2d.fromDegrees(-20),
+        //     Rotation2d.fromDegrees(0)
+        // );
 
-        public static final ArmPositionConstants kArmLevelConstants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(0),
-            Rotation2d.fromDegrees(0)
-        );
+        // public static final ArmPositionConstants kArmLevelConstants = new ArmPositionConstants(
+        //     0,
+        //     Rotation2d.fromDegrees(0),
+        //     Rotation2d.fromDegrees(0)
+        // );
 
-        public static final ArmPositionConstants kArmHighConstants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(20),
-            Rotation2d.fromDegrees(0)
-        );
+        // public static final ArmPositionConstants kArmHighConstants = new ArmPositionConstants(
+        //     0,
+        //     Rotation2d.fromDegrees(20),
+        //     Rotation2d.fromDegrees(0)
+        // );
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(-30),
             Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(20),
             Rotation2d.fromDegrees(0)
         );
         
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(20),
             Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
-            -1,
-            Rotation2d.fromDegrees(30),
+            0,
+            Rotation2d.fromDegrees(20),
             Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(20),
             Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kCubeLevel2Constants = new ArmPositionConstants(
-            -1,
-            Rotation2d.fromDegrees(30),
+            0,
+            Rotation2d.fromDegrees(20),
             Rotation2d.fromDegrees(0)
         );
 
