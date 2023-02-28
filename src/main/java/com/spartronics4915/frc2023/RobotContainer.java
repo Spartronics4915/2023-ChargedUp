@@ -139,6 +139,8 @@ public class RobotContainer {
 			kInitialPoses[kDefaultInitialPoseIndex].name,
 			kInitialPoses[kDefaultInitialPoseIndex].pose
 		);
+
+		SmartDashboard.putData("Initial Pose", mInitialPoseSelector);
 	}
 
 	private void configureAutoSelector() {
@@ -158,13 +160,13 @@ public class RobotContainer {
 						new ArrayList<>(List.of(
 							new PathPoint(
 								initialPose.getTranslation(),
-								new Rotation2d(0),
+								new Rotation2d(),
 								initialPose.getRotation()
 							),
 							new PathPoint(
-								initialPose.getTranslation().plus(new Translation2d(-Trajectory.kBackUpDistance, 0)),
-								new Rotation2d(0),
-								initialPose.getRotation()
+								initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)),
+								new Rotation2d(),
+								new Rotation2d()
 							)
 						))
 					),
