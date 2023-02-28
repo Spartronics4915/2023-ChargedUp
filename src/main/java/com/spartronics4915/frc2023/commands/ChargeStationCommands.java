@@ -77,7 +77,7 @@ public final class ChargeStationCommands {
 
         @Override
         public void execute() {
-            final double climb_to_grip_speed_m_s = 1.5;
+            final double climb_to_grip_speed_m_s = -2;
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP: {

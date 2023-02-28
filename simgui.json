@@ -2,6 +2,15 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Arm Tab/Orientation/ARM +30": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/Extend -3 Inches": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/Extend 3 Inches": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/HIGH": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/LEVEL": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/LOW": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/Set +0.3": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/Set -0.3": "Command",
+      "/Shuffleboard/Arm Tab/Orientation/Zero Encoder": "Command",
       "/Shuffleboard/Swerve/Chassis/Pigeon 2 [9]": "Gyro",
       "/Shuffleboard/Swerve/Orientation/Reset to Absolute": "Command",
       "/Shuffleboard/Swerve/Orientation/Rotate 45": "Command"

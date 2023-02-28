@@ -86,7 +86,7 @@ public class SwerveCommands {
 		@Override
 		public void initialize() {
 			super.initialize();
-            mSwerve.resetOdometry(new Pose2d(0, 0, new Rotation2d(0)));
+            mSwerve.setPose(new Pose2d(0, 0, new Rotation2d(0)));
 		}
     }
 
@@ -94,9 +94,11 @@ public class SwerveCommands {
      * Mainly used to initialize robot
      */
     public class ResetCommand extends InstantCommand {
-        public ResetCommand() {
+		private Pose2d mInitialPose;
+        public ResetCommand(Pose2d initialPose) {
             addRequirements(mSwerve);
-        }
+			mInitialPose = initialPose;
+		}
 		
 		@Override
 		public void initialize() {
@@ -104,6 +106,7 @@ public class SwerveCommands {
 			mSwerve.resetToAbsolute();
             mSwerve.stop();
 			mSwerve.alignModules();
+			mSwerve.setPose(mInitialPose);
 		}
     }
 

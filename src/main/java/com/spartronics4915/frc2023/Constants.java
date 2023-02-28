@@ -4,6 +4,7 @@
 
 package com.spartronics4915.frc2023;
 
+import java.util.HashMap;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -52,7 +53,7 @@ public final class Constants {
 		public static final double kThetaP = 0.01;
 		public static final double kMaxVelocity = 0.5;
 		public static final double kMaxAccel = 0.4;
-		public static final double kBackUpDistance = 1;
+		public static final double kBackUpDistance = 2;
 	}
 
     public static final class Swerve {
@@ -98,7 +99,7 @@ public final class Constants {
 			new int[]{ 13, 12, 14, 11 },
 			(int id) -> { return (AbsoluteEncoder)(new AbsoluteCANCoder(id)); },
 			(int id) -> { return (BasePigeon)(new Pigeon2(id)); },
-			9
+			2
 		);
 		public static final ChassisConstants kMk2ChassisConstants = new ChassisConstants(
 			8.33 / 1.0, 18.0 / 1.0,
@@ -111,7 +112,7 @@ public final class Constants {
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			12
 		);
-		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
+		public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
 
 
 		public static final class Drive {
@@ -157,7 +158,25 @@ public final class Constants {
         public static final double kTrackWidth = Units.inchesToMeters(18.75);
         public static final double kWheelBase = Units.inchesToMeters(23.75);
         public static final double kChassisRadius = Math.hypot(kTrackWidth / 2.0, kWheelBase / 2.0);
-		public static final Pose2d kInitialPose = new Pose2d();
+		// public static final Pose2d kInitialPose = new Pose2d();
+
+		public static class InitialPose {
+			public String name;
+			public Pose2d pose;
+
+			public InitialPose(String name, Pose2d pose) {
+				this.name = name;
+				this.pose = pose;
+			}
+		}
+		
+		public static final InitialPose[] kInitialPoses = {
+			new InitialPose("Left", new Pose2d(new Translation2d(), new Rotation2d(Math.PI))),
+			new InitialPose("Center", new Pose2d(new Translation2d(), new Rotation2d())),
+			new InitialPose("Right", new Pose2d(new Translation2d(), new Rotation2d()))
+		};
+
+		public static final int kDefaultInitialPoseIndex = 0;
 
         public static final double kMaxSpeed = Units.feetToMeters(14.5);
         public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s
@@ -271,6 +290,7 @@ public final class Constants {
         }
     }
 
+
     public static final class Arm {
 		public static class Auto {
 			public static final double kArmStateChangeDuration = 3; // seconds
@@ -287,6 +307,13 @@ public final class Constants {
                 this.kD = kD;
             } 
         }
+
+        public static final class ExtenderConstants{
+            public static final int kMotorID = 17;
+            public static final int kLimitSwitchZeroPort = 9; 
+            public static final int kLimitSwitch2Port = -1;
+        }
+
         public static class ClawConstants{
             public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
             public static final int klimitSwitchID = 0; //PlaceHolder Value
@@ -303,6 +330,7 @@ public final class Constants {
             public final double kP;
             public final double kI;
             public final double kD;
+            public final double kFF;
             public final double kSmartMotionMaxAccel;
             public final double kSmartMotionMaxVelocity;
             public final double kSmartMotionMinOutputVelocity;
@@ -311,7 +339,7 @@ public final class Constants {
             public final boolean kInvertMotor;
             public final MotorType kMotorType;
 
-            public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, 
+            public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, double FF, 
             double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, Rotation2d zeroOffset, 
             int followerMotorID, boolean motorInverted, MotorType motorType) {
                 super();
@@ -328,6 +356,7 @@ public final class Constants {
                 this.kFollowerMotorID = followerMotorID;
                 this.kInvertMotor = motorInverted;
                 this.kMotorType = motorType;
+                this.kFF = FF;
             }
         }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
@@ -336,7 +365,7 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             15,  //actual value 15
             Math.PI * 2, false,
-            2, 0, 0,
+            0.2, 0, 0, 0.04,
             Math.PI/8, 1, 0,
             Rotation2d.fromDegrees(66), 10, false,
             MotorType.kBrushless
@@ -345,26 +374,18 @@ public final class Constants {
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
             Math.PI * 2, true,
-            0.3, 0, 0,
+            0.3, 0, 0, 0.03,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
             Rotation2d.fromDegrees(136),-1, true,
             MotorType.kBrushed
         ); 
 
-        public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
-            17, 
-            0, false,
-            0, 0, 0,
-            0, 0, 0,
-            Rotation2d.fromDegrees(0), -1, false,
-            MotorType.kBrushless
-        ); 
         public static final int kPivotFollowerID = 16; //actual value: 16
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(0), //0
-            new Rotation2d(0) //0
+            new Rotation2d(-20), //0
+            new Rotation2d(30) //0
         );
 
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
@@ -373,58 +394,58 @@ public final class Constants {
             new Rotation2d(Math.PI/4) //45
         );
 
-        public static final ArmPositionConstants kArmLowConstants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(-20),
-            Rotation2d.fromDegrees(0)
-        );
+        // public static final ArmPositionConstants kArmLowConstants = new ArmPositionConstants(
+        //     0,
+        //     Rotation2d.fromDegrees(-20),
+        //     Rotation2d.fromDegrees(0)
+        // );
 
-        public static final ArmPositionConstants kArmLevelConstants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(0),
-            Rotation2d.fromDegrees(0)
-        );
+        // public static final ArmPositionConstants kArmLevelConstants = new ArmPositionConstants(
+        //     0,
+        //     Rotation2d.fromDegrees(0),
+        //     Rotation2d.fromDegrees(0)
+        // );
 
-        public static final ArmPositionConstants kArmHighConstants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(20),
-            Rotation2d.fromDegrees(0)
-        );
+        // public static final ArmPositionConstants kArmHighConstants = new ArmPositionConstants(
+        //     0,
+        //     Rotation2d.fromDegrees(20),
+        //     Rotation2d.fromDegrees(0)
+        // );
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(-35),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(20),
+            Rotation2d.fromDegrees(0)
         );
         
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
+            0,
+            Rotation2d.fromDegrees(50),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(
             0,
-            new Rotation2d(Math.PI), //180
-            new Rotation2d(Math.PI) //180
+            Rotation2d.fromDegrees(30),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final ArmPositionConstants kCubeLevel2Constants = new ArmPositionConstants(
-            -1,
-            new Rotation2d(),
-            new Rotation2d()
+            0,
+            Rotation2d.fromDegrees(50),
+            Rotation2d.fromDegrees(0)
         );
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
@@ -452,8 +473,8 @@ public final class Constants {
 
         public static final boolean kIsInverted = false;
 
-        public static final double kInSpeed = 0.3;
-        public static final double kOutSpeed = 0.3;
+        public static final double kInSpeed = 0.8;
+        public static final double kOutSpeed = -0.95;
 
         public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
     }

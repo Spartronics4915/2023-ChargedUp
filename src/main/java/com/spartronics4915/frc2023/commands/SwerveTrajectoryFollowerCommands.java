@@ -84,7 +84,7 @@ public class SwerveTrajectoryFollowerCommands {
 							mXPID, mYPID,
 							mThetaPID,
 							mSwerve::setModuleStates,
-							false
+							true
 						);
 						mControllerCommand.initialize();
 					}
@@ -133,7 +133,7 @@ public class SwerveTrajectoryFollowerCommands {
 				mXPID, mYPID,
 				mThetaPID,
 				mSwerve::setModuleStates,
-				false,
+				true,
 				mSwerve
 			);
 		}

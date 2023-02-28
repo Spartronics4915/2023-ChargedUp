@@ -14,9 +14,14 @@ import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
+
+    public interface AngleWithEarthProvider {
+        Rotation2d getAngleWithEarth();
+    }
 
     private CANSparkMax mMotor;
     private RelativeEncoder relEncoder;
@@ -28,12 +33,16 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private boolean mReferenceSet;
     private double mReferenceRadians;
     private double mLastSpeedOutput;
-    private ArmFeedforward tmp;
+    private AngleWithEarthProvider mAngleProvider;
+    private double kP, kFF;
+    private final TrapezoidProfile.Constraints motionConstraints;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
 
+        motionConstraints = new TrapezoidProfile.Constraints(Math.PI *20/180, Math.PI *20/180*3);
+
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
-        mMotor.setIdleMode(IdleMode.kCoast);
+        mMotor.setIdleMode(IdleMode.kBrake);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
@@ -51,6 +60,14 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mReferenceSet = false;
         mReferenceRadians = 0;
         mLastSpeedOutput = 0;
+        mAngleProvider = null;
+
+        kP = MotorConstants.kP;
+        kFF = MotorConstants.kFF;
+    }
+
+    public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
+        mAngleProvider = angleProvider;
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
@@ -140,18 +157,39 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     }
 
+    public Rotation2d getVelocity() {
+        return Rotation2d.fromRadians(mAbsEncoder.getVelocity());
+    }
+
     @Override
     public void periodic() {
 
-            double currPosArm = getArmPosition().getRadians();
+            double angleWithEarth;
+            
+            if(mAngleProvider==null) {
+
+              angleWithEarth = getArmPosition().getRadians();
+            }
+            else {
+                angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
+            }
+
+            double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
+
+            var currState = new TrapezoidProfile.State(currPosNative, currVelocity);
+            var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
+            TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
+            double ticLength = 1./50; // Robot runs at 50Hz
+            var state = currMotionProfile.calculate(ticLength);
+
+            double pidReferenceRadians = state.position;
+
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 
-            final double kFF = 0.04;
-            final double kP = 0.2;
-            double ffComponent = -kFF * Math.cos(currPosArm);
-            double err = kP*(mReferenceRadians - currPosNative);
+            double ffComponent = -kFF * Math.cos(angleWithEarth);
+            double err = kP*(pidReferenceRadians - currPosNative);
 
             double total_output = ffComponent + err;
 

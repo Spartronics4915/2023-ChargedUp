@@ -26,17 +26,18 @@ public class ArmCommands {
         public SetArmState(ArmState armState) {
             super(
                 () -> {
-                    mArm.setState(armState);
+                    mArm.setDesiredGlobalState(armState);
+                    
                 },
                 mArm
             );
         }
     }
     public class TransformArmState extends InstantCommand {
-        public TransformArmState(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
+        public TransformArmState(double extensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
             super(
                 () -> {
-                    mArm.transformState(exstensionDelta, armDelta, wristDelta);
+                    mArm.transformPosition(extensionDelta, armDelta, wristDelta);
                 },
                 mArm
             );
@@ -63,7 +64,7 @@ public class ArmCommands {
 	
 	public class ReleasePiece extends PieceInteractCommand {
 		public ReleasePiece(ArmState armState) {
-			super(armState, IntakeState.OFF);
+			super(armState, IntakeState.OUT);
 		}
 	}
 }
