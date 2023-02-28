@@ -189,9 +189,9 @@ public class SwerveModule {
         mDriveController.setD(Drive.kD);
         mDriveController.setFF(Drive.kFF);
         mDriveMotor.enableVoltageCompensation(kVoltageCompensation);
-        mDriveMotor.burnFlash();
-        mDriveEncoder.setPosition(0.0);
-    }
+        mDriveMotor.burnFlash();	
+		mDriveEncoder.setPosition(0.0);
+	}
     
     private void configureAngleMotor() {
         mAngleMotor.restoreFactoryDefaults();

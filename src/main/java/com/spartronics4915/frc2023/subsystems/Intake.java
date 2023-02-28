@@ -26,8 +26,8 @@ public class Intake extends SubsystemBase {
     private Intake() {
         mMotor = kMotorConstructor.apply(kIntakeMotorID);
         mMotor.setInverted(kIsInverted);
-        mMotor.setIdleMode(IdleMode.kBrake);
-
+        mMotor.setIdleMode(IdleMode.kCoast);
+        //mMotor.setSmartCurrentLimit(80);
         mState = IntakeState.OFF;
     }
 
@@ -50,7 +50,9 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         switch(mState) {
             case IN: mMotor.set(kInSpeed);
+            break;
             case OUT: mMotor.set(kOutSpeed);
+            break;
             default: mMotor.set(0);
         }
     }

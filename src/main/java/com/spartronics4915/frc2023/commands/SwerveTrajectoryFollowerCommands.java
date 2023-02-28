@@ -35,11 +35,11 @@ public class SwerveTrajectoryFollowerCommands {
 		mSwerve = Swerve.getInstance();
 		mXPID = new PIDController(kLinearP, 0, 0);
 		mYPID = new PIDController(kLinearP, 0, 0);
-		mThetaPID = new PIDController(kThetaP, 0, 0);
+		mThetaPID = new PIDController(kLinearP, 0, 0);
 		mThetaPID.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
-	class FollowDynamicTrajectory extends CommandBase {
+	public class FollowDynamicTrajectory extends CommandBase {
 		private PathPlannerTrajectory mTrajectory;
 		private PPSwerveControllerCommand mControllerCommand;
 		private Thread mTrajectoryThread;
@@ -61,6 +61,12 @@ public class SwerveTrajectoryFollowerCommands {
 			mTrajectoryThread.start();
 			addRequirements(mSwerve);
 		}
+		
+		public FollowDynamicTrajectory(
+			ArrayList<PathPoint> waypoints // meters
+		) {
+			this(waypoints, kMaxVelocity, kMaxAccel);
+		}
 
 		@Override
 		public void initialize() {
@@ -80,7 +86,7 @@ public class SwerveTrajectoryFollowerCommands {
 							mXPID, mYPID,
 							mThetaPID,
 							mSwerve::setModuleStates,
-							false
+							true
 						);
 						mControllerCommand.initialize();
 					}
@@ -112,8 +118,8 @@ public class SwerveTrajectoryFollowerCommands {
 				mControllerCommand.end(interrupted);
 		}
 	}
-
-	class FollowStaticTrajectory extends PPSwerveControllerCommand {
+	
+	public class FollowStaticTrajectory extends PPSwerveControllerCommand {
 		public FollowStaticTrajectory(
 			ArrayList<PathPoint> waypoints, // meters
 			double maxVelocity, // meters per second
@@ -129,9 +135,15 @@ public class SwerveTrajectoryFollowerCommands {
 				mXPID, mYPID,
 				mThetaPID,
 				mSwerve::setModuleStates,
-				false,
+				true,
 				mSwerve
 			);
+		}
+
+		public FollowStaticTrajectory(
+			ArrayList<PathPoint> waypoints // meters
+		) {
+			this(waypoints, kMaxVelocity, kMaxAccel);
 		}
 
 		@Override

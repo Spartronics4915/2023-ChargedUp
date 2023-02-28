@@ -30,9 +30,9 @@ public final class ChargeStationCommands {
         private Timer mCurrStateTimer;
         private String mLogString;
 
-        public AutoChargeStationClimb(Swerve swerveSubsystem) {
-            addRequirements(swerveSubsystem);
-            mSwerve = swerveSubsystem;
+        public AutoChargeStationClimb() {
+			mSwerve = Swerve.getInstance();
+            addRequirements(mSwerve);
             mLogString = "";
             mCurrState = ClimbState.CLIMB_TO_GRIP;
             mVXPID = new PIDController(
@@ -49,8 +49,8 @@ public final class ChargeStationCommands {
         /**
          * Only for testing
          */
-        public AutoChargeStationClimb(Swerve swerveSubsystem, ClimbState initialState) {
-            this(swerveSubsystem);
+        public AutoChargeStationClimb(ClimbState initialState) {
+            this();
             mCurrState = initialState;
         }
 
@@ -77,7 +77,7 @@ public final class ChargeStationCommands {
 
         @Override
         public void execute() {
-            final double climb_to_grip_speed_m_s = 1.5;
+            final double climb_to_grip_speed_m_s = -2;
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP: {

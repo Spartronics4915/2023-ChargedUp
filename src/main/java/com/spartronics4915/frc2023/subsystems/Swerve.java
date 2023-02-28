@@ -3,12 +3,14 @@ package com.spartronics4915.frc2023.subsystems;
 import org.photonvision.PhotonCamera;
 import org.photonvision.common.hardware.VisionLEDMode;
 
+import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
 import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -36,7 +38,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveModule[] mModules;
 
-    private WPI_Pigeon2 mIMU;
+    private BasePigeon mIMU;
     private Rotation2d mLastPitch;
     private Rotation2d mLastLastPitch;
 
@@ -59,7 +61,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private Swerve() {
-        mIMU = new WPI_Pigeon2(kPigeonID);
+        mIMU = kPigeonConstructor.apply(kPigeonID);
         configurePigeon(mIMU);
 
         mCameraWrapper = new PhotonCameraWrapper();
@@ -76,20 +78,25 @@ public class Swerve extends SubsystemBase {
 
 		mModuleCount = mModules.length;
 
-        mIMU.setYaw(kInitialPose.getRotation().getDegrees());
-        
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
             getYaw(),
             getPositions(),
-            kInitialPose,
+            new Pose2d(),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
         );
     }
 
-    private void configurePigeon(Pigeon2 pigeon2) {
-        pigeon2.configMountPose(kPigeonMountPoseYaw, kPigeonMountPosePitch, kPigeonMountPoseRoll);
+    private void configurePigeon(BasePigeon pigeon) {
+		if (mIMU instanceof Pigeon2) {
+			((Pigeon2)pigeon).configMountPose(
+				kPigeonMountPoseYaw,
+				kPigeonMountPosePitch,
+				kPigeonMountPoseRoll
+			);
+		}
     }
 
 	public int getModuleCount() {
@@ -170,7 +177,7 @@ public class Swerve extends SubsystemBase {
         return mIsFieldRelative;
     }
 
-    public WPI_Pigeon2 getIMU() {
+    public BasePigeon getIMU() {
         return mIMU;
     }
 
@@ -178,8 +185,16 @@ public class Swerve extends SubsystemBase {
         return mPoseEstimator.getEstimatedPosition();
     }
 
+	public void setYaw(Rotation2d yaw) {
+		mIMU.setYaw(yaw.getDegrees());
+	}
+
     public Rotation2d getYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
+    }
+
+    public Rotation2d getModYaw() {
+        return Rotation2d.fromDegrees(mIMU.getYaw() % 360);
     }
 
     public Rotation2d getPitch() {
@@ -202,7 +217,7 @@ public class Swerve extends SubsystemBase {
         mIMU.setYaw(0);
     }
 
-    public void resetOdometry(Pose2d pose) {
+    public void setPose(Pose2d pose) {
         mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
     }
 
