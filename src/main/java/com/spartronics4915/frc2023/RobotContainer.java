@@ -107,7 +107,7 @@ public class RobotContainer {
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
             mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
-            mTeleopInitCommand = mSwerveCommands.new ResetCommand(new Pose2d()); // remove before comp as pose will be unknown after auto
+            mTeleopInitCommand = mSwerveCommands.new ResetCommand(); // remove before comp as pose will be unknown after auto
         } else {
             mTeleopInitCommand = null;
             mAutos = null;
@@ -181,6 +181,11 @@ public class RobotContainer {
 				"Move Forward Dynamic (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
 					mAutos.new MoveForwardCommandDynamic().schedule();
 				})
+			),
+            mAutos.new Strategy(
+				"Move To Tag (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
+					mAutos.new MoveToTag().schedule();
+				})
 			)
 		};
 		for (Autos.Strategy strat : autoStrategies) {
@@ -203,7 +208,7 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new ToggleFieldRelative());
                 
                 mDriverController.b()
-                .onTrue(mSwerveCommands.new ResetYaw());
+                .onTrue(mSwerveCommands.new ResetCommand());
                 
                 mDriverController.y()
                 .onTrue(mSwerveCommands.new ResetOdometry());

@@ -7,19 +7,17 @@ package com.spartronics4915.frc2023.commands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import javax.sound.midi.Sequence;
+import org.photonvision.targeting.PhotonPipelineResult;
 
-import com.fasterxml.jackson.databind.introspect.AccessorNamingStrategy.Provider;
 import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -138,6 +136,30 @@ public final class Autos {
 		}
 	}
 
+	public class MoveToTag extends SequentialCommandGroup {
+		public MoveToTag() {
+			PhotonPipelineResult result = mSwerve.mCameraWrapper.photonCamera.getLatestResult();
+            if (result.hasTargets()) {
+				Transform3d target = result.getBestTarget().getBestCameraToTarget();
+				Rotation2d yaw = target.getRotation().toRotation2d();
+				System.out.println(target);
+				PathPoint start = new PathPoint(new Translation2d(), new Rotation2d());
+				PathPoint aprilTag1 = new PathPoint(new Translation2d(target.getX() - 1, target.getY()), yaw, yaw.unaryMinus());
+				addCommands(
+					mSwerveCommands.new ResetOdometry(),
+					mSwerveCommands.new ResetYaw(),
+					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+						new ArrayList<>(List.of(
+							start,
+							aprilTag1
+						)),
+						maxVelocity, maxAccel
+					)
+				);
+			}
+		}
+	}
+
 	public class Strategy {
 		private final Function<Pose2d, CommandBase> mGetCommand;
 		private final String mName;
@@ -153,7 +175,7 @@ public final class Autos {
 
 		public CommandBase getCommand(Pose2d initialPose) {
 			return new SequentialCommandGroup(
-				mSwerveCommands.new ResetCommand(initialPose),
+				mSwerveCommands.new ResetCommand(),
 				mGetCommand.apply(initialPose)
 			);
 		}

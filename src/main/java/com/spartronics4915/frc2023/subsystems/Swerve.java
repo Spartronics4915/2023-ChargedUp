@@ -5,6 +5,10 @@ import org.photonvision.common.hardware.VisionLEDMode;
 
 import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.spartronics4915.frc2023.Constants.Swerve.Module0;
+import com.spartronics4915.frc2023.Constants.Swerve.Module1;
+import com.spartronics4915.frc2023.Constants.Swerve.Module2;
+import com.spartronics4915.frc2023.Constants.Swerve.Module3;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
 import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
@@ -84,7 +88,6 @@ public class Swerve extends SubsystemBase {
             getPositions(),
             new Pose2d(),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1)
         );
     }
@@ -277,16 +280,17 @@ public class Swerve extends SubsystemBase {
 
 
     public void updatePoseEstimator() {
-		VisionMeasurement vision = mCameraWrapper.getEstimatedGlobalPose();
-        mPoseEstimator.update(getYaw(), getPositions());
-		if (vision != null)
-			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
+		// VisionMeasurement vision = mCameraWrapper.getEstimatedGlobalPose();
+        // mPoseEstimator.update(getYaw(), getPositions());
+		// if (vision != null)
+		// 	mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
+		// SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
     @Override
     public void periodic() {
         updatePoseEstimator();
+        resetToAbsolute();
         
         for (SwerveModule mod : mModules) {
             mod.putSmartDashboardValues();
