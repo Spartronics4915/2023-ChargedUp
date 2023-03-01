@@ -176,15 +176,7 @@ public class Swerve extends SubsystemBase {
         return mIMU;
     }
 
-    public Pose2d getPose() {
-        return mPoseEstimator.getEstimatedPosition();
-    }
-
-	public void setYaw(Rotation2d yaw) {
-		mIMU.setYaw(yaw.getDegrees());
-	}
-
-    public Rotation2d getYaw() {
+    public Rotation2d getIMUYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
     }
 
@@ -208,13 +200,25 @@ public class Swerve extends SubsystemBase {
         return kKinematics.toChassisSpeeds(getStates());
     }
 
-    public void resetYaw() {
-        mIMU.setYaw(0);
+    public void setPose(Pose2d pose) {
+        mPoseEstimator.resetPosition(getIMUYaw(), getPositions(), pose);
+    }
+	
+    public Pose2d getPose() {
+        return mPoseEstimator.getEstimatedPosition();
     }
 
-    public void setPose(Pose2d pose) {
-        mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
-    }
+	public Rotation2d getYaw() {
+		return getPose().getRotation();
+	}
+
+	public void setYaw(Rotation2d yaw) {
+		setPose(new Pose2d(getPose().getTranslation(), yaw));
+	}
+
+	public void resetYaw() {
+		setYaw(new Rotation2d());
+	}
 
     public void resetToAbsolute() {
         for (SwerveModule mod : mModules) {
@@ -312,6 +316,7 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
+		resetToAbsolute();
         updatePoseEstimator();
         for (SwerveModule mod : mModules) {
             mod.putSmartDashboardValues();
