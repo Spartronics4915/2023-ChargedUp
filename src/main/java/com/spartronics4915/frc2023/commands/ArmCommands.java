@@ -33,14 +33,25 @@ public class ArmCommands {
             );
         }
     }
-    public class TransformArmState extends InstantCommand {
+    public class TransformArmState extends CommandBase {
+        private double mExtensionDelta;
+        private Rotation2d mArmDelta, mWristDelta;
+
         public TransformArmState(double extensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
-            super(
-                () -> {
-                    mArm.transformPosition(extensionDelta, armDelta, wristDelta);
-                },
-                mArm
-            );
+            mExtensionDelta = extensionDelta;
+            mArmDelta = armDelta;
+            mWristDelta = wristDelta;
+        }
+
+        @Override
+        public void execute() {
+            mArm.transformPosition(mExtensionDelta, mArmDelta, mWristDelta);
+        }
+
+        @Override
+        public boolean isFinished()
+        {
+            return false;
         }
     }
 
