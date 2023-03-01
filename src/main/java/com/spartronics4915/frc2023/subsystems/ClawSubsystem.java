@@ -7,6 +7,7 @@ package com.spartronics4915.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,9 +18,9 @@ public class ClawSubsystem extends SubsystemBase {
     private CANSparkMax mClawMotor;
     private SparkMaxPIDController mClawPID;
     private DigitalInput mLimitSwitch;
-    /** Creates a new ExampleSubsystem. */
     public ClawSubsystem() {
         mClawMotor = new CANSparkMax(ClawConstants.kClawMotorID, MotorType.kBrushless);
+        mClawMotor.setIdleMode(IdleMode.kBrake);
         
         mLimitSwitch = new DigitalInput(ClawConstants.klimitSwitchID);
         mClawPID = mClawMotor.getPIDController();
