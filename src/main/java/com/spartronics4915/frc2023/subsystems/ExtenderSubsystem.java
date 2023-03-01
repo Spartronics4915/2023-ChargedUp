@@ -8,7 +8,10 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.SparkMaxRelativeEncoder.Type;
 import com.revrobotics.SparkMaxAlternateEncoder;
+// import com.spartronics4915.frc2023.Constants.Arm;
+import com.spartronics4915.frc2023.Constants.Arm.ExtenderConstants;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,6 +25,9 @@ public class ExtenderSubsystem extends SubsystemBase  {
     public SparkMaxPIDController mPIDController;
     public double targetReference;
 
+    private DigitalInput mLimitSwitchZero;
+
+
     // This is to work around a bug in the encoder class
     // The RelativeEncoder class cannot be negative. So we have to pad it out to 
     // a large value.
@@ -31,10 +37,14 @@ public class ExtenderSubsystem extends SubsystemBase  {
     private final double kPosTolerance = 0.2;
     private MotorAbsEncoderComboSubsystem mPivot;
 
-    public ExtenderSubsystem(int motorID, MotorAbsEncoderComboSubsystem pivot) {
-        kMotorID = motorID;
+    public ExtenderSubsystem(MotorAbsEncoderComboSubsystem pivot) {
+        kMotorID = ExtenderConstants.kMotorID;
         mMotor = new CANSparkMax(kMotorID, MotorType.kBrushed);
         mEncoder = mMotor.getEncoder(Type.kQuadrature, 8192);
+
+        mLimitSwitchZero = new DigitalInput(ExtenderConstants.kLimitSwitchZeroPort);
+
+
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
@@ -136,4 +146,25 @@ public class ExtenderSubsystem extends SubsystemBase  {
         return targetReference;
     }
 
+
+    //maybe do this in periodic
+    //if back limit switch is triggered, set pos to 0, 
+        //if motor is going backwards (aka applied output is negative)
+            //stop motor
+    //create function to set encoder to value
+    public void limitSwitchUpdate() {
+        if (!mLimitSwitchZero.get()) {
+            System.out.println("triggered");
+            mEncoder.setPosition(0);
+            if (mMotor.getAppliedOutput() < 0) {
+                stopMotor();
+            }
+        }
+    }
+
+    @Override
+    public void periodic() {
+        limitSwitchUpdate();
+    }
 }
+
