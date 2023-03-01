@@ -349,6 +349,7 @@ public final class Constants {
                 this.kP = P;
                 this.kI = I;
                 this.kD = D;
+                this.kFF = FF;
                 this.kSmartMotionMaxAccel = SmartMotionMaxAccel; 
                 this.kSmartMotionMaxVelocity = SmartMotionMaxVelocity;
                 this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
@@ -356,7 +357,6 @@ public final class Constants {
                 this.kFollowerMotorID = followerMotorID;
                 this.kInvertMotor = motorInverted;
                 this.kMotorType = motorType;
-                this.kFF = FF;
             }
         }
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
@@ -374,12 +374,20 @@ public final class Constants {
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
             Math.PI * 2, true,
-            0.3, 0, 0, 0.03,
+            0.3, 0, 0, 0.3,
             1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
             Rotation2d.fromDegrees(136),-1, true,
             MotorType.kBrushed
         ); 
 
+        public static final ArmMotorConstants kExtenderMotorConstants = new ArmMotorConstants(
+            17, 
+            0, false,
+            0, 0, 0, 0,
+            0, 0, 0,
+            Rotation2d.fromDegrees(0), -1, false,
+            MotorType.kBrushless
+        ); 
         public static final int kPivotFollowerID = 16; //actual value: 16
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(

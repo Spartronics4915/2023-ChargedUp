@@ -37,9 +37,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private double kP, kFF;
     private final TrapezoidProfile.Constraints motionConstraints;
     private double mModeledVelocity;
+    private ArmMotorConstants constants;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
-
+        constants = MotorConstants;
         motionConstraints = new TrapezoidProfile.Constraints(Math.PI *20/180, Math.PI *20/180*3);
         mModeledVelocity = 0;
 
@@ -47,16 +48,12 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mMotor.setIdleMode(IdleMode.kBrake);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
-        double radianOffset = MotorConstants.kZeroOffset.getRadians();
-        if (radianOffset < 0) {
-            radianOffset += Math.PI * 2;
-        }
-        mAbsEncoder.setZeroOffset(radianOffset);
-        if (MotorConstants.kInvertMotor) {
+        mAbsEncoder.setPositionConversionFactor(constants.kPositionConversionFactor);
+        
+        if (constants.kInvertMotor) {
             mMotor.setInverted(true);
         }
-        mPIDController = null; //initializePIDController(MotorConstants);
+        mPIDController = initializePIDController();
         mMotor.setSmartCurrentLimit(20);
         mActive = true;
         mReferenceSet = false;
@@ -72,12 +69,20 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mAngleProvider = angleProvider;
     }
 
-    private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
+    private SparkMaxPIDController initializePIDController() {
         SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(MotorConstants.kP);
-        PIDController.setI(MotorConstants.kI);
-        PIDController.setD(MotorConstants.kD);
-
+        PIDController.setP(constants.kP);
+        PIDController.setI(constants.kI);
+        PIDController.setD(constants.kD);
+        
+        mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        mAbsEncoder.setPositionConversionFactor(constants.kPositionConversionFactor);    
+        double radianOffset = constants.kZeroOffset.getRadians();
+        if (radianOffset < 0) {
+            radianOffset += Math.PI*2;
+        }
+        
+        mAbsEncoder.setZeroOffset(radianOffset);
         PIDController.setFeedbackDevice(mAbsEncoder);
         return PIDController;
     }
@@ -196,21 +201,19 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
             double ffComponent = -kFF * Math.cos(angleWithEarth);
             double err = kP*(pidReferenceRadians - currPosNative);
+            
+        // double total_output = ffComponent + err;
 
-            double total_output = ffComponent + err;
+        // if(total_output > 1.0) {
+        //     total_output = 1;
+        // } else if (total_output < -1.0) {
+        //     total_output = -1.0;
+        // }
 
-            if(total_output > 1.0) {
-                total_output = 1;
-            } else if (total_output < -1.0) {
-                total_output = -1.0;
-            }
-
-            if(mActive && mReferenceSet) {
-                mMotor.set(total_output);
-                mLastSpeedOutput = total_output;
-
-
-        }
+        // if(mActive && mReferenceSet) {
+        //     mMotor.set(total_output);
+        //     mLastSpeedOutput = total_output;
+        // }
     }
 
 }
