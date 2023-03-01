@@ -38,12 +38,13 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private final TrapezoidProfile.Constraints motionConstraints;
     private double mModeledVelocity;
     public double trapezoidTarget;
+    public double mModeledPosition;
     private static int instancecount =0;
     private int mycount;
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
         mycount = instancecount;
         instancecount +=1;
-        motionConstraints = new TrapezoidProfile.Constraints(Math.PI/2., Math.PI*2);
+        motionConstraints = new TrapezoidProfile.Constraints(Math.PI/6., Math.PI/6);
         mModeledVelocity = 0;
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
@@ -66,7 +67,6 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mReferenceRadians = 0;
         mLastSpeedOutput = 0;
         mAngleProvider = null;
-
         kP = MotorConstants.kP;
         kFF = MotorConstants.kFF;
     }
@@ -92,6 +92,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
      *            directly out from the arm
      */
     public void setArmReference(Rotation2d ref) {
+        mModeledPosition = getRawPosition();
         setNativeReference(armToNative(ref));
     }
 
@@ -187,7 +188,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
 
-            var currState = new TrapezoidProfile.State(currPosNative, mModeledVelocity);
+            var currState = new TrapezoidProfile.State(mModeledPosition, mModeledVelocity);
             var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
             TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
             double ticLength = 1./50; // Robot runs at 50Hz
@@ -196,8 +197,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             // Trapezoid profiling not working, so this effectively disables it.
             
             double pidReferenceRadians = mReferenceRadians;//state.position;
-            trapezoidTarget = pidReferenceRadians;
-            mModeledVelocity = currVelocity;//state.velocity;
+            trapezoidTarget = state.position;
+
+            mModeledVelocity = state.velocity;
+            // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
+            mModeledPosition = state.position;
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 

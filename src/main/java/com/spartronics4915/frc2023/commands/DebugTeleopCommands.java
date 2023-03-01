@@ -247,6 +247,7 @@ public final class DebugTeleopCommands {
             wristArmMinus30Native = wristLayout.add("Wrist Native w Arm at -30", 0).getEntry();
             wristArmPlus30Native = wristLayout.add("Wrist Native w Arm at +30", 0).getEntry();
             wristSpeed = wristLayout.add("Wrist Speed Command",0).getEntry();
+            
 
             shoulderRaw = armModule.add("Shoulder (Raw)", 0).getEntry();
             shoulderNative = armModule.add("Shoulder (Native)", 0).getEntry();
@@ -257,7 +258,7 @@ public final class DebugTeleopCommands {
             stateShoulderRotation = armModule.add("desired shoulder angle", 0).getEntry();
             pivotSpeed = armModule.add("pivot speed", 0).getEntry();
 
-            wristRef = combinedLayout.add("Wrist Reference",0).getEntry();
+            wristRef = combinedLayout.add("Wrist Reference",0).withWidget(BuiltInWidgets.kGraph).getEntry();
             shoulderRef = combinedLayout.add("Shoulder Reference", 0).getEntry();
             exOutput = combinedLayout.add("Ex Output", 0).getEntry();
         }
