@@ -153,14 +153,18 @@ public class RobotContainer {
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
-            mAutos.new Strategy("Drop, Leave, Pick-up", (Pose2d initialPose) -> new SequentialCommandGroup(
+            mAutos.new Strategy(
+                "Drop, Leave, Pick-up",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
                 mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-                mSwerveTrajectoryFollowerCommands.new FollowTrajectory(new ArrayList<>(List.of(
-                    initialPose,
-                    new Pose2d(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), initialPose.getRotation().plus(Rotation2d.fromDegrees(180)))
-                ))),
+                mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+                    new ArrayList<>(List.of(
+                        initialPose,
+                        new Pose2d(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), initialPose.getRotation().plus(Rotation2d.fromDegrees(180)))
+                    ))
+                ),
                 mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
-            )
+                )
             )
 			// mAutos.new Strategy(
 			// 	"Drop, Leave, Pick-up",
