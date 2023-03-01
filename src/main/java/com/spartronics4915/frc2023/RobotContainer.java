@@ -124,8 +124,8 @@ public class RobotContainer {
 
         }
 
-        // configureAutoSelector();
-		// configureInitialPoseSelector();
+        configureAutoSelector();
+		configureInitialPoseSelector();
         
         // Configure the button bindings
         configureButtonBindings();
