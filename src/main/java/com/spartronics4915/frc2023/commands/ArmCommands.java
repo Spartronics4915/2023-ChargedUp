@@ -51,7 +51,7 @@ public class ArmCommands {
         @Override
         public boolean isFinished()
         {
-            return true;
+            return false;
         }
     }
 

@@ -37,10 +37,13 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private double kP, kFF;
     private final TrapezoidProfile.Constraints motionConstraints;
     private double mModeledVelocity;
-
+    public double trapezoidTarget;
+    private static int instancecount =0;
+    private int mycount;
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
-
-        motionConstraints = new TrapezoidProfile.Constraints(Math.PI *20/180, Math.PI *20/180*3);
+        mycount = instancecount;
+        instancecount +=1;
+        motionConstraints = new TrapezoidProfile.Constraints(Math.PI/2., Math.PI*2);
         mModeledVelocity = 0;
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
@@ -114,6 +117,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     private void setNativeReference(Rotation2d ref) {
 
+        System.out.println("SetNativeReferenceCalled");
         mCurrentReference = ref;
         mReferenceRadians = ref.getRadians();
         mReferenceSet = true;
@@ -189,8 +193,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             double ticLength = 1./50; // Robot runs at 50Hz
             var state = currMotionProfile.calculate(ticLength);
 
-            double pidReferenceRadians = state.position;
-            mModeledVelocity = state.velocity;
+            // Trapezoid profiling not working, so this effectively disables it.
+            
+            double pidReferenceRadians = mReferenceRadians;//state.position;
+            trapezoidTarget = pidReferenceRadians;
+            mModeledVelocity = currVelocity;//state.velocity;
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 

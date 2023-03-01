@@ -277,7 +277,7 @@ public final class DebugTeleopCommands {
             wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
             wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
             wristSpeed.setDouble(module.getWrist().getMotor().getAppliedOutput());
-            wristRef.setDouble(module.getWrist().getCurrentReference().getDegrees());
+            wristRef.setDouble(Rotation2d.fromRadians(module.getWrist().trapezoidTarget).getDegrees());
             } 
 
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
