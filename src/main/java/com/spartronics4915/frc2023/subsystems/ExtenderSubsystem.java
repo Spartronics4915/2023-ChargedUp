@@ -130,8 +130,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
         return (Math.abs(getPosition() - pos) < kPosTolerance);
     }
 
-    public CommandBase extendToNInches(double N) {
-        return Commands.runEnd(()->this.startExtending(), () -> this.stopMotor()).until(() -> atPos(N));
+    public CommandBase extendToNInchesCommand(double N) {
+        return Commands.runEnd(()->this.startExtending(), () -> this.stopMotor(), this).until(() -> atPos(N));
     }
 
     public void setReference(double p) {
