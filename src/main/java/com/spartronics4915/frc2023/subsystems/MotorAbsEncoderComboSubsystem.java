@@ -36,10 +36,12 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private AngleWithEarthProvider mAngleProvider;
     private double kP, kFF;
     private final TrapezoidProfile.Constraints motionConstraints;
+    private double mModeledVelocity;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
 
         motionConstraints = new TrapezoidProfile.Constraints(Math.PI *20/180, Math.PI *20/180*3);
+        mModeledVelocity = 0;
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
         mMotor.setIdleMode(IdleMode.kBrake);
@@ -129,6 +131,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         return mCurrentReference;
     }
 
+    public Rotation2d getCurrentReferenceArm() {
+        return armToNative(mCurrentReference);
+    }
+
     public Rotation2d getArmPosition() {
         return nativeToArm(getNativePosition());
     }
@@ -177,14 +183,14 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
 
-            var currState = new TrapezoidProfile.State(currPosNative, currVelocity);
+            var currState = new TrapezoidProfile.State(currPosNative, mModeledVelocity);
             var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
             TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
             double ticLength = 1./50; // Robot runs at 50Hz
             var state = currMotionProfile.calculate(ticLength);
 
             double pidReferenceRadians = state.position;
-
+            mModeledVelocity = state.velocity;
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 

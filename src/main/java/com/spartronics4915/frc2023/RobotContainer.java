@@ -87,7 +87,7 @@ public class RobotContainer {
 	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
-    private final boolean useSwerveChassis = true;
+    private final boolean useSwerveChassis = false;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
     
@@ -124,8 +124,8 @@ public class RobotContainer {
 
         }
 
-        configureAutoSelector();
-		configureInitialPoseSelector();
+        // configureAutoSelector();
+		// configureInitialPoseSelector();
         
         // Configure the button bindings
         configureButtonBindings();
@@ -291,10 +291,10 @@ public class RobotContainer {
                     .whileTrue(mExtenderCommands.new Retract());
 
                 mOperatorController.leftBumper()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+                    .onTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
 
                 mOperatorController.rightBumper()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                    .onTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
                 
             }
 
