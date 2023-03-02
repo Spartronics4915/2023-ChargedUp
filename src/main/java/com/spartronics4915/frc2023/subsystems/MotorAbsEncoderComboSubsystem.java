@@ -17,6 +17,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Understanding native and arm coordinate systems:
+ * To reason about motions, it is most conventient to put 0 degrees at horizontal and use CCW coordinates
+ * So +30 is up and -30 is down.  But, this puts wrap-around right at horizontal.
+ * These are called "arm coordinates".
+ * To avoid having to handle wraparound everywhere, the encoder is actually set so that horizontal is at 180.
+ * This gives 180 degrees up and down and avoids having to think about handling warp-around
+ * These are "native coordinates", the coordinates of the actual encoder
+ * They should be strictly internal and all other systems should use arm coordinates.
+ */
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     public interface AngleWithEarthProvider {

@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.spartronics4915.frc2023.Constants.Arm.*;
 
+/**
+ * this is the main subsytem responsible for controlling and managing the arm
+ */
 public class ArmSubsystem extends SubsystemBase {
 
     private class WristAngleProvider implements AngleWithEarthProvider {
@@ -39,7 +42,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
     
     /**
-     * Represents the position of the arm and wrist.
+     * Represents the preset values for the arm
      */
     public enum ArmState {
         RETRACTED(kRetractedConstants),
@@ -247,6 +250,12 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // TODO make a way
+    /**
+     * this method transform the arm based on its current position
+     * @param exstensionDelta distance in inches to tranform the arm by
+     * @param armDelta  amount to rotate the arm by
+     * @param wristDelta amount to rotate the wrist by
+     */
     public void transformPosition(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
         ArmPosition current = getLocalReference();
         ArmPosition transformed = new ArmPosition(
