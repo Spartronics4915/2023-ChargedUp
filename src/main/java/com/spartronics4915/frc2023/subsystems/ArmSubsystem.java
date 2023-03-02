@@ -126,8 +126,7 @@ public class ArmSubsystem extends SubsystemBase {
         if(mWristMotor != null) {
             mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
         }
-        mPivotMotor.setActive(false);
-
+        // mPivotMotor.setActive(true);
     }
 
     public ExtenderSubsystem getExtender() {
