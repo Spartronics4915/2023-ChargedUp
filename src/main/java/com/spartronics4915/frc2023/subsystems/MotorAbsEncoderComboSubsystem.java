@@ -58,6 +58,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mModeledVelocity = 0;
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
+        mMotor.restoreFactoryDefaults();
         mMotor.setIdleMode(IdleMode.kBrake);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
@@ -79,6 +80,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mAngleProvider = null;
         kP = MotorConstants.kP;
         kFF = MotorConstants.kFF;
+        mMotor.burnFlash();
     }
 
     public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
