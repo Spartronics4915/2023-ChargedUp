@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase {
             break;
             case OUT: mMotor.set(kOutSpeed);
             break;
-            default: mMotor.set(0);
+            default: mMotor.set(0.01);
         }
     }
 }
