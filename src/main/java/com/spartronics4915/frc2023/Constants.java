@@ -116,7 +116,7 @@ public final class Constants {
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			12
 		);
-		public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
+		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
 
 
 		public static final class Drive {

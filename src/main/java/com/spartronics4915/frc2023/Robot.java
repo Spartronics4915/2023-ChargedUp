@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         mRobotContainer = new RobotContainer();
 
-        mAutonomousCommand = null;//mRobotContainer.getAutonomousCommand();
+        mAutonomousCommand = mRobotContainer.getAutonomousCommand();
         mTeleopInitCommand = mRobotContainer.getTeleopInitCommand();
         mTestingCommand = mRobotContainer.getTestingCommand();
 
