@@ -341,6 +341,7 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
             
 
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setArmReference(Rotation2d.fromDegrees(0))).withName("arm 0"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(30))).withName("Wrist +30"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(0))).withName("Wrist +0"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));

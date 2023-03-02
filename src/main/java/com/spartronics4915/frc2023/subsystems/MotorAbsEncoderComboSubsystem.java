@@ -149,7 +149,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getCurrentReferenceArm() {
-        return armToNative(mCurrentReference);
+        return nativeToArm(mCurrentReference);
     }
 
     public Rotation2d getArmPosition() {
