@@ -131,7 +131,13 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public CommandBase extendToNInches(double N) {
-        return Commands.runEnd(()->this.startExtending(), () -> this.stopMotor()).until(() -> atPos(N));
+        return Commands.runEnd(()->{
+            if(getPosition() < N){
+                startRetracting();
+            }else{
+                startExtending();
+            }
+        }, () -> this.stopMotor()).until(() -> atPos(N));
     }
 
     public void setReference(double p) {
