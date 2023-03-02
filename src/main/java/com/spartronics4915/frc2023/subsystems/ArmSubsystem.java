@@ -223,15 +223,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setDesiredGlobalState(ArmState state) {
         // Global state has all of the angles in global coordinates (0 is the horizon)
-        if (mDesiredState == ArmState.RETRACTED || state == ArmState.RETRACTED){
-            ArmState tempState = state; 
-            mDesiredState = ArmState.RETRACTED_PRIOR;
-            
-
-        }else{
-            mDesiredState = state;
-            setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
-        }
+        mDesiredState = state;
+        setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
     private Rotation2d getCorrectAngleDEPRECATE(Rotation2d armAngle) {
