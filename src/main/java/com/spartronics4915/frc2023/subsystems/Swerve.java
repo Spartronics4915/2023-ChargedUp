@@ -11,6 +11,7 @@ import com.spartronics4915.frc2023.Constants.Swerve.Module2;
 import com.spartronics4915.frc2023.Constants.Swerve.Module3;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
 import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
+import com.spartronics4915.frc2023.commands.PrintPos;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.MatBuilder;
@@ -280,11 +281,11 @@ public class Swerve extends SubsystemBase {
 
 
     public void updatePoseEstimator() {
-		// VisionMeasurement vision = mCameraWrapper.getEstimatedGlobalPose();
-        // mPoseEstimator.update(getYaw(), getPositions());
-		// if (vision != null)
-		// 	mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-		// SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
+		VisionMeasurement vision = mCameraWrapper.getEstimatedGlobalPose();
+        mPoseEstimator.update(getYaw(), getPositions());
+		if (vision != null)
+			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
+		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
     @Override

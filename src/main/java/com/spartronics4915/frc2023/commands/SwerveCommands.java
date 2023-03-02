@@ -11,6 +11,7 @@ import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeSpeedMultipl
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.spartronics4915.frc2023.Constants.Swerve.BalanceConstants;
+import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
@@ -87,7 +88,10 @@ public class SwerveCommands {
 		@Override
 		public void initialize() {
 			super.initialize();
-            mSwerve.setPose(new Pose2d(0, 0, new Rotation2d(0)));
+            VisionMeasurement result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
+            if(result != null) {
+                mSwerve.setPose(result.mPose);
+            }        
         }
     }
 

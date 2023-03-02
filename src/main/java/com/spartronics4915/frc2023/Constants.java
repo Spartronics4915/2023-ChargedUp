@@ -116,7 +116,7 @@ public final class Constants {
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			12
 		);
-		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
+		public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
 
 
 		public static final class Drive {
@@ -177,7 +177,7 @@ public final class Constants {
 		public static final InitialPose[] kInitialPoses = {
 			new InitialPose("Left", new Pose2d(new Translation2d(), new Rotation2d(Math.PI))),
 			new InitialPose("Center", new Pose2d(new Translation2d(), new Rotation2d())),
-			new InitialPose("Right", new Pose2d(new Translation2d(), new Rotation2d()))
+			new InitialPose("Right", new Pose2d(new Translation2d(11.88, 1.09), new Rotation2d()))
 		};
 
 		public static final int kDefaultInitialPoseIndex = 0;

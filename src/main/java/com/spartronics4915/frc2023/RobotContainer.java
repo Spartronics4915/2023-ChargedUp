@@ -141,7 +141,6 @@ public class RobotContainer {
 			kInitialPoses[kDefaultInitialPoseIndex].name,
 			kInitialPoses[kDefaultInitialPoseIndex].pose
 		);
-
 		SmartDashboard.putData("Initial Pose", mInitialPoseSelector);
 	}
 
@@ -154,15 +153,14 @@ public class RobotContainer {
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
-            mAutos.new Strategy("Drop, Leave, Pick-up", (Pose2d initialPose) -> new SequentialCommandGroup(
-                mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-                mSwerveTrajectoryFollowerCommands.new FollowTrajectory(new ArrayList<>(List.of(
-                    initialPose,
-                    new Pose2d(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), initialPose.getRotation().plus(Rotation2d.fromDegrees(180)))
-                ))),
-                mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
-            )
-            )
+            // mAutos.new Strategy("Drop, Leave, Pick-up", (Pose2d initialPose) -> new SequentialCommandGroup(
+            //     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+            //     mSwerveTrajectoryFollowerCommands.new FollowTrajectory(new ArrayList<>(List.of(
+            //         initialPose,
+            //         new Pose2d(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), initialPose.getRotation().plus(Rotation2d.fromDegrees(180)))
+            //     ))),
+            //     mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
+            // )
 			// mAutos.new Strategy(
 			// 	"Drop, Leave, Pick-up",
 			// 	(Pose2d initialPose) -> new SequentialCommandGroup(
@@ -184,7 +182,7 @@ public class RobotContainer {
 			// 		mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
 			// 	)
 
-			),
+			// ),
 			mAutos.new Strategy(
 				"Move Forward Static (Test)",
 				(Pose2d initialPose) -> mAutos.new MoveForwardCommandFancy()
@@ -193,12 +191,12 @@ public class RobotContainer {
 				"Move Forward Dynamic (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
 					mAutos.new MoveForwardCommandDynamic().schedule();
 				})
-			),
-            mAutos.new Strategy(
-				"Move To Tag (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
-					mAutos.new MoveToTag().schedule();
-				})
 			)
+            // mAutos.new Strategy(
+			// 	"Move To Tag (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
+			// 		mAutos.new MoveToTag().schedule();
+			// 	})
+			// )
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat::getCommand);
@@ -228,6 +226,9 @@ public class RobotContainer {
                 mDriverController.rightTrigger(kTriggerDeadband)
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
+
+                mDriverController.leftTrigger(kTriggerDeadband)
+                .onTrue((new PrintPos()));
                 
                 mDriverController.rightBumper()
                 .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());

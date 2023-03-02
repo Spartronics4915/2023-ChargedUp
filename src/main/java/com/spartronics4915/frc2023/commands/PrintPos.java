@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class PrintPos extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     private final Swerve mSwerve;
-    private PhotonCameraWrapper cameraWrapper;
+    VisionMeasurement result;
     // private PhotonCamera mPhotonCamera;
     /**
      * Creates a new ExampleCommand.
@@ -37,13 +37,17 @@ public class PrintPos extends CommandBase {
         //     SmartDashboard.putNumber("Pose2D X", result.mPose.getX());
         //     SmartDashboard.putNumber("Pose2D Y", result.mPose.getY());
         // }
+        result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
+        if(result != null) {
+            mSwerve.setPose(result.mPose);
+        }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         System.out.println("epic test print");
-        VisionMeasurement result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
+        result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
         if(result != null) {
             System.out.println("(" + result.mPose.getX() + "," + result.mPose.getY() + ")");
             SmartDashboard.putNumber("Vision X", result.mPose.getX());
@@ -51,7 +55,7 @@ public class PrintPos extends CommandBase {
             SmartDashboard.putNumber("Vision Rotation", result.mPose.getRotation().getRadians());
         }
         SmartDashboard.putNumber("Swerve X", mSwerve.getPose().getX());
-        SmartDashboard.putNumber("Swerve Y", mSwerve.getPose().getX());
+        SmartDashboard.putNumber("Swerve Y", mSwerve.getPose().getY());
         SmartDashboard.putNumber("Swerve Rotation", mSwerve.getPose().getRotation().getRadians());
     }
 
