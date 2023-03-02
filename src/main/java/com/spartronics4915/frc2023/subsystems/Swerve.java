@@ -31,7 +31,7 @@ import java.util.Arrays;
 
 public class Swerve extends SubsystemBase {
     // private SwerveDriveOdometry mOdometry;
-    private SwerveDrivePoseEstimator mPoseEstimator;
+    private final SwerveDrivePoseEstimator mPoseEstimator;
 
     private SwerveModule[] mModules;
 
@@ -80,7 +80,7 @@ public class Swerve extends SubsystemBase {
 
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
-            getYaw(),
+            getIMUYaw(),
             getPositions(),
             new Pose2d(),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
