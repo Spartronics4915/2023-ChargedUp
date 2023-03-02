@@ -126,6 +126,9 @@ public class SwerveCommands {
         }
     }
 
+    /**
+     * The default teleop driving command for the swerve.
+     */
     public class TeleopCommand extends CommandBase {
         public TeleopCommand() {
             addRequirements(mSwerve);
@@ -173,6 +176,9 @@ public class SwerveCommands {
         }
     }
 
+    /**
+     * Balance on the charge station.
+     */
     public class Balance extends CommandBase {
         private final PIDController mXVelocityPIDController;
         private final PIDController mRotationPIDController;

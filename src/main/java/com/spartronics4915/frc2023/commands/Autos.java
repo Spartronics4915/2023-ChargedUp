@@ -59,8 +59,8 @@ public final class Autos {
 			addCommands(
 				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 					new ArrayList<>(List.of(
-						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
-						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+						new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
+						new PathPoint(new Translation2d(3, 0), new Rotation2d(Math.PI / 2.))
 					))
 				),
 				new InstantCommand(() -> {
@@ -69,46 +69,61 @@ public final class Autos {
 				})
 			);
 		}
+		// public MoveForwardCommandFancy() {
+		// 	addRequirements(mSwerve);
+		// 	addCommands(
+		// 		mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+		// 			new ArrayList<>(List.of(
+		// 				new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+		// 				new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+		// 			))
+		// 		),
+		// 		new InstantCommand(() -> {
+		// 			mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+		// 			for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+		// 		})
+		// 	);
+		// }
 	}
 	
-	public class MoveForwardCommandDynamic extends SequentialCommandGroup {
-		public MoveForwardCommandDynamic() {
-			addRequirements(mSwerve);
-			addCommands(
-				mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
-					new ArrayList<>(List.of(
-						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
-						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
-					))
-				),
-				new InstantCommand(() -> {
-					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
-					for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
-				})
-			);
-		}
-	}
+	// public class MoveForwardCommandDynamic extends SequentialCommandGroup {
+	// 	public MoveForwardCommandDynamic() {
+	// 		addRequirements(mSwerve);
+	// 		addCommands(
+	// 			mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
+	// 				new ArrayList<>(List.of(
+	// 					new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+	// 					new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+	// 				))
+	// 			),
+	// 			new InstantCommand(() -> {
+	// 				mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+	// 				for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+	// 			})
+	// 		);
+	// 	}
+	// }
 
-	public class MoveBackAndForthFancy extends SequentialCommandGroup {
-		public MoveBackAndForthFancy() {
-			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
-			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
-			addCommands(
-				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-					new ArrayList<>(List.of(
-						aprilTag1,
-						aprilTag2
-					))
-				),
-				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-					new ArrayList<>(List.of(
-						aprilTag2,
-						aprilTag1
-					))
-				)
-			);
-		}
-	}
+	// public class MoveBackAndForthFancy extends SequentialCommandGroup {
+	// 	public MoveBackAndForthFancy() {
+	// 		PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
+	// 		PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
+	// 		addCommands(
+	// 			mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+	// 				new ArrayList<>(List.of(
+	// 					aprilTag1,
+	// 					aprilTag2
+	// 				))
+	// 			),
+	// 			mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+	// 				new ArrayList<>(List.of(
+	// 					aprilTag2,
+	// 					aprilTag1
+	// 				))
+	// 			)
+	// 		);
+	// 	}
+	// }
 
 	public class Strategy {
 		private final Function<Pose2d, CommandBase> mGetCommand;
