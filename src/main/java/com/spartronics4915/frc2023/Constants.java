@@ -420,7 +420,7 @@ public final class Constants {
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(20),
+            Rotation2d.fromDegrees(0),
             Rotation2d.fromDegrees(0)
         );
         
