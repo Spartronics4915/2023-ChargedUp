@@ -40,6 +40,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     public ExtenderSubsystem(MotorAbsEncoderComboSubsystem pivot) {
         kMotorID = ExtenderConstants.kMotorID;
         mMotor = new CANSparkMax(kMotorID, MotorType.kBrushed);
+        mMotor.restoreFactoryDefaults();
         mEncoder = mMotor.getEncoder(Type.kQuadrature, 8192);
 
         mLimitSwitchZero = new DigitalInput(ExtenderConstants.kLimitSwitchZeroPort);
@@ -59,6 +60,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mEncoder.setPosition(kPositionPad);
         mPivot = pivot;
         targetReference = 0;
+
+        mMotor.burnFlash();
     }
 
     public void setZero() {
@@ -130,8 +133,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
         return (Math.abs(getPosition() - pos) < kPosTolerance);
     }
 
-    public CommandBase extendToNInches(double N) {
-        return Commands.runEnd(()->this.startExtending(), () -> this.stopMotor()).until(() -> atPos(N));
+    public CommandBase extendToNInchesCommand(double N) {
+        return Commands.runEnd(()->this.startExtending(), () -> this.stopMotor(), this).until(() -> atPos(N));
     }
 
     public void setReference(double p) {

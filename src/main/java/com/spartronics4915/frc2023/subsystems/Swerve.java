@@ -39,7 +39,7 @@ import java.util.Arrays;
 
 public class Swerve extends SubsystemBase {
     // private SwerveDriveOdometry mOdometry;
-    private SwerveDrivePoseEstimator mPoseEstimator;
+    private final SwerveDrivePoseEstimator mPoseEstimator;
 
     private SwerveModule[] mModules;
 
@@ -58,6 +58,10 @@ public class Swerve extends SubsystemBase {
 
     private static Swerve mInstance = null;
 
+    /**
+     * Gets the current instance of the Swerve subsystem.
+     * @return The current instance.
+     */
     public static Swerve getInstance() {
         if (mInstance == null) {
             mInstance = new Swerve();
@@ -85,7 +89,7 @@ public class Swerve extends SubsystemBase {
 
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
-            getYaw(),
+            getIMUYaw(),
             getPositions(),
             new Pose2d(),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
@@ -103,15 +107,19 @@ public class Swerve extends SubsystemBase {
 		}
     }
 
+    /**
+     * Gets the module count.
+     * @return The module count.
+     */
 	public int getModuleCount() {
 		return mModuleCount;
 	}
 
     /**
      * This overload should only be used for controller input.
-     * @param translation
-     * @param rotation
-     * @param isOpenLoop
+     * @param translation The left stick x and y.
+     * @param rotation The right stick x.
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
@@ -121,14 +129,20 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Uses subsystem's current field relative setting
-     * @param chassisSpeeds
-     * @param isOpenLoop
+     * Drive the robot using a {@link ChassisSpeeds} based on the drivetrain's current field-oriented setting
+     * @param chassisSpeeds The {@link ChassisSpeeds} to use.
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void drive(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
         drive(chassisSpeeds, mIsFieldRelative, isOpenLoop);
     }
 
+    /**
+     * Drive the robot using a {@link ChassisSpeeds}
+     * @param chassisSpeeds The {@link ChassisSpeeds} to use.
+     * @param fieldRelative Whether to drive in field-relative mode or not.
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
+     */
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative, boolean isOpenLoop) {
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getYaw());
@@ -139,6 +153,11 @@ public class Swerve extends SubsystemBase {
         setModuleStates(moduleStates, isOpenLoop);
     }
 
+    /**
+     * Set the module states. 
+     * @param desiredStates The desired module states.
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
+     */
     public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kMaxSpeed);
 
@@ -147,6 +166,10 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    /**
+     * Set the module states.
+     * @param desiredStates The desired module states.
+     */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         setModuleStates(desiredStates, true);
     }
@@ -158,6 +181,11 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    /**
+     * Force the modules to a specific orientation.
+     * @param orientation The orientation to force the modules to. 
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
+     */
     public void forceModuleOrientations(Rotation2d orientation, boolean isOpenLoop) {
         // Forces all of the modules to one orientation
         // Mainly for testing - be careful if you use it
@@ -185,20 +213,8 @@ public class Swerve extends SubsystemBase {
         return mIMU;
     }
 
-    public Pose2d getPose() {
-        return mPoseEstimator.getEstimatedPosition();
-    }
-
-	public void setYaw(Rotation2d yaw) {
-		mIMU.setYaw(yaw.getDegrees());
-	}
-
-    public Rotation2d getYaw() {
+    public Rotation2d getIMUYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
-    }
-
-    public Rotation2d getModYaw() {
-        return Rotation2d.fromDegrees(mIMU.getYaw() % 360);
     }
 
     public Rotation2d getPitch() {
@@ -209,22 +225,52 @@ public class Swerve extends SubsystemBase {
         return Rotation2d.fromDegrees(mIMU.getRoll());
     }
 
+    /**
+     * Gets the rate of change of the pitch.
+     * @return The rate of change of the pitch in rad/s.
+     */
     public double getPitchOmega() {
         return (mLastPitch.minus(mLastLastPitch)).getRadians() / 0.02;
     }
 
+    /**
+     * Gets the robot's current chassis speeds.
+     * @return The robot's speeds.
+     */
     public ChassisSpeeds getChassisSpeeds() {
         return kKinematics.toChassisSpeeds(getStates());
     }
 
-    public void resetYaw() {
-        mIMU.setYaw(0);
-    }
-
+    /**
+     * Resets the pose estimator to the specified pose. 
+     * @param pose The pose to reset the pose estimator to.
+     */
     public void setPose(Pose2d pose) {
-        mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
+        mPoseEstimator.resetPosition(getIMUYaw(), getPositions(), pose);
     }
 
+    public Pose2d getPose() {
+        return mPoseEstimator.getEstimatedPosition();
+    }
+
+	public Rotation2d getYaw() {
+		return getPose().getRotation();
+	}
+
+	public void setYaw(Rotation2d yaw) {
+		setPose(new Pose2d(getPose().getTranslation(), yaw));
+	}
+
+	/**
+	 * Resets odometry pose to yaw = 0
+	 */
+	public void resetYaw() {
+		setYaw(new Rotation2d());
+	}
+
+    /**
+     * Resets the modules' internal steering encoders to equal the absolute encoders.
+     */
     public void resetToAbsolute() {
         for (SwerveModule mod : mModules) {
             mod.resetToAbsolute();
@@ -255,6 +301,9 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
+    /**
+     * Aligns the modules to the orientation 0.
+     */
 	public void alignModules() {
 		forceModuleOrientations(Rotation2d.fromRadians(0), true);
 	}
@@ -290,6 +339,7 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
+		resetToAbsolute();
         updatePoseEstimator();
         resetToAbsolute();
         

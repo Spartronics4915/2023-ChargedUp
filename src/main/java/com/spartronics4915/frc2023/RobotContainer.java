@@ -191,10 +191,52 @@ public class RobotContainer {
 				"Move Forward Dynamic (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
 					mAutos.new MoveForwardCommandDynamic().schedule();
 				})
-			)
+			),
             // mAutos.new Strategy(
 			// 	"Move To Tag (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
 			// 		mAutos.new MoveToTag().schedule();
+            mAutos.new Strategy(
+                "Drop, Leave, Pick-up",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+					mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+						new ArrayList<>(List.of(
+							new PathPoint(initialPose.getTranslation(), new Rotation2d(), initialPose.getRotation()),
+							new PathPoint(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), new Rotation2d(), new Rotation2d())
+						))
+					),
+					mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
+                )
+            ),
+			mAutos.new Strategy(
+				"Drop, Leave, Pick-up",
+				(Pose2d initialPose) -> new SequentialCommandGroup(
+					mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+						new ArrayList<>(List.of(
+							new PathPoint(
+								initialPose.getTranslation(),
+								new Rotation2d(),
+								initialPose.getRotation()
+							),
+							new PathPoint(
+								initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)),
+								new Rotation2d(),
+								new Rotation2d()
+							)
+						))
+					),
+					mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
+				)
+
+			)//,
+			// mAutos.new Strategy(
+			// 	"Move Forward Static (Test)",
+			// 	(Pose2d initialPose) -> mAutos.new MoveForwardCommandFancy()
+			// ),
+			// mAutos.new Strategy(
+			// 	"Move Forward Dynamic (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
+			// 		mAutos.new MoveForwardCommandDynamic().schedule();
 			// 	})
 			// )
 		};

@@ -121,6 +121,7 @@ public class ArmSubsystem extends SubsystemBase {
         if(mWristMotor != null) {
             mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
         }
+        mPivotMotor.setActive(false);
 
     }
 
@@ -167,6 +168,15 @@ public class ArmSubsystem extends SubsystemBase {
         );
     }
 
+    public ArmPosition  getLocalReference() {
+        Rotation2d pivotReference = mPivotMotor.getCurrentReferenceArm();
+        Rotation2d wristReference = mWristMotor.getCurrentReferenceArm();
+        double extenderReference = mExtenderSubsystem.getReference();
+
+        return new ArmPosition(extenderReference, pivotReference, wristReference);
+
+    }
+
     public ArmState getDesiredGlobalState() {
         // Global state has all of the angles in global coordinates (0 is the horizon)
         return mDesiredState; // This will get the desired state
@@ -197,7 +207,7 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO determine zero offsets
     // TODO add extender motor
     private void setDesiredLocalPosition(ArmPosition state) {
-        mExtenderSubsystem.extendToNInches(state.armRadius);
+        mExtenderSubsystem.extendToNInchesCommand(state.armRadius).schedule();
         mPivotMotor.setArmReference(state.armTheta);
         mWristMotor.setArmReference(state.wristTheta);
     }
@@ -229,12 +239,14 @@ public class ArmSubsystem extends SubsystemBase {
 
     // TODO make a way
     public void transformPosition(double exstensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
-        ArmPosition current = getLocalPosition();
+        ArmPosition current = getLocalReference();
         ArmPosition transformed = new ArmPosition(
             current.armRadius + exstensionDelta, 
             current.armTheta.plus(armDelta),
             current.wristTheta.plus(wristDelta));
         setDesiredLocalPosition(transformed);
+        System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.armTheta.getDegrees() + " " + wristDelta);
+
     }
     
     // public void transformState(Rotation2d armDelta, Rotation2d wristDelta) {

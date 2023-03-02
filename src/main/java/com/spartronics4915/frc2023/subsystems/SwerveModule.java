@@ -65,6 +65,14 @@ public class SwerveModule {
 
     private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Drive.kS, Drive.kV, Drive.kA);
 
+    /**
+     * Constructs a SwerveModule from a module number and a set of constants.
+     * @param moduleNumber
+     * @param driveMotorID
+     * @param angleMotorID
+     * @param encoderID
+     * @param absoluteOffsetRadians
+     */
     public SwerveModule(int moduleNumber, int driveMotorID, int angleMotorID, int encoderID, double absoluteOffsetRadians) {
         mModuleNumber = moduleNumber;
 
@@ -90,10 +98,21 @@ public class SwerveModule {
         mLastAngle = getState().angle.getRadians();
     }
 
+    /**
+     * Constructs a SwerveModule from a module number and a set of constants.
+     * @param moduleNumber Which module the constants relate to
+     * @param constants The relevant constants
+     */
     public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
         this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.absoluteOffset);
     }
 
+    /**
+     * Forces all of the modules to a desired orientation. Will not change the speed.
+     * Mainly for testing, be careful if you use this.
+     * @param newAngle The new desired angle of the module
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
+     */
     public void forceModuleOrientation(Rotation2d newAngle, boolean isOpenLoop){
         // Forces all of the modules to a desired orientation.  Will not change the speed
         // Mainly for testing, be careful if you use this.
@@ -104,6 +123,12 @@ public class SwerveModule {
         this.setDesiredState(newState, isOpenLoop, true);
     }
 
+    /**
+     * Sets the desired state of this module.
+     * @param desiredState The new desired state of the module
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
+     * @param suppressTurningAtLowSpeed Whether to suppress turning when the speed is low. 
+     */
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningAtLowSpeed) {
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         mDesiredState = desiredState;
@@ -139,6 +164,9 @@ public class SwerveModule {
         return mDesiredState;
     }
 
+    /**
+     * Puts encoder values on the SmartDashboard.
+     */
     public void putSmartDashboardValues() {
         // SmartDashboard.putNumber("mod " + mModuleNumber + " encoder", mSteeringEncoder.getDistance());
         
@@ -153,10 +181,17 @@ public class SwerveModule {
         // SmartDashboard.putNumber("mod " + mModuleNumber + " desired angle", mDesiredState.angle.getRadians());
     }
 
+    /**
+     * Resets this module's internal steering encoder to the same value as the absolute encoder. 
+     */
     public void resetToAbsolute() {
 		mIntegratedAngleEncoder.setPosition(getShiftedAbsoluteEncoderRotation().getRadians());
     }
 
+    /**
+     * Gets the absolute encoder's value.
+     * @return The encoder's value in degrees.
+     */
     public double getAbsoluteEncoderValue() {
         return mAngleEncoder.getAbsolutePosition();
     }
@@ -165,10 +200,18 @@ public class SwerveModule {
         return Rotation2d.fromDegrees(getAbsoluteEncoderValue());
     }
 
+    /**
+     * Gets the absolute encoder's value, taking into account the offset.
+     * @return The encoder's value.
+     */
     public Rotation2d getShiftedAbsoluteEncoderRotation() {
         return getAbsoluteEncoderRotation().minus(mAbsoluteOffset);
     }
 
+    /**
+     * Gets the integrated steering encoder's value.
+     * @return The encoder's value (in radians).
+     */
     public double getRelativeEncoderValue() {
         return mIntegratedAngleEncoder.getPosition();
     }
@@ -177,6 +220,9 @@ public class SwerveModule {
         return Rotation2d.fromRadians(getRelativeEncoderValue());
     }
 
+    /**
+     * Configures the drive motor.
+     */
     private void configureDriveMotor() {
         mDriveMotor.restoreFactoryDefaults();
         mDriveMotor.setSmartCurrentLimit(Drive.kContinuousCurrentLimit);
@@ -193,6 +239,9 @@ public class SwerveModule {
 		mDriveEncoder.setPosition(0.0);
 	}
     
+    /**
+     * Configures the angle motor.
+     */
     private void configureAngleMotor() {
         mAngleMotor.restoreFactoryDefaults();
         mAngleMotor.setSmartCurrentLimit(Angle.kContinuousCurrentLimit);
@@ -220,9 +269,5 @@ public class SwerveModule {
         double drivePosition = mDriveEncoder.getPosition();
         Rotation2d angle = getState().angle;
         return new SwerveModulePosition(drivePosition, angle);
-    }
-
-    public void zeroPIDP() {
-        mAngleController.setP(0);
     }
 }
