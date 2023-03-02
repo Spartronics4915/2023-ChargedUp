@@ -127,7 +127,7 @@ public final class ChargeStationCommands {
 
                 case LEVEL_ROBOT: {
                     double vx = mVXPID.calculate(mSwerve.getPitch().getRadians());
-                    double omega = mThetaPID.calculate(mSwerve.getYaw().getRadians());
+                    double omega = mThetaPID.calculate(mSwerve.getEstimatedYaw().getRadians());
 
                     ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
 

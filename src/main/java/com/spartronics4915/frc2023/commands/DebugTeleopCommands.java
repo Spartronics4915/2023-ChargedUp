@@ -94,7 +94,7 @@ public final class DebugTeleopCommands {
         }
 
         public void update(Swerve swerveSubsystem) {
-            yawEntry.setDouble(swerveSubsystem.getYaw().getDegrees());
+            yawEntry.setDouble(swerveSubsystem.getEstimatedYaw().getDegrees());
         }
     }
 

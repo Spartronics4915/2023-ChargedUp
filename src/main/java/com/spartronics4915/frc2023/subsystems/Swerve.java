@@ -80,7 +80,7 @@ public class Swerve extends SubsystemBase {
 
 		mPoseEstimator = new SwerveDrivePoseEstimator(
             kKinematics,
-            getIMUYaw(),
+            getYaw(),
             getPositions(),
             new Pose2d(),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
@@ -204,7 +204,7 @@ public class Swerve extends SubsystemBase {
         return mIMU;
     }
 
-    public Rotation2d getIMUYaw() {
+    public Rotation2d getYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
     }
 
@@ -237,14 +237,14 @@ public class Swerve extends SubsystemBase {
      * @param pose The pose to reset the pose estimator to.
      */
     public void setPose(Pose2d pose) {
-        mPoseEstimator.resetPosition(getIMUYaw(), getPositions(), pose);
+        mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
     }
 
     public Pose2d getPose() {
         return mPoseEstimator.getEstimatedPosition();
     }
 
-	public Rotation2d getYaw() {
+	public Rotation2d getEstimatedYaw() {
 		return getPose().getRotation();
 	}
 
@@ -348,13 +348,12 @@ public class Swerve extends SubsystemBase {
 		VisionMeasurement vision = getVisionMeasurement();
 		if (vision != null)
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-        mPoseEstimator.update(getYaw(), getPositions());
+        mPoseEstimator.update(getEstimatedYaw(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
     @Override
     public void periodic() {
-		resetToAbsolute();
         updatePoseEstimator();
         for (SwerveModule mod : mModules) {
             mod.putSmartDashboardValues();
