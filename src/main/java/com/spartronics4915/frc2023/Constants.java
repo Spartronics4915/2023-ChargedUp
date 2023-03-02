@@ -384,14 +384,14 @@ public final class Constants {
         
         public static final ArmPositionConstants kRetractedConstants = new ArmPositionConstants(
             0,
-            new Rotation2d(-20), //0
-            new Rotation2d(30) //0
+            Rotation2d.fromDegrees(-20), //0
+            Rotation2d.fromDegrees(30) //0
         );
 
         public static final ArmPositionConstants kPriorRetracted = new ArmPositionConstants(
             0,
-            new Rotation2d(0), //0
-            new Rotation2d(20) //0
+            Rotation2d.fromDegrees(0), //0
+            Rotation2d.fromDegrees(20) //0
         );
 
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
@@ -431,29 +431,29 @@ public final class Constants {
         );
         
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(30),
-            Rotation2d.fromDegrees(0)
+            8,
+            Rotation2d.fromDegrees(12),
+            Rotation2d.fromDegrees(-5)
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(50),
-            Rotation2d.fromDegrees(0)
+            14,
+            Rotation2d.fromDegrees(18),
+            Rotation2d.fromDegrees(38)
         );
 
         public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(30),
-            Rotation2d.fromDegrees(0)
+            1.25,
+            Rotation2d.fromDegrees(11),
+            Rotation2d.fromDegrees(-16)
         );
 
         public static final ArmPositionConstants kCubeLevel2Constants = new ArmPositionConstants(
-            0,
-            Rotation2d.fromDegrees(50),
-            Rotation2d.fromDegrees(0)
+            11,
+            Rotation2d.fromDegrees(23),
+            Rotation2d.fromDegrees(-36)
         );
-
+        
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
         public static final double kArmRetractedPriorWaitDuration = 1; // seconds
 
