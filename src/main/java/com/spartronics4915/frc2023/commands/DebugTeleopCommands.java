@@ -72,9 +72,9 @@ public final class DebugTeleopCommands {
             ShuffleboardLayout chassisLayout = tab.getLayout("Chassis", BuiltInLayouts.kList)
             .withSize(2, 2).withProperties(Map.of("Label position", "LEFT"));
             
-            yawEntry = chassisLayout.add("yaw (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
-            pitchEntry = chassisLayout.add("pitch (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
-            rollEntry = chassisLayout.add("roll (deg)", 0).withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).getEntry();
+            yawEntry = chassisLayout.add("yaw (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
+            pitchEntry = chassisLayout.add("pitch (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
+            rollEntry = chassisLayout.add("roll (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
 
             vxEntry = chassisLayout.add("vx (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
             vyEntry = chassisLayout.add("vy (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
@@ -140,10 +140,10 @@ public final class DebugTeleopCommands {
         SwerveTab(Swerve swerve, SwerveCommands swerveCommands) {
             mSwerveCommands = swerveCommands;
             tab = Shuffleboard.getTab("Swerve");
-            // module0 = new SwerveModuleWidget(tab, "Module 0");
-            // module1 = new SwerveModuleWidget(tab, "Module 1");
-            // module2 = new SwerveModuleWidget(tab, "Module 2");
-            // module3 = new SwerveModuleWidget(tab, "Module 3");
+            module0 = new SwerveModuleWidget(tab, "Module 0");
+            module1 = new SwerveModuleWidget(tab, "Module 1");
+            module2 = new SwerveModuleWidget(tab, "Module 2");
+            module3 = new SwerveModuleWidget(tab, "Module 3");
             chassisWidget = new ChassisWidget(tab);
             pidWidget = new PIDWidget(tab);
 
@@ -170,12 +170,12 @@ public final class DebugTeleopCommands {
 
         public void update() {
 
-            // var swerve_modules = swerve_subsystem.getSwerveModules();
+            var swerve_modules = swerve_subsystem.getSwerveModules();
 
-            // module0.update(swerve_modules[0]);
-            // module1.update(swerve_modules[1]);
-            // module2.update(swerve_modules[2]);
-            // module3.update(swerve_modules[3]);
+            module0.update(swerve_modules[0]);
+            module1.update(swerve_modules[1]);
+            module2.update(swerve_modules[2]);
+            module3.update(swerve_modules[3]);
 
             chassisWidget.update(swerve_subsystem);
         }
@@ -377,9 +377,16 @@ public final class DebugTeleopCommands {
         ArmTab mArmTab;
         ArmCommands mArmCommands;
 
-        public ShuffleboardUpdateCommand(ArmSubsystem ArmSubsystem, ArmCommands ArmCommands) {
-            mArmSubsystem = ArmSubsystem;
-            mArmCommands = ArmCommands;
+        Swerve mSwerve;
+        SwerveCommands mSwerveCommands;
+        SwerveTab mSwerveTab;
+
+        public ShuffleboardUpdateCommand(ArmSubsystem armSubsystem, ArmCommands armCommands, Swerve swerve, SwerveCommands swerveCommands) {
+            mArmSubsystem = armSubsystem;
+            mArmCommands = armCommands;
+
+            mSwerve = swerve;
+            mSwerveCommands = swerveCommands;
         }
         // Called when the command is initially scheduled.
 
@@ -387,12 +394,14 @@ public final class DebugTeleopCommands {
         public void initialize() {
 
             mArmTab = new ArmTab(mArmSubsystem, mArmCommands);
+            mSwerveTab = new SwerveTab(mSwerve, mSwerveCommands);
         }
 
         // Called every time the scheduler runs while the command is scheduled.
         @Override
         public void execute() {
             mArmTab.update();
+            mSwerveTab.update();
         }
 
         // Lets this command run even when disabled

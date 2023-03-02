@@ -266,7 +266,7 @@ public final class Constants {
             }
         }
 
-        public static final SwerveDriveKinematics kKinematics = new SwerveDriveKinematics( // FIXME: dont know if module numbers in comments below are correct
+        public static final SwerveDriveKinematics kKinematics = new SwerveDriveKinematics(
             new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0), // front left, module 0
             new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0), // front right, module 1
             new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0), // back left, module 2

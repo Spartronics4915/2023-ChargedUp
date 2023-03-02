@@ -227,10 +227,10 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
-                mDriverController.rightBumper()
+                mDriverController.rightBumper() // TODO: remove before comp
                 .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
                 
-                mDriverController.leftBumper()
+                mDriverController.leftBumper() // TODO: remove before comp
                 .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));    
             }
             
@@ -333,7 +333,7 @@ public class RobotContainer {
     }
     
     public void initRobot() {
-        Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mArm, mArmCommands);
+        Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
         
         if (mSwerve != null) {

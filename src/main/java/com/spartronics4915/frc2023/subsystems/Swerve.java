@@ -205,15 +205,18 @@ public class Swerve extends SubsystemBase {
     }
 
     public Rotation2d getYaw() {
-        return Rotation2d.fromDegrees(mIMU.getYaw());
+        double yaw = mIMU instanceof Pigeon2 ? ((Pigeon2)mIMU).getYaw() : mIMU.getYaw();
+        return Rotation2d.fromDegrees(yaw);
     }
 
     public Rotation2d getPitch() {
-        return Rotation2d.fromDegrees(mIMU.getPitch());
+        double pitch = mIMU instanceof Pigeon2 ? ((Pigeon2)mIMU).getPitch() : mIMU.getPitch();
+        return Rotation2d.fromDegrees(pitch);
     }
 
     public Rotation2d getRoll() {
-        return Rotation2d.fromDegrees(mIMU.getRoll());
+        double roll = mIMU instanceof Pigeon2 ? ((Pigeon2)mIMU).getRoll() : mIMU.getRoll();
+        return Rotation2d.fromDegrees(roll);
     }
 
     /**
