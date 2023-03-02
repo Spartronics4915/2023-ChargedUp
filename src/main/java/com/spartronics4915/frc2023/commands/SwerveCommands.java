@@ -212,7 +212,7 @@ public class SwerveCommands {
 
             ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
             
-            mSwerve.drive(chassisSpeeds, true, false);
+            mSwerve.drive(chassisSpeeds, true, true);
         }
 
         @Override
