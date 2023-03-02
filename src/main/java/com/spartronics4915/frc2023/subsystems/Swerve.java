@@ -204,19 +204,7 @@ public class Swerve extends SubsystemBase {
         return mIMU;
     }
 
-    /**
-     * Gets the estimated global pose from the pose estimator.
-     * @return The estimated pose. 
-     */
-    public Pose2d getPose() {
-        return mPoseEstimator.getEstimatedPosition();
-    }
-
-	private void setYaw(Rotation2d yaw) {
-		mIMU.setYaw(yaw.getDegrees());
-	}
-
-    public Rotation2d getYaw() {
+    public Rotation2d getIMUYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
     }
 
@@ -253,19 +241,28 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Sets the IMU's yaw to 0.
-     */
-    public void resetYaw() {
-        mIMU.setYaw(0);
-    }
-
-    /**
      * Resets the pose estimator to the specified pose. 
      * @param pose The pose to reset the pose estimator to.
      */
     public void setPose(Pose2d pose) {
-        mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
+        mPoseEstimator.resetPosition(getIMUYaw(), getPositions(), pose);
     }
+
+    public Pose2d getPose() {
+        return mPoseEstimator.getEstimatedPosition();
+    }
+
+	public Rotation2d getYaw() {
+		return getPose().getRotation();
+	}
+
+	public void setYaw(Rotation2d yaw) {
+		setPose(new Pose2d(getPose().getTranslation(), yaw));
+	}
+
+	public void resetYaw() {
+		setYaw(new Rotation2d());
+	}
 
     /**
      * Resets the modules' internal steering encoders to equal the absolute encoders.
@@ -362,6 +359,7 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
+		resetToAbsolute();
         updatePoseEstimator();
         for (SwerveModule mod : mModules) {
             mod.putSmartDashboardValues();
