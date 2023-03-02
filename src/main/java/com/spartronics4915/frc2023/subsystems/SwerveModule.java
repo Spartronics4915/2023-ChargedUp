@@ -98,8 +98,8 @@ public class SwerveModule {
 
     /**
      * Constructs a SwerveModule from a module number and a set of constants.
-     * @param moduleNumber
-     * @param constants
+     * @param moduleNumber Which module the constants relate to
+     * @param constants The relevant constants
      */
     public SwerveModule(int moduleNumber, SwerveModuleConstants constants) {
         this(moduleNumber, constants.driveMotorID, constants.angleMotorID, constants.encoderID, constants.absoluteOffset);
@@ -108,8 +108,8 @@ public class SwerveModule {
     /**
      * Forces all of the modules to a desired orientation. Will not change the speed.
      * Mainly for testing, be careful if you use this.
-     * @param newAngle
-     * @param isOpenLoop
+     * @param newAngle The new desired angle of the module
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void forceModuleOrientation(Rotation2d newAngle, boolean isOpenLoop){
         // Forces all of the modules to a desired orientation.  Will not change the speed
@@ -123,8 +123,8 @@ public class SwerveModule {
 
     /**
      * Sets the desired state of this module.
-     * @param desiredState
-     * @param isOpenLoop
+     * @param desiredState The new desired state of the module
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      * @param suppressTurningAtLowSpeed Whether to suppress turning when the speed is low. 
      */
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean suppressTurningAtLowSpeed) {
