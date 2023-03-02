@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem.AngleWithEarthProvider;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,6 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
         // ARM_LOW(kArmLowConstants),
         // ARM_HIGH(kArmHighConstants),
         // ARM_LEVEL(kArmLevelConstants),
+        RETRACTED_PRIOR(kPriorRetracted),
         FLOOR_POS(kFloorPositionConstants),
         DOUBLE_SUBSTATION(kDoubleSubstationConstants),
         CONE_LEVEL_1(kConeLevel1Constants),
@@ -218,8 +220,15 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setDesiredGlobalState(ArmState state) {
         // Global state has all of the angles in global coordinates (0 is the horizon)
-        mDesiredState = state;
-        setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+        if (mDesiredState == ArmState.RETRACTED || state == ArmState.RETRACTED){
+            ArmState tempState = state; 
+            mDesiredState = ArmState.RETRACTED_PRIOR;
+            
+
+        }else{
+            mDesiredState = state;
+            setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+        }
     }
 
     private Rotation2d getCorrectAngleDEPRECATE(Rotation2d armAngle) {

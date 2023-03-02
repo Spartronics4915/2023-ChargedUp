@@ -388,6 +388,12 @@ public final class Constants {
             new Rotation2d(30) //0
         );
 
+        public static final ArmPositionConstants kPriorRetracted = new ArmPositionConstants(
+            0,
+            new Rotation2d(0), //0
+            new Rotation2d(20) //0
+        );
+
         public static final ArmPositionConstants kGrabUprightConstants = new ArmPositionConstants(
             0,
             new Rotation2d(Math.PI/4), //45
@@ -449,6 +455,7 @@ public final class Constants {
         );
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
+        public static final double kArmRetractedPriorWaitDuration = 1; // seconds
 
         // public static final ArmPositionConstants kConeLevel3Constants = new ArmPositionConstants(
         //     -1,

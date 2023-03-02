@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import static com.spartronics4915.frc2023.Constants.Arm.Auto.*;
+import static com.spartronics4915.frc2023.Constants.Arm.kArmRetractedPriorWaitDuration;;
+
 
 public class ArmCommands {
     private final ArmSubsystem mArm;
@@ -22,14 +24,22 @@ public class ArmCommands {
 		mIntakeCommands = intakeCommands;
     }
 
-    public class SetArmState extends InstantCommand {
+    public class SetArmState extends SequentialCommandGroup {
         public SetArmState(ArmState armState) {
-            super(
-                () -> {
+            if (mArm.getDesiredGlobalState() == ArmState.RETRACTED || armState == ArmState.RETRACTED)
+                addCommands(
+                    new InstantCommand(() -> {
+                        mArm.setDesiredGlobalState(ArmState.RETRACTED_PRIOR);
+                    }, mArm),
+                    new WaitCommand(kArmRetractedPriorWaitDuration),
+                    new InstantCommand(() -> {
+                        mArm.setDesiredGlobalState(armState);
+                    }, mArm)
+                );
+            else addCommands(
+                new InstantCommand(() -> {
                     mArm.setDesiredGlobalState(armState);
-                    
-                },
-                mArm
+                }, mArm)
             );
         }
     }
