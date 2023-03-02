@@ -75,7 +75,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mMotor.setSmartCurrentLimit(20);
         mActive = true;
         mReferenceSet = false;
-        mReferenceRadians = 0;
+        mCurrentReference = getNativePosition();
+        mReferenceRadians = mCurrentReference.getRadians();
         mLastSpeedOutput = 0;
         mAngleProvider = null;
         kP = MotorConstants.kP;
