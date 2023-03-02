@@ -110,7 +110,7 @@ public class Swerve extends SubsystemBase {
      * This overload should only be used for controller input.
      * @param translation The left stick x and y.
      * @param rotation The right stick x.
-     * @param isOpenLoop
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
@@ -122,7 +122,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Drive the robot using a {@link ChassisSpeeds} based on the drivetrain's current field-oriented setting
      * @param chassisSpeeds The {@link ChassisSpeeds} to use.
-     * @param isOpenLoop
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void drive(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
         drive(chassisSpeeds, mIsFieldRelative, isOpenLoop);
@@ -132,7 +132,7 @@ public class Swerve extends SubsystemBase {
      * Drive the robot using a {@link ChassisSpeeds}
      * @param chassisSpeeds The {@link ChassisSpeeds} to use.
      * @param fieldRelative Whether to drive in field-relative mode or not.
-     * @param isOpenLoop
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative, boolean isOpenLoop) {
         if (fieldRelative) {
@@ -147,7 +147,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Set the module states. 
      * @param desiredStates The desired module states.
-     * @param isOpenLoop
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, kMaxSpeed);
@@ -175,7 +175,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Force the modules to a specific orientation.
      * @param orientation The orientation to force the modules to. 
-     * @param isOpenLoop
+     * @param isOpenLoop Whether the drive motor doesn't use PID control
      */
     public void forceModuleOrientations(Rotation2d orientation, boolean isOpenLoop) {
         // Forces all of the modules to one orientation
@@ -206,14 +206,6 @@ public class Swerve extends SubsystemBase {
 
     public Rotation2d getIMUYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
-    }
-
-    /**
-     * Gets the yaw wrapped on [0, 360).
-     * @return The wrapped yaw.
-     */
-    public Rotation2d getModYaw() {
-        return Rotation2d.fromDegrees(mIMU.getYaw() % 360);
     }
 
     public Rotation2d getPitch() {
@@ -260,6 +252,9 @@ public class Swerve extends SubsystemBase {
 		setPose(new Pose2d(getPose().getTranslation(), yaw));
 	}
 
+	/**
+	 * Resets odometry pose to yaw = 0
+	 */
 	public void resetYaw() {
 		setYaw(new Rotation2d());
 	}
