@@ -213,16 +213,14 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             // double ticLength = 1./50; // Robot runs at 50Hz
             // var state = currMotionProfile.calculate(ticLength);
 
-            // Trapezoid profiling not working, so this effectively disables it.
+            // // Trapezoid profiling not working, so this effectively disables it.
             
             double pidReferenceRadians = mReferenceRadians;//state.position;
+            //trapezoidTarget = state.position;
 
-            // trapezoidTarget = state.position;
-
-            // mModeledVelocity = state.velocity;
-            // // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
-            // mModeledPosition = state.position;
-
+            //mModeledVelocity = state.velocity;
+            // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
+            //mModeledPosition = state.position;
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 

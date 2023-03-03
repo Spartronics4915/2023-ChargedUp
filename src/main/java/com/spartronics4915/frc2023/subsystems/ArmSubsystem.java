@@ -211,13 +211,19 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO determine zero offsets
     // TODO add extender motor
     private void setDesiredLocalPosition(ArmPosition state) {
-        mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
+        // mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
         mPivotMotor.setArmReference(state.armTheta);
         mWristMotor.setArmReference(state.wristTheta);
     }
 
     private void setDesiredGlobalPosition(ArmPosition pos) {
         setDesiredLocalPosition(globalToLocalState(pos));
+    }
+
+    public void setDesiredLocalState(ArmState state) {
+        // Global state has all of the angles in global coordinates (0 is the horizon)
+        mDesiredState = state;
+        setDesiredLocalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
     public void setDesiredGlobalState(ArmState state) {
