@@ -84,17 +84,13 @@ public final class DebugTeleopCommands {
         public void update() {
 			Swerve swerve = Swerve.getInstance();
 
-            yawEntry.setDouble(swerve.getIMU().getYaw());
-            pitchEntry.setDouble(swerve.getIMU().getPitch());
-            rollEntry.setDouble(swerve.getIMU().getRoll());
+            yawEntry.setDouble(swerve.getYaw().getDegrees());
+            pitchEntry.setDouble(swerve.getPitch().getDegrees());
+            rollEntry.setDouble(swerve.getRoll().getDegrees());
             
             vxEntry.setDouble(swerve.getChassisSpeeds().vxMetersPerSecond);
             vyEntry.setDouble(swerve.getChassisSpeeds().vyMetersPerSecond);
             omegaEntry.setDouble(swerve.getChassisSpeeds().omegaRadiansPerSecond);
-        }
-
-        public void update(Swerve swerveSubsystem) {
-            yawEntry.setDouble(swerveSubsystem.getEstimatedYaw().getDegrees());
         }
     }
 
@@ -177,7 +173,7 @@ public final class DebugTeleopCommands {
             module2.update(swerve_modules[2]);
             module3.update(swerve_modules[3]);
 
-            chassisWidget.update(swerve_subsystem);
+            chassisWidget.update();
         }
     }
 

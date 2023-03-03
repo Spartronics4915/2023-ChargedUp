@@ -89,12 +89,13 @@ public class Swerve extends SubsystemBase {
     }
 
     private void configurePigeon(WPI_Pigeon2 pigeon) {
-		mIMU.configMountPose(
-				kPigeonMountPoseYaw,
-				kPigeonMountPosePitch,
-				kPigeonMountPoseRoll
-			);
-		
+		pigeon.configEnableCompass(false);
+        
+        pigeon.configMountPose(
+            kPigeonMountPoseYaw,
+            kPigeonMountPosePitch,
+            kPigeonMountPoseRoll
+		);
     }
 
     /**
@@ -199,7 +200,7 @@ public class Swerve extends SubsystemBase {
         return mIsFieldRelative;
     }
 
-    public BasePigeon getIMU() {
+    public WPI_Pigeon2 getIMU() {
         return mIMU;
     }
 
