@@ -420,8 +420,8 @@ public final class Constants {
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(-35),
-            Rotation2d.fromDegrees(0)
+            Rotation2d.fromDegrees(-15),
+            Rotation2d.fromDegrees(15)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
@@ -431,9 +431,9 @@ public final class Constants {
         );
         
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
-            8,
+            4,
             Rotation2d.fromDegrees(12),
-            Rotation2d.fromDegrees(-5)
+            Rotation2d.fromDegrees(5)//Should be -5,just changed for testing
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
