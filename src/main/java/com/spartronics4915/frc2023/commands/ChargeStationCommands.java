@@ -77,12 +77,13 @@ public final class ChargeStationCommands {
 
         @Override
         public void execute() {
-            final double climb_to_grip_speed_m_s = -2;
+            System.out.println(mLogString);
+            final double climb_to_grip_speed_m_s = -3;
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP: {
                     final double climb_to_grip_target_pitch_deg = 10;
-                    final double climb_to_grip_time_allowed = 5;
+                    final double climb_to_grip_time_allowed = 7;
 
                     if (mCurrStateTimer.hasElapsed(climb_to_grip_time_allowed)) {
                         mSwerve.stop();

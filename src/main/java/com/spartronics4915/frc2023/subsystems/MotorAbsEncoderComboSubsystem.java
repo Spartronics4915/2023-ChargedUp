@@ -106,13 +106,15 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
      */
     public void setArmReference(Rotation2d ref) {
         // This is designed to ignore unsafe arm positions.
-        if (Math.abs(ref.getDegrees()) > 80)
-        {
-            System.out.println("Unsafe arm position requested: " + ref);
-            return;
-        }
+        // if (Math.abs(ref.getDegrees()) > 80)
+        // {
+        //     System.out.println("Unsafe arm position requested: " + ref);
+        //     return;
+        // }
         mModeledPosition = getRawPosition();
         setNativeReference(armToNative(ref));
+
+        System.out.println(armToNative(ref));
     }
 
     public void setActive(boolean active) {
@@ -236,11 +238,15 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             }
 
             if(mActive && mReferenceSet) {
+                System.out.println("total_output: " + total_output);
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
+            } else {
+                System.err.println("not sending speed ");
+                System.err.println("mReferenceSet: " + mReferenceSet);
+            }
 
 
-        }
     }
 
 }

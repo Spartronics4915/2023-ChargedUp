@@ -365,7 +365,7 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             15,  //actual value 15
             Math.PI * 2, false,
-            0.2, 0, 0, 0.04,
+            0.4, 0, 0, 0.08,
             Math.PI/8, 1, 0,
             Rotation2d.fromDegrees(66), 10, false,
             MotorType.kBrushless

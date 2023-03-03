@@ -252,7 +252,7 @@ public class Swerve extends SubsystemBase {
 	}
 
 	public void setYaw(Rotation2d yaw) {
-		setPose(new Pose2d(getPose().getTranslation(), yaw));
+		mIMU.setYaw(yaw.getDegrees());
 	}
 
 	/**

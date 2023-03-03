@@ -139,10 +139,10 @@ public final class Autos {
 		}
 
 		public CommandBase getCommand(Pose2d initialPose) {
-			return new SequentialCommandGroup(
-				mSwerveCommands.new ResetCommand(initialPose),
-				mGetCommand.apply(initialPose)
-			);
+			// return new SequentialCommandGroup(
+				// mSwerveCommands.new ResetCommand(initialPose),
+				return mGetCommand.apply(initialPose);
+			// );
 		}
 	}
 }
