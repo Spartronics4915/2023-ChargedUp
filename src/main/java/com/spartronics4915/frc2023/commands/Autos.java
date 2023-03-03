@@ -34,12 +34,14 @@ public final class Autos {
 	private final boolean mIsOpenLoop = true;
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
 	private final SwerveCommands mSwerveCommands;
+	private final ExtenderCommands mExtenderCommands;
 			
 
-    public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
+    public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands, ExtenderCommands extenderCommands) {
 		mSwerve = Swerve.getInstance();
 		mSwerveCommands = swerveCommands;
 		mSwerveTrajectoryFollowerCommands = swerveTrajectoryFollowerCommands;
+		mExtenderCommands = extenderCommands;
     }
 
 	public class MoveForwardCommand extends SequentialCommandGroup {
@@ -141,6 +143,7 @@ public final class Autos {
 		public CommandBase getCommand(Pose2d initialPose) {
 			return new SequentialCommandGroup(
 				mSwerveCommands.new ResetCommand(initialPose),
+				mExtenderCommands.new Retract(),
 				mGetCommand.apply(initialPose)
 			);
 		}

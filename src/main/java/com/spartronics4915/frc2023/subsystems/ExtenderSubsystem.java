@@ -150,6 +150,11 @@ public class ExtenderSubsystem extends SubsystemBase  {
     public boolean closeEnough() {
         return ((Math.abs(getPosition() - targetReference)) < kPosTolerance);
     }
+
+    public boolean limitSwitch() {
+        return !mLimitSwitchZero.get();
+    }
+
     public double getReference() {
 
         return targetReference;

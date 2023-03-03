@@ -99,13 +99,24 @@ public class RobotContainer {
         mDriverController = useJoystick ? new CommandXboxController(kDriverControllerID) : null;
         mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
         
+        
+        if (useArm) {
+            mArm = ArmSubsystem.getInstance();
+            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
+            mIntake = Intake.getInstance();
+            mIntakeCommands = new IntakeCommands(mIntake);
+            mArmCommands = new ArmCommands(mArm, mIntakeCommands);
+            
+        }
+        
         if (useSwerveChassis) {
             mSwerve = Swerve.getInstance();
             mSwerveCommands = new SwerveCommands(mDriverController);
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
             
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
-            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
+            
+            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands, mExtenderCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand(new Pose2d()); // remove before comp as pose will be unknown after auto
         } else {
@@ -115,16 +126,6 @@ public class RobotContainer {
             mSwerveCommands = null;
             mSwerveTrajectoryFollowerCommands = null;
         }
-        
-        if (useArm) {
-            mArm = ArmSubsystem.getInstance();
-            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
-            mIntake = Intake.getInstance();
-            mIntakeCommands = new IntakeCommands(mIntake);
-            mArmCommands = new ArmCommands(mArm, mIntakeCommands);
-
-        }
-
         configureAutoSelector();
 		configureInitialPoseSelector();
         
