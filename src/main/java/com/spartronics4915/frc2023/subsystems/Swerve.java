@@ -35,7 +35,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveModule[] mModules;
 
-    private BasePigeon mIMU;
+    private WPI_Pigeon2 mIMU;
     private Rotation2d mLastPitch;
     private Rotation2d mLastLastPitch;
 
@@ -60,7 +60,7 @@ public class Swerve extends SubsystemBase {
     }
 
     private Swerve() {
-        mIMU = kPigeonConstructor.apply(kPigeonID);
+        mIMU = new WPI_Pigeon2(kPigeonID);
         configurePigeon(mIMU);
 
         if (useCamera) {
@@ -88,14 +88,13 @@ public class Swerve extends SubsystemBase {
         );
     }
 
-    private void configurePigeon(BasePigeon pigeon) {
-		if (mIMU instanceof Pigeon2) {
-			((Pigeon2)pigeon).configMountPose(
+    private void configurePigeon(WPI_Pigeon2 pigeon) {
+		mIMU.configMountPose(
 				kPigeonMountPoseYaw,
 				kPigeonMountPosePitch,
 				kPigeonMountPoseRoll
 			);
-		}
+		
     }
 
     /**
