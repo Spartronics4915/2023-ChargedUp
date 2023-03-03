@@ -49,11 +49,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private double mModeledVelocity;
     public double trapezoidTarget;
     public double mModeledPosition;
-    private static int instancecount =0;
-    private int mycount;
+
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
-        mycount = instancecount;
-        instancecount +=1;
         motionConstraints = new TrapezoidProfile.Constraints(Math.PI/6., Math.PI/6);
         mModeledVelocity = 0;
 
@@ -195,10 +192,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public void periodic() {
 
             double angleWithEarth;
-            
+            boolean isArm=false;
             if(mAngleProvider==null) {
 
               angleWithEarth = getArmPosition().getRadians();
+              isArm=true;
             }
             else {
                 angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
@@ -225,9 +223,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 
             double ffComponent = -kFF * Math.cos(angleWithEarth);
-            double err = kP*(pidReferenceRadians - currPosNative);
+            double err = (pidReferenceRadians - currPosNative);
 
-            double total_output = ffComponent + err;
+            double total_output = ffComponent + kP*err;
 
             if(total_output > 1.0) {
                 total_output = 1;
@@ -238,7 +236,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
-
+        //         if(isArm) {
+        //         System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + mReferenceRadians + " " + err);}
 
         }
     }
