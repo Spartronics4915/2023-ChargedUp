@@ -537,6 +537,7 @@ public final class Constants {
                                 0, 0,
                                 0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
         // from center.
-        static final String cameraName = "OV5647";
+        // static final String cameraName = "OV5647";
+        static final String cameraName = "Arducam_OV9281_USB_Camera";
     }
 }
