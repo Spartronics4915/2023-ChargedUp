@@ -310,10 +310,10 @@ public class RobotContainer {
                 mOperatorController.povDown()
                     .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
-                mOperatorController.povLeft()
+                mOperatorController.povRight()
                     .whileTrue(mExtenderCommands.new Extend());
 
-                mOperatorController.povRight()
+                mOperatorController.povLeft()
                     .whileTrue(mExtenderCommands.new Retract());
 
                 mOperatorController.leftBumper()
