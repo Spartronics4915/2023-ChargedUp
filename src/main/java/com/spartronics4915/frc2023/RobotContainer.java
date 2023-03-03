@@ -122,7 +122,12 @@ public class RobotContainer {
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
             mArmCommands = new ArmCommands(mArm, mIntakeCommands);
-
+        } else {
+            mArm = null;
+            mExtenderCommands = null;
+            mIntake = null;
+            mIntakeCommands = null;
+            mArmCommands = null;
         }
 
         configureAutoSelector();
@@ -333,7 +338,7 @@ public class RobotContainer {
     }
     
     public void initRobot() {
-        Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(mArm, mArmCommands, mSwerve, mSwerveCommands);
+        Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(useArm, useSwerveChassis, mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
         
         if (mSwerve != null) {

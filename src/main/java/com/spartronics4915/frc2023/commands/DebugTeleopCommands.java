@@ -373,6 +373,9 @@ public final class DebugTeleopCommands {
 
     public static class ShuffleboardUpdateCommand extends CommandBase {
 
+        boolean useArm;
+        boolean useSwerve;
+
         ArmSubsystem mArmSubsystem;
         ArmTab mArmTab;
         ArmCommands mArmCommands;
@@ -381,7 +384,10 @@ public final class DebugTeleopCommands {
         SwerveCommands mSwerveCommands;
         SwerveTab mSwerveTab;
 
-        public ShuffleboardUpdateCommand(ArmSubsystem armSubsystem, ArmCommands armCommands, Swerve swerve, SwerveCommands swerveCommands) {
+        public ShuffleboardUpdateCommand(boolean useArm, boolean useSwerve, ArmSubsystem armSubsystem, ArmCommands armCommands, Swerve swerve, SwerveCommands swerveCommands) {
+            this.useArm = useArm;
+            this.useSwerve = useSwerve;
+            
             mArmSubsystem = armSubsystem;
             mArmCommands = armCommands;
 
@@ -393,15 +399,15 @@ public final class DebugTeleopCommands {
         @Override
         public void initialize() {
 
-            mArmTab = new ArmTab(mArmSubsystem, mArmCommands);
-            mSwerveTab = new SwerveTab(mSwerve, mSwerveCommands);
+            mArmTab = useArm ? new ArmTab(mArmSubsystem, mArmCommands) : null;
+            mSwerveTab = useSwerve ? new SwerveTab(mSwerve, mSwerveCommands) : null;
         }
 
         // Called every time the scheduler runs while the command is scheduled.
         @Override
         public void execute() {
-            mArmTab.update();
-            mSwerveTab.update();
+            if (useArm) { mArmTab.update(); }
+            if (useSwerve) { mSwerveTab.update(); }
         }
 
         // Lets this command run even when disabled
