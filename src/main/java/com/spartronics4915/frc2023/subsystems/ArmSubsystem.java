@@ -45,6 +45,7 @@ public class ArmSubsystem extends SubsystemBase {
      * Represents the preset values for the arm
      */
     public enum ArmState {
+        TUCK_INTERMEDIATE(kReadyForTuck),
         RETRACTED(kRetractedConstants),
         // GRAB_UPRIGHT(kGrabUprightConstants),
         // GRAB_FALLEN(kArmLowConstants),
@@ -243,6 +244,10 @@ public class ArmSubsystem extends SubsystemBase {
         return armAngle.unaryMinus();
     }
 
+
+    public void stopPivot() {
+        mPivotMotor.stopMotor();
+    }
 
     public Rotation2d getRef() {
         return mPivotMotor.getCurrentReference();

@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -234,9 +235,15 @@ public class RobotContainer {
                 
                 // mDriverController.rightBumper() // TODO: remove before comp
                 // .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
-                
+
+                mDriverController.leftBumper()
+                .onTrue(mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE));
+ 
                 mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(mArm.getExtender().extendToTarget());    
+                .whileTrue(mArm.getExtender().extendToTarget());
+                
+                // This is to tuck into stow
+                mDriverController.povDown().onTrue(Commands.runOnce(()->mArm.stopPivot()));
             }
             
             // OPERATOR CONTROLS

@@ -418,10 +418,17 @@ public final class Constants {
         //     Rotation2d.fromDegrees(0)
         // );
 
-        public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
+
+        public static final ArmPositionConstants kReadyForTuck = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(-15),
-            Rotation2d.fromDegrees(15)
+            Rotation2d.fromDegrees(-25),
+            Rotation2d.fromDegrees(96)
+        );
+
+        public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
+            8,
+            Rotation2d.fromDegrees(-28),
+            Rotation2d.fromDegrees(30)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
@@ -433,7 +440,7 @@ public final class Constants {
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
             4,
             Rotation2d.fromDegrees(12),
-            Rotation2d.fromDegrees(5)//Should be -5,just changed for testing
+            Rotation2d.fromDegrees(-5)
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(

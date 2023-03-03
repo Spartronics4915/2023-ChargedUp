@@ -103,7 +103,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
      */
     public void setArmReference(Rotation2d ref) {
         // This is designed to ignore unsafe arm positions.
-        if (Math.abs(ref.getDegrees()) > 80)
+        if (Math.abs(ref.getDegrees()) > 100)
         {
             System.out.println("Unsafe arm position requested: " + ref);
             return;
@@ -186,6 +186,11 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     public Rotation2d getVelocity() {
         return Rotation2d.fromRadians(mAbsEncoder.getVelocity());
+    }
+
+    public void stopMotor() {
+        mReferenceSet = false;
+        mMotor.stopMotor();
     }
 
     @Override
