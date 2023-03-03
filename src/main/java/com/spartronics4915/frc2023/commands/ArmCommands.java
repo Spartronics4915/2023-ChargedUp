@@ -24,8 +24,8 @@ public class ArmCommands {
 		mIntakeCommands = intakeCommands;
     }
 
-    public class SetArmState extends SequentialCommandGroup {
-        public SetArmState(ArmState armState) {
+    public class SetArmStateComplex extends SequentialCommandGroup {
+        public SetArmStateComplex(ArmState armState) {
             if (mArm.getDesiredGlobalState() == ArmState.RETRACTED || armState == ArmState.RETRACTED)
                 addCommands(
                     new InstantCommand(() -> {
@@ -43,6 +43,27 @@ public class ArmCommands {
             );
         }
     }
+
+    public class SetArmLocalState extends CommandBase {
+        ArmState mArmState;
+
+        public SetArmLocalState(ArmState armState) {
+            mArmState = armState;
+        }
+
+        @Override
+        public void execute()
+        {
+            mArm.setDesiredLocalState(mArmState);
+
+        }
+        @Override
+        public boolean isFinished(){
+            return true;
+        }
+    }
+
+
     public class TransformArmState extends CommandBase {
         private double mExtensionDelta;
         private Rotation2d mArmDelta, mWristDelta;
@@ -68,7 +89,7 @@ public class ArmCommands {
 	public class PieceInteractCommand extends SequentialCommandGroup {
 		public PieceInteractCommand(ArmState armState, IntakeState intakeState) {
 			super(
-				new SetArmState(armState),
+				new SetArmLocalState(armState),
 				new WaitCommand(kArmStateChangeDuration),
 				mIntakeCommands.new SetIntakeState(intakeState),
 				new WaitCommand(kGrabDuration),
