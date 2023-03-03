@@ -232,11 +232,11 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
-                mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                // mDriverController.rightBumper() // TODO: remove before comp
+                // .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
                 
-                mDriverController.leftBumper() // TODO: remove before comp
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));    
+                mDriverController.rightBumper() // TODO: remove before comp
+                .whileTrue(mArm.getExtender().extendToTarget());    
             }
             
             // OPERATOR CONTROLS
@@ -264,7 +264,7 @@ public class RobotContainer {
                     .onTrue(mArmCommands.new SetArmLocalState(ArmState.DOUBLE_SUBSTATION));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CUBE_LEVEL_1));
+                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.FLOOR_POS));
                 
                 mOperatorController.x()
                     .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_1));
@@ -340,10 +340,23 @@ public class RobotContainer {
     public void initRobot() {
         Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(useArm, useSwerveChassis, mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
-        
+        mSwerve.resetYaw();
         if (mSwerve != null) {
             mSwerve.resetToAbsolute();
             mSwerve.setFieldRelative(true);
+        }
+    }
+
+    // Be careful, there is also reset code in the command itself
+    public void resetForTeleop() {
+        if (mSwerve != null) {
+            mSwerve.resetYaw();
+        }
+    }
+
+    public void resetForAuto() {
+        if (mSwerve != null) {
+            mSwerve.resetYaw();
         }
     }
 }

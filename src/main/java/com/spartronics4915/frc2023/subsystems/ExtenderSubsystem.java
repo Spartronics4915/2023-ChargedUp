@@ -21,7 +21,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     private final int kMotorID;
     private CANSparkMax mMotor;
     public RelativeEncoder mEncoder;
-    private final double kRevPerInch = 12.0;
+    private final double kRevPerInch = 24.0;
     public SparkMaxPIDController mPIDController;
     public double targetReference;
 
@@ -86,6 +86,10 @@ public class ExtenderSubsystem extends SubsystemBase  {
         return null;//mPIDController;
     }
 
+    public void setTarget(double target) {
+        targetReference = target;
+    }
+
     public CANSparkMax getMotor() {
 
         return mMotor;
@@ -116,7 +120,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public void startRetracting() {
-        if(false){//(getPosition() < kMinDist){
+        if(limitSwitchActive()){//(getPosition() < kMinDist){
             mMotor.stopMotor();
         }
         else {
@@ -138,10 +142,24 @@ public class ExtenderSubsystem extends SubsystemBase  {
             if(getPosition() < N){
                 startExtending();
             }else{
-                startRetracting();
+                if(!limitSwitchActive()) {
+                startRetracting();}
             }
         }, () -> this.stopMotor()).until(() -> atPos(N));
     }
+
+    // Note, you need to set the target first!
+    public CommandBase extendToTarget() {
+        return Commands.runEnd(()->{
+            if(getPosition() < targetReference){
+                startExtending();
+            }else{
+                if(!limitSwitchActive()) {
+                startRetracting();}
+            }
+        }, () -> this.stopMotor()).until(() -> atPos(targetReference));
+    }
+
 
     public void setReference(double p) {
         targetReference = p;
@@ -155,6 +173,9 @@ public class ExtenderSubsystem extends SubsystemBase  {
         return targetReference;
     }
 
+    public boolean limitSwitchActive() {
+        return !mLimitSwitchZero.get();
+    };
 
     //maybe do this in periodic
     //if back limit switch is triggered, set pos to 0, 
@@ -163,8 +184,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     //create function to set encoder to value
     public void limitSwitchUpdate() {
         if (!mLimitSwitchZero.get()) {
-            System.out.println("triggered");
-            mEncoder.setPosition(0);
+            setZero();
             if (mMotor.getAppliedOutput() < 0) {
                 stopMotor();
             }
