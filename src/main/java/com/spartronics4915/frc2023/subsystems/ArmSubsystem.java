@@ -211,7 +211,7 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO determine zero offsets
     // TODO add extender motor
     private void setDesiredLocalPosition(ArmPosition state) {
-        mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
+        // mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
         mPivotMotor.setArmReference(state.armTheta);
         mWristMotor.setArmReference(state.wristTheta);
     }
