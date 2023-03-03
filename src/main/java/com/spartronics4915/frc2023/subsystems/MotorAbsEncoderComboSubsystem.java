@@ -204,23 +204,25 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
                 angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
             }
 
-            double currVelocity = getVelocity().getRadians();
+            // double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
 
-            var currState = new TrapezoidProfile.State(mModeledPosition, mModeledVelocity);
-            var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
-            TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
-            double ticLength = 1./50; // Robot runs at 50Hz
-            var state = currMotionProfile.calculate(ticLength);
+            // var currState = new TrapezoidProfile.State(mModeledPosition, mModeledVelocity);
+            // var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
+            // TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
+            // double ticLength = 1./50; // Robot runs at 50Hz
+            // var state = currMotionProfile.calculate(ticLength);
 
             // Trapezoid profiling not working, so this effectively disables it.
             
             double pidReferenceRadians = mReferenceRadians;//state.position;
-            trapezoidTarget = state.position;
 
-            mModeledVelocity = state.velocity;
-            // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
-            mModeledPosition = state.position;
+            // trapezoidTarget = state.position;
+
+            // mModeledVelocity = state.velocity;
+            // // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
+            // mModeledPosition = state.position;
+
             // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
             // currPosNative = Rotation2d.fromDegrees(180).getRadians();
 
