@@ -69,7 +69,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             mMotor.setInverted(true);
         }
         mPIDController = null; //initializePIDController(MotorConstants);
-        mMotor.setSmartCurrentLimit(40);
+        mMotor.setSmartCurrentLimit(60);
         mActive = true;
         mReferenceSet = false;
         mCurrentReference = getNativePosition();
