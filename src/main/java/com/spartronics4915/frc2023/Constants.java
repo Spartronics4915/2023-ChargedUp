@@ -481,7 +481,7 @@ public final class Constants {
         public static final boolean kIsInverted = false;
 
         public static final double kInSpeed = 0.8;
-        public static final double kOutSpeed = -0.95;
+        public static final double kOutSpeed = -0.2;
 
         public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
     }
