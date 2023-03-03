@@ -14,6 +14,7 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
@@ -21,8 +22,11 @@ import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
@@ -173,7 +177,7 @@ public final class Constants {
 		public static final InitialPose[] kInitialPoses = {
 			new InitialPose("Left", new Pose2d(new Translation2d(), new Rotation2d(Math.PI))),
 			new InitialPose("Center", new Pose2d(new Translation2d(), new Rotation2d())),
-			new InitialPose("Right", new Pose2d(new Translation2d(), new Rotation2d()))
+			new InitialPose("Right", new Pose2d(new Translation2d(11.88, 1.09), new Rotation2d()))
 		};
 
 		public static final int kDefaultInitialPoseIndex = 0;
@@ -518,5 +522,21 @@ public final class Constants {
 
 		public static final int kDefaultAutoIndex = 0;
 
+    }
+    
+    public static final class FieldConstants {
+        static final double length = Units.feetToMeters(54);
+        static final double width = Units.feetToMeters(27);
+    }
+
+    public static final class VisionConstants {
+        static final Transform3d robotToCam =
+                new Transform3d(
+                        new Translation3d(0.5, 0.0, 0.5),
+                        new Rotation3d(
+                                0, 0,
+                                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+        // from center.
+        static final String cameraName = "OV5647";
     }
 }

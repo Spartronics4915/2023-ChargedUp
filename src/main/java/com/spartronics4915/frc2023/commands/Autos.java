@@ -7,19 +7,18 @@ package com.spartronics4915.frc2023.commands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import javax.sound.midi.Sequence;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.fasterxml.jackson.databind.introspect.AccessorNamingStrategy.Provider;
 import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -34,6 +33,10 @@ public final class Autos {
 	private final boolean mIsOpenLoop = true;
 	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
 	private final SwerveCommands mSwerveCommands;
+	private final double maxVelocity = 0.5;
+	private final double maxAccel = 0.4;
+	private final double maxAngularVelocity = 0.8;
+	private final double maxAngularAcceleration = 0.2;
 			
 
     public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
@@ -72,6 +75,21 @@ public final class Autos {
 		// public MoveForwardCommandFancy() {
 		// 	addRequirements(mSwerve);
 		// 	addCommands(
+		// 		mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
+		// 			new ArrayList<>(List.of(
+		// 				new Pose2d(new Translation2d(0, 0), new Rotation2d(0)),
+		// 				new Pose2d(new Translation2d(3, 0), new Rotation2d(Math.PI / 2.))
+		// 			))
+		// 		),
+		// 		new InstantCommand(() -> {
+		// 			mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+		// 			for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+		// 		})
+		// 	);
+		// }
+		// public MoveForwardCommandFancy() {
+		// 	addRequirements(mSwerve);
+		// 	addCommands(
 		// 		mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
 		// 			new ArrayList<>(List.of(
 		// 				new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
@@ -86,42 +104,88 @@ public final class Autos {
 		// }
 	}
 	
-	// public class MoveForwardCommandDynamic extends SequentialCommandGroup {
-	// 	public MoveForwardCommandDynamic() {
-	// 		addRequirements(mSwerve);
-	// 		addCommands(
-	// 			mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
-	// 				new ArrayList<>(List.of(
-	// 					new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
-	// 					new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
-	// 				))
-	// 			),
-	// 			new InstantCommand(() -> {
-	// 				mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
-	// 				for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
-	// 			})
-	// 		);
-	// 	}
-	// }
+	public class MoveForwardCommandDynamic extends SequentialCommandGroup {
+		public MoveForwardCommandDynamic() {
+			addRequirements(mSwerve);
+			addCommands(
+				mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
+					new ArrayList<>(List.of(
+						new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+						new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+					))
+				),
+				new InstantCommand(() -> {
+					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+					for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+				})
+			);
+		}
+	}
 
-	// public class MoveBackAndForthFancy extends SequentialCommandGroup {
-	// 	public MoveBackAndForthFancy() {
-	// 		PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
-	// 		PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
-	// 		addCommands(
-	// 			mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-	// 				new ArrayList<>(List.of(
-	// 					aprilTag1,
-	// 					aprilTag2
-	// 				))
-	// 			),
-	// 			mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-	// 				new ArrayList<>(List.of(
-	// 					aprilTag2,
-	// 					aprilTag1
-	// 				))
-	// 			)
-	// 		);
+	public class MoveBackAndForthFancy extends SequentialCommandGroup {
+		public MoveBackAndForthFancy() {
+			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
+			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
+			addCommands(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						aprilTag1,
+						aprilTag2
+					))
+				),
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						aprilTag2,
+						aprilTag1
+					))
+				)
+			);
+		}
+	}
+
+	public class MoveBetweenTags extends SequentialCommandGroup {
+		public MoveBetweenTags() {
+			PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
+			PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
+			addCommands(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						aprilTag1,
+						aprilTag2
+					)),
+					maxVelocity, maxAccel
+				),
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						aprilTag2,
+						aprilTag1
+					)),
+					maxVelocity, maxAccel
+				)
+			);
+		}
+	}
+
+	// public class MoveToTag extends SequentialCommandGroup {
+	// 	public MoveToTag() {
+	// 		PhotonPipelineResult result = mSwerve.mCameraWrapper.photonCamera.getLatestResult();
+    //         if (result.hasTargets()) {
+	// 			PhotonTrackedTarget target = result.getBestTarget();
+	// 			System.out.println(target);
+	// 			PathPoint start = new PathPoint(new Translation2d(), new Rotation2d());
+	// 			PathPoint aprilTag1 = new PathPoint(new Translation2d(target.getX() - 1, target.getY()), Rotation2d.fromDegrees(-target.getYaw()), new Rotation2d());
+	// 			addCommands(
+	// 				mSwerveCommands.new ResetOdometry(),
+	// 				mSwerveCommands.new ResetYaw(),
+	// 				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+	// 					new ArrayList<>(List.of(
+	// 						start,
+	// 						aprilTag1
+	// 					)),
+	// 					maxVelocity, maxAccel
+	// 				)
+	// 			);
+	// 		}
 	// 	}
 	// }
 
@@ -140,7 +204,7 @@ public final class Autos {
 
 		public CommandBase getCommand(Pose2d initialPose) {
 			return new SequentialCommandGroup(
-				mSwerveCommands.new ResetCommand(initialPose),
+				mSwerveCommands.new ResetCommand(),
 				mGetCommand.apply(initialPose)
 			);
 		}

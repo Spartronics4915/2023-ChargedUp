@@ -29,6 +29,7 @@ import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStat
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
+import com.spartronics4915.frc2023.commands.PrintPos;
 import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
@@ -107,7 +108,7 @@ public class RobotContainer {
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
             mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
-            mTeleopInitCommand = mSwerveCommands.new ResetCommand(new Pose2d()); // remove before comp as pose will be unknown after auto
+            mTeleopInitCommand = mSwerveCommands.new ResetCommand(); // remove before comp as pose will be unknown after auto
         } else {
             mTeleopInitCommand = null;
             mAutos = null;
@@ -145,7 +146,6 @@ public class RobotContainer {
 			kInitialPoses[kDefaultInitialPoseIndex].name,
 			kInitialPoses[kDefaultInitialPoseIndex].pose
 		);
-
 		SmartDashboard.putData("Initial Pose", mInitialPoseSelector);
 	}
 
@@ -223,7 +223,7 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new ToggleFieldRelative());
                 
                 mDriverController.b()
-                .onTrue(mSwerveCommands.new ResetYaw());
+                .onTrue(mSwerveCommands.new ResetCommand());
                 
                 mDriverController.y()
                 .onTrue(mSwerveCommands.new ResetOdometry());
@@ -231,6 +231,9 @@ public class RobotContainer {
                 mDriverController.rightTrigger(kTriggerDeadband)
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
+
+                mDriverController.leftTrigger(kTriggerDeadband)
+                .onTrue((new PrintPos()));
                 
                 mDriverController.rightBumper() // TODO: remove before comp
                 .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());

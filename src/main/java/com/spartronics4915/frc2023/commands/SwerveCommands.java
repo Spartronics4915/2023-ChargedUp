@@ -1,30 +1,32 @@
 package com.spartronics4915.frc2023.commands;
 
+import static com.spartronics4915.frc2023.Constants.OI.kResponseCurveExponent;
+import static com.spartronics4915.frc2023.Constants.OI.kStickDeadband;
+import static com.spartronics4915.frc2023.Constants.Swerve.kMaxAcceleration;
+import static com.spartronics4915.frc2023.Constants.Swerve.kMaxAngularSpeed;
+import static com.spartronics4915.frc2023.Constants.Swerve.kMaxSpeed;
+import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeAngularSpeedMultiplier;
+import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeSpeedMultiplier;
+
+import org.photonvision.targeting.PhotonPipelineResult;
+
+import com.spartronics4915.frc2023.Constants.Swerve.BalanceConstants;
+import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
+import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
-
-import static com.spartronics4915.frc2023.Constants.Swerve.*;
-
-import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
-
-import static com.spartronics4915.frc2023.Constants.OI.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class SwerveCommands {
     private final CommandXboxController mDriverController;
@@ -80,25 +82,26 @@ public class SwerveCommands {
      */
     public class ResetOdometry extends InstantCommand {
         public ResetOdometry() {
-			
+
 		}
 		
 		@Override
 		public void initialize() {
 			super.initialize();
-            mSwerve.setPose(new Pose2d(0, 0, new Rotation2d(0)));
-		}
+            VisionMeasurement result = mSwerve.mCameraWrapper.getEstimatedGlobalPose();
+            if(result != null) {
+                mSwerve.setPose(result.mPose);
+            }        
+        }
     }
 
     /**
      * Mainly used to initialize robot
      */
     public class ResetCommand extends InstantCommand {
-		private Pose2d mInitialPose;
-        public ResetCommand(Pose2d initialPose) {
+        public ResetCommand() {
             addRequirements(mSwerve);
-			mInitialPose = initialPose;
-		}
+        }
 		
 		@Override
 		public void initialize() {
@@ -106,7 +109,6 @@ public class SwerveCommands {
 			mSwerve.resetToAbsolute();
             mSwerve.stop();
 			mSwerve.alignModules();
-			mSwerve.setPose(mInitialPose);
 		}
     }
 
@@ -251,6 +253,68 @@ public class SwerveCommands {
         }
     }
     
+
+    public class RotateToTarget extends CommandBase {;
+        // private final double mYawToleranceDegrees = 10;
+        // private final double mAngularVelToleranceDegreesSec = 1;
+        // private final ProfiledPIDController pid;
+
+        public RotateToTarget() {
+            // pid = new ProfiledPIDController(0.02, 0, 0.01, new TrapezoidProfile.Constraints(
+            //     0.1,
+            //     kMaxAcceleration
+            // ));
+            // pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
+            // pid.enableContinuousInput(0, 360);
+
+            addRequirements(mSwerve);
+        }
+
+        @Override
+        public void initialize() {
+            PhotonPipelineResult result = mSwerve.mCameraWrapper.photonCamera.getLatestResult();
+            if (result.hasTargets()) {
+                // var yaw = mSwerve.getYaw();
+                // System.out.println("Current Yaw: " + yaw.getDegrees());
+                double targetYaw = result.getBestTarget().getYaw();
+                // double targetYaw = result.getBestTarget().getBestCameraToTarget().inverse().getTranslation().toTranslation2d().getAngle().getDegrees();
+                System.out.println("Tag Yaw: " + targetYaw);
+                // Rotation2d newYaw = yaw.minus(Rotation2d.fromDegrees(targetYaw));
+                // System.out.println("Goal Yaw: " + newYaw.getDegrees());
+                var newCommand = new RotateYaw(Rotation2d.fromDegrees(targetYaw));
+                newCommand.schedule();
+            }
+        }
+
+        // @Override
+        // public void execute() {
+        //     PhotonPipelineResult result = mSwerve.mCameraWrapper.photonCamera.getLatestResult();
+        //     if (result.hasTargets()) {
+        //         double tagYaw = result.getBestTarget().getYaw();
+        //         // double d = pid.calculate(tagYaw, 0);
+        //         // mSwerve.drive(
+        //         //     new Translation2d(),
+        //         //     -d,
+        //         //     true
+        //         // );
+        //         System.out.println("Tag Yaw: " + tagYaw);
+        //         System.out.println("Tag Pitch: " + result.getBestTarget().getPitch());
+        //     }
+        // }
+
+        // @Override
+        // public boolean isFinished() {
+        //     boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+        //     boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+        //     Boolean finished = positionFine && velocityFine;
+        //     finished = false;
+        //     if (finished) {
+        //         System.out.println("done");
+        //     }
+        //     return finished;
+        // }
+    }
+
     public class RotateToYaw extends CommandBase {
 
         private final double mYawToleranceDegrees = 2;
@@ -262,14 +326,15 @@ public class SwerveCommands {
 
         public RotateToYaw(Rotation2d destinationYaw) {
             this(destinationYaw, null);
+        
         }
 
         public RotateToYaw(Rotation2d destinationYaw, PIDWidget pidWidget) {
             mPIDWidget = pidWidget;
-            motionConstraints = new TrapezoidProfile.Constraints(Math.PI / 4, Math.PI / 4);
+            motionConstraints = new TrapezoidProfile.Constraints(Math.PI / 1, Math.PI / 2);
             addRequirements(mSwerve);
             mlastVelocity = 0;
-            mDestinationYaw = destinationYaw;
+            mDestinationYaw = destinationYaw.times(-1);
         }
 
         @Override
@@ -284,14 +349,14 @@ public class SwerveCommands {
             var currState = new TrapezoidProfile.State(yaw, mlastVelocity);
             var goalState = new TrapezoidProfile.State(goal, 0);
             TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
-            double ticLength = 1./50; // Robot runs at 50Hz
-            var state = currMotionProfile.calculate(ticLength);
-            mlastVelocity = state.velocity;
+            double ticLength = 1./20; //Robot runs at 20Hz
+            var driveCommand = currMotionProfile.calculate(ticLength);
+            mlastVelocity = driveCommand.velocity;
             if (mPIDWidget != null) {
-                mPIDWidget.update(yaw, goal, state.velocity);
+                mPIDWidget.update(yaw, goal, driveCommand.velocity);
             }
             mSwerve.drive(
-                new ChassisSpeeds(0, 0, state.velocity),
+                new ChassisSpeeds(0, 0, driveCommand.velocity),
                 true,
                 true
             );
@@ -314,15 +379,65 @@ public class SwerveCommands {
             }
             return finished;
         }
+
     }
+
+    // public class RotateYaw extends CommandBase {
+
+    //     private final double mYawToleranceDegrees = 10;
+    //     private final double mAngularVelToleranceDegreesSec = 1;
+    //     private final double kP = 0.2;
+    //     private Rotation2d mDeltaYaw;
+    //     private final ProfiledPIDController pid;
+
+    //     public RotateYaw(Rotation2d deltaYaw) {
+    //         pid = new ProfiledPIDController(kP, 0, 0.01, new TrapezoidProfile.Constraints(
+    //             10,
+    //             kMaxAcceleration
+    //         ));
+    //         pid.setTolerance(mYawToleranceDegrees, mAngularVelToleranceDegreesSec);
+    //         pid.enableContinuousInput(0, 360);
+
+    //         addRequirements(mSwerve);
+    //         mDeltaYaw = deltaYaw;
+    //     }
+
+    //     @Override
+    //     public void execute() {
+    //         double d = pid.calculate(mDeltaYaw.getDegrees(), 0);
+    //         //System.out.println(d);
+    //         mSwerve.drive(
+    //             new Translation2d(),
+    //             -d,
+    //             true
+    //         );
+    //     }
+
+    //     @Override
+
+    //     public void end(boolean isInterrupted) {
+    //         mSwerve.stop();
+    //     }
+    //     @Override
+    //     public boolean isFinished() {
+    //         boolean positionFine = (Math.abs(pid.getPositionError()) < pid.getPositionTolerance());
+    //         boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
+    //         Boolean finished = positionFine && velocityFine;
+    //         if (finished) {
+    //             System.out.println("done");
+    //         }
+    //         return finished;
+    //     }
+
+    // }
 
     public class RotateYaw extends RotateToYaw {
         public RotateYaw(Rotation2d deltaYaw) {
-            super(deltaYaw.plus(mSwerve.getEstimatedYaw()));
+            super(deltaYaw.plus(mSwerve.getYaw()));
         }
 
         public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
-            super(deltaYaw.plus(mSwerve.getEstimatedYaw()), widget);
+            super(deltaYaw.plus(mSwerve.getYaw()), widget);
         }
 
     }

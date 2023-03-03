@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 public class SwerveModule {
 	public interface AbsoluteEncoder {
@@ -53,9 +54,9 @@ public class SwerveModule {
     private final CANSparkMax mDriveMotor;
     private final CANSparkMax mAngleMotor;
 
-    private final RelativeEncoder mDriveEncoder;
-    private final RelativeEncoder mIntegratedAngleEncoder;
-    private final CANCoder mAngleEncoder;
+    private RelativeEncoder mDriveEncoder;
+    private RelativeEncoder mIntegratedAngleEncoder;
+    private AbsoluteEncoder mAngleEncoder;
 
     private final SparkMaxPIDController mDriveController;
     private final SparkMaxPIDController mAngleController;
@@ -87,7 +88,8 @@ public class SwerveModule {
         mAngleController = mAngleMotor.getPIDController();
         configureAngleMotor();
 
-        mAngleEncoder = new CANCoder(encoderID);
+
+        mAngleEncoder = kAbsoluteEncoderConstructor.apply(encoderID);
 
         resetToAbsolute();
 

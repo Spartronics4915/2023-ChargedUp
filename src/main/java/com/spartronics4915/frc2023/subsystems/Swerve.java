@@ -1,9 +1,17 @@
 package com.spartronics4915.frc2023.subsystems;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.common.hardware.VisionLEDMode;
 
 import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.spartronics4915.frc2023.Constants.Swerve.Module0;
+import com.spartronics4915.frc2023.Constants.Swerve.Module1;
+import com.spartronics4915.frc2023.Constants.Swerve.Module2;
+import com.spartronics4915.frc2023.Constants.Swerve.Module3;
+import com.spartronics4915.frc2023.PhotonCameraWrapper;
+import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
+import com.spartronics4915.frc2023.commands.PrintPos;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.MatBuilder;
@@ -40,7 +48,9 @@ public class Swerve extends SubsystemBase {
     private Rotation2d mLastLastPitch;
 
 	private final int mModuleCount;
-    private PhotonCamera mFrontCamera;
+    
+    public PhotonCameraWrapper mCameraWrapper;
+    // private PhotonCamera mFrontCamera;
 
     private boolean mIsFieldRelative = true;
 
@@ -63,9 +73,8 @@ public class Swerve extends SubsystemBase {
         mIMU = new WPI_Pigeon2(kPigeonID);
         configurePigeon(mIMU);
 
-        if (useCamera) {
-            mFrontCamera = new PhotonCamera(NetworkTableInstance.getDefault(), kFrontCameraName);
-        }
+        mCameraWrapper = new PhotonCameraWrapper();
+        // mFrontCamera = new PhotonCamera(NetworkTableInstance.getDefault(), kFrontCameraName);
 
         mModules = new SwerveModule[] {
             new SwerveModule(0, Module0.kConstants),
@@ -312,55 +321,35 @@ public class Swerve extends SubsystemBase {
         return mModules;
     }
 
-	private class VisionMeasurement {
-		public Pose2d mPose;
-		public double mTime;
+    // public void zeroPIDP(){
+    //     for (var module: getSwerveModules()) {
 
-		public VisionMeasurement(Pose2d pose, double time) {
-			mPose = pose;
-			mTime = time;
-		}
-	};
+    //         module.zeroPIDP();
+    //     }
+    // }
 
-	private VisionMeasurement getVisionMeasurement() {
-        if (!useCamera) {
-            return null;
-        }
-        var frontLatestResult = mFrontCamera.getLatestResult();
-        if (frontLatestResult.hasTargets()) {
-            double imageCaptureTime = (Timer.getFPGATimestamp() * 1000) - frontLatestResult.getLatencyMillis();
-            var bestTarget = frontLatestResult.getBestTarget();
-            int bestTargetID = bestTarget.getFiducialId();
-            var camToTargetTransform3d = bestTarget.getBestCameraToTarget();
-            var camToTargetTransform2d = new Transform2d(
-                camToTargetTransform3d.getTranslation().toTranslation2d(),
-                camToTargetTransform3d.getRotation().toRotation2d()
-            );
-            Pose2d camPose = kTagPoses[bestTargetID].transformBy(camToTargetTransform2d.inverse());
-            SmartDashboard.putNumber("x to tag", camPose.getX());
-            SmartDashboard.putNumber("y to tag", camPose.getY());
-			return new VisionMeasurement(camPose.transformBy(kFrontCameraToRobot), imageCaptureTime);
-		}
-        return null;
-	}
 
-    private void updatePoseEstimator() {
-		VisionMeasurement vision = getVisionMeasurement();
+    public void updatePoseEstimator() {
+		VisionMeasurement vision = mCameraWrapper.getEstimatedGlobalPose();
+        mPoseEstimator.update(getYaw(), getPositions());
 		if (vision != null)
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-        mPoseEstimator.update(getEstimatedYaw(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
     @Override
     public void periodic() {
         updatePoseEstimator();
+        resetToAbsolute();
+        
         for (SwerveModule mod : mModules) {
             mod.putSmartDashboardValues();
         }
         SmartDashboard.putNumber("pose x", getPose().getX());
         SmartDashboard.putNumber("pose y", getPose().getY());
         SmartDashboard.putNumber("pose rotation degrees", getPose().getRotation().getDegrees());
+        
+        SmartDashboard.putNumber("Yaw", getYaw().getDegrees());
 
         SmartDashboard.putBoolean("field relative", mIsFieldRelative);
 
