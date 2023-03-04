@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
@@ -144,6 +145,10 @@ public class Swerve extends SubsystemBase {
         SwerveModuleState[] moduleStates = kKinematics.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, kMaxSpeed);
         setModuleStates(moduleStates, isOpenLoop);
+    }
+
+    public CommandBase driveCommand(ChassisSpeeds chassisSpeeds, boolean fieldRelative, boolean isOpenLoop) {
+        return runOnce(() -> drive(chassisSpeeds, fieldRelative, isOpenLoop));
     }
 
     /**

@@ -523,7 +523,7 @@ public final class Constants {
         public static final double kTriggerDeadband = 0.08;
         public static final double kResponseCurveExponent = 5.0 / 3.0;
 
-		public static final int kDefaultAutoIndex = 0;
+		public static final int kDefaultAutoIndex = 3;
 
     }
 }

@@ -44,6 +44,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,6 +52,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -198,6 +200,21 @@ public class RobotContainer {
                 "do nothing",
                 (Pose2d initialPose) -> new CommandBase() {}
             ),
+            mAutos.new Strategy(
+                "place, do nothing",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.new ReleasePiece(ArmState.FLOOR_POS)
+                )
+            ),
+            mAutos.new Strategy(
+                "place, leave community",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+                    mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
+                    new WaitCommand(3),
+                    mSwerve.driveCommand(new ChassisSpeeds(), false, true)
+                )
+            )
             // mAutos.new Strategy(
             //     "drop, leave",
             //     (Pose2d initialPose) -> new SequentialCommandGroup(
