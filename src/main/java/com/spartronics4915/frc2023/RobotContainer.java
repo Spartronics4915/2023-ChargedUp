@@ -333,7 +333,8 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
+        // return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
+        return null;
     }
     
     public Command getTeleopInitCommand() {

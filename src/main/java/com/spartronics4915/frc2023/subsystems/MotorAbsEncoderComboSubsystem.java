@@ -241,8 +241,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
-        //         if(isArm) {
-        //         System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + mReferenceRadians + " " + err);}
+                if(isArm) {
+                System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + mReferenceRadians + " " + err);}
 
         }
     }
