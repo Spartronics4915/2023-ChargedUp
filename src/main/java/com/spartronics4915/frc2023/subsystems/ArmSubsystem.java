@@ -218,6 +218,10 @@ public class ArmSubsystem extends SubsystemBase {
         mWristMotor.setArmReference(state.wristTheta);
     }
 
+    public CommandBase setDesiredLocalStateCommand(ArmPosition state) {
+        return runOnce(() -> setDesiredLocalPosition(state));
+    }
+
     private void setDesiredGlobalPosition(ArmPosition pos) {
         setDesiredLocalPosition(globalToLocalState(pos));
     }

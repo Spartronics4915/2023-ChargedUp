@@ -193,7 +193,17 @@ public class RobotContainer {
 					mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
 				)
 
-			)//,
+			),
+            mAutos.new Strategy(
+                "do nothing",
+                (Pose2d initialPose) -> new CommandBase() {}
+            ),
+            // mAutos.new Strategy(
+            //     "drop, leave",
+            //     (Pose2d initialPose) -> new SequentialCommandGroup(
+            //         mArmCommands.new 
+            //     )    
+            // )
 			// mAutos.new Strategy(
 			// 	"Move Forward Static (Test)",
 			// 	(Pose2d initialPose) -> mAutos.new MoveForwardCommandFancy()
@@ -333,8 +343,8 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        // return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
-        return null;
+        return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
+        // return null;
     }
     
     public Command getTeleopInitCommand() {

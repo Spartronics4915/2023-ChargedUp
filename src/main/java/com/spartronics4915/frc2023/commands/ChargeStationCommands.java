@@ -77,7 +77,7 @@ public final class ChargeStationCommands {
 
         @Override
         public void execute() {
-            final double climb_to_grip_speed_m_s = -2;
+            final double climb_to_grip_speed_m_s = -2.4;
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP: {
@@ -101,7 +101,7 @@ public final class ChargeStationCommands {
                 }
 
                 case GRIP_TO_PLATFORM: {
-                    final double grip_to_platform_speed_m_s = climb_to_grip_speed_m_s * 0.25;
+                    final double grip_to_platform_speed_m_s = -2. * 0.175;
                     final double grip_to_platform_target_roll_deg = 8;
                     final double grip_to_platform_time_allowed = 5;
                     if (mCurrStateTimer.hasElapsed(grip_to_platform_time_allowed)) {
@@ -113,7 +113,7 @@ public final class ChargeStationCommands {
                     mSwerve.drive(new ChassisSpeeds(grip_to_platform_speed_m_s, 0, 0), true, true);
                     if (Math.abs(mSwerve.getPitch().getDegrees()) < grip_to_platform_target_roll_deg) {
                         mLastState = mCurrState;
-                        mCurrState = ClimbState.LEVEL_ROBOT_SETUP;
+                        mCurrState = ClimbState.STOP;
                         mCurrStateTimer = null;
                     }
                     break;
