@@ -210,8 +210,29 @@ public class RobotContainer {
                 "place, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
-                    new WaitCommand(3),
+                    new WaitCommand(2.5),
+                    mSwerve.driveCommand(new ChassisSpeeds(), false, true)
+                )
+            ),
+            mAutos.new Strategy(
+                "cube high (test)",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE)
+                )
+            ),
+            mAutos.new Strategy(
+                "place, move short (test)",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    new WaitCommand(1),
+                    mSwerve.driveCommand(new ChassisSpeeds(-0.5, 0, 0), false, true),
+                    new WaitCommand(2),
+                    mSwerve.driveCommand(new ChassisSpeeds(-1, 0, 0), false, true),
+                    new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
             )

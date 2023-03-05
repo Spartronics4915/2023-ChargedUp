@@ -460,6 +460,12 @@ public final class Constants {
             Rotation2d.fromDegrees(23),
             Rotation2d.fromDegrees(-36)
         );
+
+        public static final ArmPositionConstants kCubeTopShootConstants = new ArmPositionConstants(
+            0,
+            Rotation2d.fromDegrees(9.996031),
+            Rotation2d.fromDegrees(30.441)
+        );
         
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
         public static final double kArmRetractedPriorWaitDuration = 1; // seconds
