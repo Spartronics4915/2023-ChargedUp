@@ -355,7 +355,7 @@ public class Swerve extends SubsystemBase {
 		VisionMeasurement vision = getVisionMeasurement();
 		if (vision != null)
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-        mPoseEstimator.update(getEstimatedYaw(), getPositions());
+        mPoseEstimator.update(getYaw(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
