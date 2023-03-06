@@ -161,6 +161,15 @@ public class RobotContainer {
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
+            mAutos.new Strategy(
+				"High cube, Balance",
+				(Pose2d initialPose) -> new SequentialCommandGroup(		
+					mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
+                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    new WaitCommand(1),
+					new ChargeStationCommands.AutoChargeStationClimb()
+				)
+			),
             // mAutos.new Strategy(
             //     "Drop, Leave, Pick-up",
             //     (Pose2d initialPose) -> new SequentialCommandGroup(
@@ -175,7 +184,7 @@ public class RobotContainer {
             //     )
             // ),
 			mAutos.new Strategy(
-				"Drop, Leave, Pick-up",
+				"Drop, Leave, Pick-up (do not use)",
 				(Pose2d initialPose) -> new SequentialCommandGroup(
 					mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
 					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
@@ -207,9 +216,26 @@ public class RobotContainer {
                 )
             ),
             mAutos.new Strategy(
+                "high cube, do nothing",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE)
+                )
+            ),
+            mAutos.new Strategy(
                 "place, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
+                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    new WaitCommand(1),
+                    mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
+                    new WaitCommand(2.5),
+                    mSwerve.driveCommand(new ChassisSpeeds(), false, true)
+                )
+            ),
+            mAutos.new Strategy(
+                "cube high, leave community",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
                     mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),

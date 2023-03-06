@@ -101,8 +101,8 @@ public final class ChargeStationCommands {
                 }
 
                 case GRIP_TO_PLATFORM: {
-                    final double grip_to_platform_speed_m_s = -2. * 0.175;
-                    final double grip_to_platform_target_roll_deg = 8;
+                    final double grip_to_platform_speed_m_s = -2. * 0.1875;
+                    final double grip_to_platform_target_roll_deg = 9;
                     final double grip_to_platform_time_allowed = 5;
                     if (mCurrStateTimer.hasElapsed(grip_to_platform_time_allowed)) {
                         mSwerve.stop();

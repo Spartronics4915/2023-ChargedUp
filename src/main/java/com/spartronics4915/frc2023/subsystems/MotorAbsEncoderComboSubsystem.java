@@ -105,7 +105,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         // This is designed to ignore unsafe arm positions.
         if (Math.abs(ref.getDegrees()) > 100)
         {
-            System.out.println("Unsafe arm position requested: " + ref);
+            System.out.println("Unsafe arm position requested (setArmReference): " + ref);
             return;
         }
         mModeledPosition = getRawPosition();
@@ -134,8 +134,12 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     private void setNativeReference(Rotation2d ref) {
 
-        System.out.println("SetNativeReferenceCalled");
+        if (Math.abs(mCurrentReference.minus(ref).getDegrees()) > 120) {
+            System.out.println("setNativeReference illegal request:" + ref);
+            return;
+        }
         mCurrentReference = ref;
+
         mReferenceRadians = ref.getRadians();
         mReferenceSet = true;
     }
