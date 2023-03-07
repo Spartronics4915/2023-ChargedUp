@@ -116,9 +116,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         {
             System.out.println("Unsafe arm position requested: " + ref);
             return;
+        } else {
+            mModeledPosition = getNativePosition().getRadians();
+            setNativeReference(HorizonToNative(ref));
         }
-        mModeledPosition = getNativePosition().getRadians();
-        setNativeReference(HorizonToNative(ref));
     }
 
     public void setActive(boolean active) {
@@ -161,7 +162,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         return mCurrentReference;
     }
 
-    public Rotation2d getCurrentReferenceArm() {
+    public Rotation2d getCurrentReferenceHorizon() {
         return nativeToHorizon(mCurrentReference);
     }
 
@@ -224,12 +225,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             } else if (total_output < -1.0) {
                 total_output = -1.0;
             }
-
+            
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
-
-
         }
     }
 

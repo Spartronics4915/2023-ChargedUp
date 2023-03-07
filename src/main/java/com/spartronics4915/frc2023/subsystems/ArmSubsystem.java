@@ -173,8 +173,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public ArmPosition  getLocalReference() {
-        Rotation2d pivotReference = mPivotMotor.getCurrentReferenceArm();
-        Rotation2d wristReference = mWristMotor.getCurrentReferenceArm();
+        Rotation2d pivotReference = mPivotMotor.getCurrentReferenceHorizon();
+        Rotation2d wristReference = mWristMotor.getCurrentReferenceHorizon();
         double extenderReference = mExtenderSubsystem.getReference();
 
         return new ArmPosition(extenderReference, pivotReference, wristReference);
