@@ -57,18 +57,18 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         motionConstraints = new TrapezoidProfile.Constraints(Math.PI/6., Math.PI/6);
         mModeledVelocity = 0;
 
-        mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
+        mMotor = new CANSparkMax(MotorConstants.kMotorConstants.kMotorID, motorType);
         mMotor.restoreFactoryDefaults();
         mMotor.setIdleMode(IdleMode.kBrake);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
-        double radianOffset = MotorConstants.kZeroOffset.getRadians();
+        double radianOffset = MotorConstants.kMotorConstants.kZeroOffset.getRadians();
         if (radianOffset < 0) {
             radianOffset += Math.PI * 2;
         }
         mAbsEncoder.setZeroOffset(radianOffset);
-        if (MotorConstants.kInvertMotor) {
+        if (MotorConstants.kMotorConstants.kInverted) {
             mMotor.setInverted(true);
         }
         mPIDController = null; //initializePIDController(MotorConstants);
@@ -79,9 +79,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mReferenceRadians = mCurrentReference.getRadians();
         mLastSpeedOutput = 0;
         mAngleProvider = null;
-        kP = MotorConstants.kP;
-        kFF = MotorConstants.kFF;
+        kP = MotorConstants.kPIDConstants.kP;
+        kFF = MotorConstants.kPIDConstants.kFF;
         mMotor.burnFlash();
+        
     }
 
     public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
@@ -90,9 +91,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
         SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(MotorConstants.kP);
-        PIDController.setI(MotorConstants.kI);
-        PIDController.setD(MotorConstants.kD);
+        PIDController.setP(MotorConstants.kPIDConstants.kP);
+        PIDController.setI(MotorConstants.kPIDConstants.kI);
+        PIDController.setD(MotorConstants.kPIDConstants.kD);
 
         PIDController.setFeedbackDevice(mAbsEncoder);
         return PIDController;

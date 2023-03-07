@@ -292,93 +292,89 @@ public final class Constants {
 
 
     public static final class Arm {
-		public static class Auto {
-			public static final double kArmStateChangeDuration = 3; // seconds
-			public static final double kGrabDuration = 2; // seconds
-		}
         public static class PIDConstants {
             public final double kP;
             public final double kI;
             public final double kD;
-            public PIDConstants(double kP, double kI, double kD) {
+            public final double kFF;
+            public PIDConstants(double kP, double kI, double kD, double kFF) {
                 super();
                 this.kP = kP;
                 this.kI = kI;
                 this.kD = kD;
+                this.kFF = kFF;
             } 
         }
+        public static class SmartMotionsConstants{
+            public final double kSmartMotionMaxAccel;
+            public final double kSmartMotionMaxVelocity;
+            public final double kSmartMotionMinOutputVelocity;
+            public SmartMotionsConstants(double kSmartMotionMaxAccel, double kSmartMotionMaxVelocity, double kSmartMotionMinOutputVelocity) {
+                this.kSmartMotionMaxAccel = kSmartMotionMaxAccel;
+                this.kSmartMotionMaxVelocity = kSmartMotionMaxVelocity;
+                this.kSmartMotionMinOutputVelocity = kSmartMotionMinOutputVelocity;
+            }
+        }
+        public static class CanSparkMaxMotorConstants{
+            public final int kMotorID;
+            public final double kPositionConversionFactor;
+            public final MotorType kMotorType;
+            public final IdleMode kIdleMode;
+            public final boolean kInverted;
+            public final Rotation2d kZeroOffset;
+            public CanSparkMaxMotorConstants(int kMotorID, double kPositionConversionFactor, MotorType kMotorType, IdleMode kIdleMode, boolean kInverted, Rotation2d kZeroOffset ) {
+                this.kMotorID = kMotorID;
+                this.kPositionConversionFactor = kPositionConversionFactor;
+                this.kMotorType = kMotorType;
+                this.kIdleMode = kIdleMode;
+                this.kInverted = kInverted;
+                this.kZeroOffset = kZeroOffset;
+            }
 
+        }
+		
+        public static class Auto {
+			public static final double kArmStateChangeDuration = 3; // seconds
+			public static final double kGrabDuration = 2; // seconds
+		}
+        
+        
         public static final class ExtenderConstants{
             public static final int kMotorID = 17;
             public static final int kLimitSwitchZeroPort = 9; 
             public static final int kLimitSwitch2Port = -1;
         }
 
-        public static class ClawConstants{
-            public static final PIDConstants kClawMotorPID = new PIDConstants(0, 0, 0); //PlaceHolder Value
-            public static final int klimitSwitchID = 0; //PlaceHolder Value
-            public static final int kClawMotorID = 0; //PlaceHolder Value
-            public static final double kInSpeed = 0.25; //PlaceHolder Value
-            public static final double kOutSpeed = 0.25; //PlaceHolder Value, already negative in code
-            public static final double kGrabTimerLength = 1; //seconds
-            public static final double kReleaseTimerLength = 1; //seconds
-        }
-        public static final class ArmMotorConstants{
-            public final int kMotorID;
-            public final double kPositionConversionFactor;
-            public final boolean kInverted;
-            public final double kP;
-            public final double kI;
-            public final double kD;
-            public final double kFF;
-            public final double kSmartMotionMaxAccel;
-            public final double kSmartMotionMaxVelocity;
-            public final double kSmartMotionMinOutputVelocity;
-            public final Rotation2d kZeroOffset;
-            public final int kFollowerMotorID;
-            public final boolean kInvertMotor;
-            public final MotorType kMotorType;
-
-            public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, double FF, 
-            double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, Rotation2d zeroOffset, 
-            int followerMotorID, boolean motorInverted, MotorType motorType) {
+        public static class ArmMotorConstants{
+            public final CanSparkMaxMotorConstants kMotorConstants;
+            public final PIDConstants kPIDConstants;
+            public final SmartMotionsConstants kSmartMotionsConstants;
+            public final Rotation2d kHorizonDeflection;
+            public ArmMotorConstants( CanSparkMaxMotorConstants kMotorConstants, PIDConstants kPIDConstants, SmartMotionsConstants kSmartMotionsConstants, Rotation2d kHorizonDeflection) {
                 super();
-                this.kMotorID = MotorID;
-                this.kPositionConversionFactor = PositionConversionFactor;
-                this.kInverted = Inverted;
-                this.kP = P;
-                this.kI = I;
-                this.kD = D;
-                this.kSmartMotionMaxAccel = SmartMotionMaxAccel; 
-                this.kSmartMotionMaxVelocity = SmartMotionMaxVelocity;
-                this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
-                this.kZeroOffset = zeroOffset;
-                this.kFollowerMotorID = followerMotorID;
-                this.kInvertMotor = motorInverted;
-                this.kMotorType = motorType;
-                this.kFF = FF;
+                this.kPIDConstants = kPIDConstants;
+                this.kSmartMotionsConstants = kSmartMotionsConstants;
+                this.kMotorConstants = kMotorConstants;
+                this.kHorizonDeflection = kHorizonDeflection;
             }
         }
+
         public static final IntFunction<CANSparkMax> kNeoConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
         public static final IntFunction<CANSparkMax> k775Constructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushed); };
 
-        public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
-            15,  //actual value 15
-            Math.PI * 2, false,
-            0.2, 0, 0, 0.04,
-            Math.PI/8, 1, 0,
-            Rotation2d.fromDegrees(66), 10, false,
-            MotorType.kBrushless
-        ); 
 
+        public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
+            new CanSparkMaxMotorConstants(15, Math.PI*2, MotorType.kBrushless, IdleMode.kBrake, false, Rotation2d.fromDegrees(66)), 
+            new PIDConstants(0.2, 0, 0, 0.04), 
+            new SmartMotionsConstants(Math.PI/8, 1, 0), 
+            Rotation2d.fromDegrees(0)
+        );
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
-            19, 
-            Math.PI * 2, true,
-            0.3, 0, 0, 0.03,
-            1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
-            Rotation2d.fromDegrees(136),-1, true,
-            MotorType.kBrushed
-        ); 
+            new CanSparkMaxMotorConstants(19, Math.PI*2,MotorType.kBrushed, IdleMode.kBrake, true, Rotation2d.fromDegrees(136)), 
+            new PIDConstants(0.3, 0, 0, 0.03), 
+            new SmartMotionsConstants(1, 1, 0), 
+            Rotation2d.fromDegrees(0)
+        );
 
         public static final int kPivotFollowerID = 16; //actual value: 16
         
