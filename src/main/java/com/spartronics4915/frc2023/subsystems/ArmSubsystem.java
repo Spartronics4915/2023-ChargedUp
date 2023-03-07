@@ -33,8 +33,8 @@ public class ArmSubsystem extends SubsystemBase {
 
         public Rotation2d getAngleWithEarth() {
 
-            Rotation2d pivotArmAngle = mPivot.getArmPosition();
-            Rotation2d wristArmAngle = mWrist.getArmPosition();
+            Rotation2d pivotArmAngle = mPivot.getHorizonPosition();
+            Rotation2d wristArmAngle = mWrist.getHorizonPosition();
 
             Rotation2d wristAngleWithEarth = pivotArmAngle.plus(wristArmAngle);
             return  wristAngleWithEarth;
@@ -159,15 +159,15 @@ public class ArmSubsystem extends SubsystemBase {
         if(mWristMotor == null) {
             return new ArmPosition(
                 mExtenderSubsystem.getPosition(),
-                mPivotMotor.getArmPosition(),
+                mPivotMotor.getHorizonPosition(),
                 new Rotation2d(0)
         );
 
         }
         return new ArmPosition(
                 mExtenderSubsystem.getPosition(),
-                mPivotMotor.getArmPosition(),
-                mWristMotor.getArmPosition()
+                mPivotMotor.getHorizonPosition(),
+                mWristMotor.getHorizonPosition()
         // new Rotation2d(0)
         );
     }
@@ -212,8 +212,8 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO add extender motor
     private void setDesiredLocalPosition(ArmPosition state) {
         // mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
-        mPivotMotor.setArmReference(state.armTheta);
-        mWristMotor.setArmReference(state.wristTheta);
+        mPivotMotor.setHorizonReference(state.armTheta);
+        mWristMotor.setHorizonReference(state.wristTheta);
     }
 
     private void setDesiredGlobalPosition(ArmPosition pos) {

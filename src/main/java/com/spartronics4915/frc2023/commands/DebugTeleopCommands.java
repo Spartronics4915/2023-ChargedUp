@@ -268,20 +268,20 @@ public final class DebugTeleopCommands {
 
 
             if (module.getWrist() != null) {
-            wristRaw.setDouble(module.getWrist().getRawPosition());
+            wristRaw.setDouble(module.getWrist().getNativePosition().getDegrees());
             wristNative.setDouble(module.getWrist().getNativePosition().getDegrees());
-            wristArm.setDouble(module.getWrist().getArmPosition().getDegrees());
-            wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
-            wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
+            wristArm.setDouble(module.getWrist().getHorizonPosition().getDegrees());
+            wristArmMinus30Native.setDouble(module.getWrist().HorizonToNative(Rotation2d.fromDegrees(-30)).getDegrees());
+            wristArmPlus30Native.setDouble(module.getWrist().HorizonToNative(Rotation2d.fromDegrees(30)).getDegrees());
             wristSpeed.setDouble(module.getWrist().getMotor().getAppliedOutput());
             wristRef.setDouble(Rotation2d.fromRadians(module.getWrist().trapezoidTarget).getDegrees());
             } 
 
-            shoulderRaw.setDouble(module.getPivot().getRawPosition());
+            shoulderRaw.setDouble(module.getPivot().getNativePosition().getDegrees());
             shoulderNative.setDouble(module.getPivot().getNativePosition().getDegrees());
-            shoulderArm.setDouble(module.getPivot().getArmPosition().getDegrees());
-            shouldArmMinus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
-            shoulderArmPlus30Native.setDouble(module.getPivot().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
+            shoulderArm.setDouble(module.getPivot().getHorizonPosition().getDegrees());
+            shouldArmMinus30Native.setDouble(module.getPivot().HorizonToNative(Rotation2d.fromDegrees(-30)).getDegrees());
+            shoulderArmPlus30Native.setDouble(module.getPivot().HorizonToNative(Rotation2d.fromDegrees(30)).getDegrees());
             stateShoulderRotation.setDouble(desired.armTheta.getDegrees());
             shoulderRef.setDouble(module.getPivot().getCurrentReference().getDegrees());
             pivotSpeed.setDouble(motors[0].getMotorSpeed());
@@ -337,9 +337,9 @@ public final class DebugTeleopCommands {
             // elevatorCommands.add((mArmCommands.new SetArmState(ArmState.ARM_LOW)).withName("LOW"));
             
 
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setArmReference(Rotation2d.fromDegrees(0))).withName("arm 0"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(30))).withName("Wrist +30"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(0))).withName("Wrist +0"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setHorizonReference(Rotation2d.fromDegrees(0))).withName("arm 0"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setHorizonReference(Rotation2d.fromDegrees(30))).withName("Wrist +30"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setHorizonReference(Rotation2d.fromDegrees(0))).withName("Wrist +0"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Motor"));

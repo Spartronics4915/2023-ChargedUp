@@ -367,13 +367,13 @@ public final class Constants {
             new CanSparkMaxMotorConstants(15, Math.PI*2, MotorType.kBrushless, IdleMode.kBrake, false, Rotation2d.fromDegrees(66)), 
             new PIDConstants(0.2, 0, 0, 0.04), 
             new SmartMotionsConstants(Math.PI/8, 1, 0), 
-            Rotation2d.fromDegrees(0)
+            Rotation2d.fromDegrees(180)
         );
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             new CanSparkMaxMotorConstants(19, Math.PI*2,MotorType.kBrushed, IdleMode.kBrake, true, Rotation2d.fromDegrees(136)), 
             new PIDConstants(0.3, 0, 0, 0.03), 
             new SmartMotionsConstants(1, 1, 0), 
-            Rotation2d.fromDegrees(0)
+            Rotation2d.fromDegrees(180)
         );
 
         public static final int kPivotFollowerID = 16; //actual value: 16

@@ -39,6 +39,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private SparkMaxPIDController mPIDController;
     private Rotation2d mCurrentReference = new Rotation2d(0);
 
+    private final ArmMotorConstants motorConstants; 
+
     private boolean mActive;
     private boolean mReferenceSet;
     private double mReferenceRadians;
@@ -51,26 +53,32 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public double mModeledPosition;
     private static int instancecount =0;
     private int mycount;
-    public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
+    public MotorAbsEncoderComboSubsystem(ArmMotorConstants motorConstants, MotorType motorType) {
+        this.motorConstants = motorConstants;
         mycount = instancecount;
         instancecount +=1;
         motionConstraints = new TrapezoidProfile.Constraints(Math.PI/6., Math.PI/6);
         mModeledVelocity = 0;
 
-        mMotor = new CANSparkMax(MotorConstants.kMotorConstants.kMotorID, motorType);
+        mMotor = new CANSparkMax(motorConstants.kMotorConstants.kMotorID, motorType);
         mMotor.restoreFactoryDefaults();
-        mMotor.setIdleMode(IdleMode.kBrake);
+        mMotor.setIdleMode(motorConstants.kMotorConstants.kIdleMode);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
-        double radianOffset = MotorConstants.kMotorConstants.kZeroOffset.getRadians();
+
+        double radianOffset = motorConstants.kMotorConstants.kZeroOffset.getRadians();
+
         if (radianOffset < 0) {
             radianOffset += Math.PI * 2;
         }
+
         mAbsEncoder.setZeroOffset(radianOffset);
-        if (MotorConstants.kMotorConstants.kInverted) {
+
+        if (motorConstants.kMotorConstants.kInverted) {
             mMotor.setInverted(true);
         }
+
         mPIDController = null; //initializePIDController(MotorConstants);
         mMotor.setSmartCurrentLimit(20);
         mActive = true;
@@ -79,8 +87,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mReferenceRadians = mCurrentReference.getRadians();
         mLastSpeedOutput = 0;
         mAngleProvider = null;
-        kP = MotorConstants.kPIDConstants.kP;
-        kFF = MotorConstants.kPIDConstants.kFF;
+        kP = motorConstants.kPIDConstants.kP;
+        kFF = motorConstants.kPIDConstants.kFF;
         mMotor.burnFlash();
         
     }
@@ -105,23 +113,23 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
      * @param ref A Rotation2d. This should be in arm coordinates where 0 points
      *            directly out from the arm
      */
-    public void setArmReference(Rotation2d ref) {
+    public void setHorizonReference(Rotation2d ref) {
         // This is designed to ignore unsafe arm positions.
         if (Math.abs(ref.getDegrees()) > 80)
         {
             System.out.println("Unsafe arm position requested: " + ref);
             return;
         }
-        mModeledPosition = getRawPosition();
-        setNativeReference(armToNative(ref));
+        mModeledPosition = getNativePosition().getRadians();
+        setNativeReference(HorizonToNative(ref));
     }
 
     public void setActive(boolean active) {
         mActive = active;
     }
 
-    public Rotation2d armToNative(Rotation2d armRotation) {
-        var outputRot = armRotation.unaryMinus().plus(Rotation2d.fromDegrees(180));
+    public Rotation2d HorizonToNative(Rotation2d armRotation) {
+        var outputRot = armRotation.unaryMinus().plus(motorConstants.kHorizonDeflection);
 
         // To match the encoder, we want angles in [0, 2PI]
         var radValue = outputRot.getRadians();
@@ -132,8 +140,8 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         return outputRot;
     }
 
-    public Rotation2d nativeToArm(Rotation2d nativeRotation) {
-        return nativeRotation.minus(Rotation2d.fromDegrees(180)).unaryMinus();
+    public Rotation2d nativeToHorizon(Rotation2d nativeRotation) {
+        return nativeRotation.minus(motorConstants.kHorizonDeflection).unaryMinus();
     }
 
     private void setNativeReference(Rotation2d ref) {
@@ -157,22 +165,15 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getCurrentReferenceArm() {
-        return nativeToArm(mCurrentReference);
+        return nativeToHorizon(mCurrentReference);
     }
 
-    public Rotation2d getArmPosition() {
-        return nativeToArm(getNativePosition());
+    public Rotation2d getHorizonPosition() {
+        return nativeToHorizon(getNativePosition());
     }
 
     public Rotation2d getNativePosition() {
-        return Rotation2d.fromRadians(getRawPosition());
-    }
-
-    public double getRawPosition() {
-        // System.out.println("get Pos Called");
-
-            return mAbsEncoder.getPosition();
-        // return 123;
+        return Rotation2d.fromRadians(mAbsEncoder.getPosition());
     }
 
     public double getMotorSpeed() {
@@ -185,7 +186,6 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     public void setMotor(double setting) {
         mMotor.set(setting);
-
     }
 
     public Rotation2d getVelocity() {
@@ -195,15 +195,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-            double angleWithEarth;
-            
-            if(mAngleProvider==null) {
-
-              angleWithEarth = getArmPosition().getRadians();
-            }
-            else {
-                angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
-            }
+            double angleWithEarth = ((mAngleProvider == null) ?  getHorizonPosition() : mAngleProvider.getAngleWithEarth()).getRadians();
 
             // double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
