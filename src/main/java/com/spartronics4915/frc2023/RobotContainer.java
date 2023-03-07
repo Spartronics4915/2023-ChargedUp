@@ -9,6 +9,7 @@ import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
 import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
 import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
 
+import java.util.List;
 import java.util.function.Function;
 
 import com.spartronics4915.frc2023.Constants.Arm;
@@ -24,6 +25,7 @@ import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
+import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowTrajectoryCommand;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
@@ -33,7 +35,11 @@ import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -210,6 +216,25 @@ public class RobotContainer {
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
+            ),
+            mAutos.new Strategy(
+                "follow test trajectory",
+                (Pose2d initialPose) -> {
+                    initialPose = new Pose2d();
+                    var cfg = new TrajectoryConfig(2.5, 2.5).setKinematics(kKinematics);
+                    var trajectory = TrajectoryGenerator.generateTrajectory(
+                        List.of(
+                            initialPose,
+                            initialPose.plus(new Transform2d(new Translation2d(1, 2), Rotation2d.fromDegrees(150))),
+                            initialPose.plus(new Transform2d(new Translation2d(3, 3), Rotation2d.fromDegrees(210)))
+                        ),
+                        cfg
+                    );
+                    return new SequentialCommandGroup(
+                        new FollowTrajectoryCommand(trajectory),
+                        mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+                    );
+                }
             )
 		};
 		for (Autos.Strategy strat : autoStrategies) {
