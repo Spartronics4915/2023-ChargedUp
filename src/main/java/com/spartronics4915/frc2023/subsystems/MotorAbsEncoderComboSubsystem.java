@@ -4,15 +4,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 // import com.spartronics4915.frc2023.Constants.ArmConstants.PIDConstants;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -65,7 +61,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mMotor.setIdleMode(motorConstants.kMotorConstants.kIdleMode);
 
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        mAbsEncoder.setPositionConversionFactor(Math.PI * 2);
+        mAbsEncoder.setPositionConversionFactor(motorConstants.kMotorConstants.kPositionConversionFactor);
 
         double radianOffset = motorConstants.kMotorConstants.kZeroOffset.getRadians();
 
@@ -97,14 +93,19 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mAngleProvider = angleProvider;
     }
 
-    private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
-        SparkMaxPIDController PIDController = mMotor.getPIDController();
-        PIDController.setP(MotorConstants.kPIDConstants.kP);
-        PIDController.setI(MotorConstants.kPIDConstants.kI);
-        PIDController.setD(MotorConstants.kPIDConstants.kD);
+    private SparkMaxPIDController initializePIDController() {
+        SparkMaxPIDController pidController = mMotor.getPIDController();
+        pidController.setP(motorConstants.kPIDConstants.kP);
+        pidController.setI(motorConstants.kPIDConstants.kI);
+        pidController.setD(motorConstants.kPIDConstants.kD);
+        pidController.setFF(motorConstants.kPIDConstants.kFF);
 
-        PIDController.setFeedbackDevice(mAbsEncoder);
-        return PIDController;
+        pidController.setSmartMotionMaxAccel(motorConstants.kSmartMotionsConstants.kSmartMotionMaxAccel, 0);
+        pidController.setSmartMotionMaxVelocity(motorConstants.kSmartMotionsConstants.kSmartMotionMaxVelocity, 0);
+        pidController.setSmartMotionMinOutputVelocity(motorConstants.kSmartMotionsConstants.kSmartMotionMinOutputVelocity, 0);
+
+        pidController.setFeedbackDevice(mAbsEncoder);
+        return pidController;
     }
 
     /**
