@@ -17,6 +17,7 @@ public class Intake extends SubsystemBase {
         OUT
     }
 
+    double outSpeed;
     private static Intake mInstance;
 
     private IntakeState mState;
@@ -31,6 +32,16 @@ public class Intake extends SubsystemBase {
         mMotor.setSmartCurrentLimit(40);
         mMotor.burnFlash();
         mState = IntakeState.OFF;
+        outSpeed = kOutSpeed;
+    }
+
+    public double getOutSpeed() {
+        return outSpeed;
+    }
+
+    public void setOutSpeed(double newSpeed) {
+        outSpeed = newSpeed;
+
     }
 
     public static Intake getInstance() {
@@ -53,7 +64,7 @@ public class Intake extends SubsystemBase {
         switch(mState) {
             case IN: mMotor.set(kInSpeed);
             break;
-            case OUT: mMotor.set(kOutSpeed);
+            case OUT: mMotor.set(outSpeed);
             break;
             default: mMotor.set(0.01);
         }
