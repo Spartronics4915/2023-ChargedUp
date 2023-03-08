@@ -84,7 +84,7 @@ public class RobotContainer {
     
     private final boolean useJoystick = true;
     private final boolean useSwerveChassis = true;
-    private final boolean useArm = true;
+    private final boolean useArm = false;
     // private final Command mTestingCommand;
     
     /**
