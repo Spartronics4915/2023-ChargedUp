@@ -9,34 +9,27 @@ import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
 import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
 import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
-import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
 
 import com.spartronics4915.frc2023.Constants.OI;
-import com.spartronics4915.frc2023.Constants.Trajectory;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
-import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
-import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
-import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
+import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowTrajectoryCommand;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.Swerve;
-import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
@@ -45,12 +38,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -70,8 +64,6 @@ public class RobotContainer {
     
     private final CommandXboxController mDriverController;
     private final CommandXboxController mOperatorController;
-    
-    private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     
     // The robot's subsystems and commands are defined here...
     private final Swerve mSwerve;
@@ -107,8 +99,7 @@ public class RobotContainer {
             mSwerveCommands = new SwerveCommands(mDriverController);
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
             
-            mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
-            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
+            mAutos = new Autos(mSwerveCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand(new Pose2d()); // remove before comp as pose will be unknown after auto
         } else {
@@ -116,7 +107,6 @@ public class RobotContainer {
             mAutos = null;
             mSwerve = null;
             mSwerveCommands = null;
-            mSwerveTrajectoryFollowerCommands = null;
         }
         
         if (useArm) {
@@ -170,42 +160,7 @@ public class RobotContainer {
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
-            // mAutos.new Strategy(
-            //     "Drop, Leave, Pick-up",
-            //     (Pose2d initialPose) -> new SequentialCommandGroup(
-			// 		mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-			// 		mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-			// 			new ArrayList<>(List.of(
-			// 				new PathPoint(initialPose.getTranslation(), new Rotation2d(), initialPose.getRotation()),
-			// 				new PathPoint(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), new Rotation2d(), new Rotation2d())
-			// 			))
-			// 		),
-			// 		mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
-            //     )
-            // ),
 			mAutos.new Strategy(
-				"Drop, Leave, Pick-up (do not use)",
-				(Pose2d initialPose) -> new SequentialCommandGroup(
-					mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-						new ArrayList<>(List.of(
-							new PathPoint(
-								initialPose.getTranslation(),
-								new Rotation2d(),
-								initialPose.getRotation()
-							),
-							new PathPoint(
-								initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)),
-								new Rotation2d(),
-								new Rotation2d()
-							)
-						))
-					),
-					mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
-				)
-
-			),
-            mAutos.new Strategy(
                 "do nothing",
                 (Pose2d initialPose) -> new CommandBase() {}
             ),
@@ -261,22 +216,26 @@ public class RobotContainer {
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
+            ),
+            mAutos.new Strategy(
+                "follow test trajectory",
+                (Pose2d initialPose) -> {
+                    initialPose = new Pose2d();
+                    var cfg = new TrajectoryConfig(2.5, 2.5).setKinematics(kKinematics);
+                    var trajectory = TrajectoryGenerator.generateTrajectory(
+                        List.of(
+                            initialPose,
+                            initialPose.plus(new Transform2d(new Translation2d(1, 2), Rotation2d.fromDegrees(150))),
+                            initialPose.plus(new Transform2d(new Translation2d(3, 3), Rotation2d.fromDegrees(210)))
+                        ),
+                        cfg
+                    );
+                    return new SequentialCommandGroup(
+                        new FollowTrajectoryCommand(trajectory),
+                        mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+                    );
+                }
             )
-            // mAutos.new Strategy(
-            //     "drop, leave",
-            //     (Pose2d initialPose) -> new SequentialCommandGroup(
-            //         mArmCommands.new 
-            //     )    
-            // )
-			// mAutos.new Strategy(
-			// 	"Move Forward Static (Test)",
-			// 	(Pose2d initialPose) -> mAutos.new MoveForwardCommandFancy()
-			// ),
-			// mAutos.new Strategy(
-			// 	"Move Forward Dynamic (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
-			// 		mAutos.new MoveForwardCommandDynamic().schedule();
-			// 	})
-			// )
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat::getCommand);

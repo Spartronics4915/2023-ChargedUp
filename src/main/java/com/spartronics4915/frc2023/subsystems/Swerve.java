@@ -251,10 +251,6 @@ public class Swerve extends SubsystemBase {
         return mPoseEstimator.getEstimatedPosition();
     }
 
-	public Rotation2d getEstimatedYaw() {
-		return getPose().getRotation();
-	}
-
 	public void setYaw(Rotation2d yaw) {
 		mIMU.setYaw(yaw.getDegrees());
 	}
@@ -353,9 +349,10 @@ public class Swerve extends SubsystemBase {
 
     private void updatePoseEstimator() {
 		VisionMeasurement vision = getVisionMeasurement();
-		if (vision != null)
+		if (vision != null) {
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-        mPoseEstimator.update(getEstimatedYaw(), getPositions());
+        }
+        mPoseEstimator.update(getYaw(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
