@@ -251,10 +251,6 @@ public class Swerve extends SubsystemBase {
         return mPoseEstimator.getEstimatedPosition();
     }
 
-	public Rotation2d getEstimatedYaw() {
-		return getPose().getRotation();
-	}
-
 	public void setYaw(Rotation2d yaw) {
 		mIMU.setYaw(yaw.getDegrees());
 	}
