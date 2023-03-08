@@ -132,9 +132,9 @@ public abstract class ArmJointAbstractSubsystem extends SubsystemBase{
     }
 
      /**
-     * @return the refrence the PID controller is in horizon angles
+     * @return the refrence the PID controller is in native angles
      */
-    public Rotation2d getCurrentRefrence() {
+    public Rotation2d getCurrentReference() {
         return currentRefrence;
     }
 

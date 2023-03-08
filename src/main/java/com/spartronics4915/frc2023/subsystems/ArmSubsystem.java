@@ -102,8 +102,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     private ArmState mDesiredState;
 
-    private final MotorAbsEncoderComboSubsystem mPivotMotor;
-    private final MotorAbsEncoderComboSubsystem mWristMotor;
+    private final PivotSubsystem mPivotMotor;
+    private final WristSubsystem mWristMotor;
     private final CANSparkMax mPivotFollower;
 
     private final ExtenderSubsystem mExtenderSubsystem;
@@ -112,20 +112,20 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {
         mDesiredState = ArmState.RETRACTED;
         System.out.println("arm created");
-        mPivotMotor = new MotorAbsEncoderComboSubsystem(kPivotMotorConstants, MotorType.kBrushless);
-        mWristMotor = new MotorAbsEncoderComboSubsystem(kWristMotorConstants, MotorType.kBrushed);
+        mPivotMotor = new PivotSubsystem();
+        mWristMotor = new WristSubsystem(mPivotMotor);
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
         mPivotFollower.setSmartCurrentLimit(20);
         mPivotFollower.setIdleMode(IdleMode.kBrake);
-        mExtenderSubsystem = new ExtenderSubsystem(mPivotMotor);
+        mExtenderSubsystem = new ExtenderSubsystem();
 
         mIntake = Intake.getInstance();
         
-        if(mWristMotor != null) {
-            mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
-        }
+        // if(mWristMotor != null) {
+        //     mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
+        // }
         // mPivotMotor.setActive(true);
     }
 
@@ -133,16 +133,16 @@ public class ArmSubsystem extends SubsystemBase {
         return mExtenderSubsystem;
     }
     
-    public MotorAbsEncoderComboSubsystem[] getMotors() {
-        MotorAbsEncoderComboSubsystem[] x = { mPivotMotor, mWristMotor };
+    public ArmJointAbstractSubsystem[] getMotors() {
+        ArmJointAbstractSubsystem[] x = { mPivotMotor, mWristMotor };
         return x;
     }
 
-    public MotorAbsEncoderComboSubsystem getPivot() {
+    public PivotSubsystem getPivot() {
         return mPivotMotor;
     }
 
-    public MotorAbsEncoderComboSubsystem getWrist() {
+    public WristSubsystem getWrist() {
         return mWristMotor;
     }
 
@@ -173,8 +173,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public ArmPosition  getLocalReference() {
-        Rotation2d pivotReference = mPivotMotor.getCurrentReferenceHorizon();
-        Rotation2d wristReference = mWristMotor.getCurrentReferenceHorizon();
+        Rotation2d pivotReference = mPivotMotor.nativeToHorizon(mPivotMotor.getCurrentReference());
+        Rotation2d wristReference = mWristMotor.nativeToHorizon(mWristMotor.getCurrentReference());
         double extenderReference = mExtenderSubsystem.getReference();
 
         return new ArmPosition(extenderReference, pivotReference, wristReference);

@@ -35,9 +35,8 @@ public class ExtenderSubsystem extends SubsystemBase  {
     private final double kMinDist = 0.5;
     private final double kMaxDist = 12;
     private final double kPosTolerance = 0.2;
-    private MotorAbsEncoderComboSubsystem mPivot;
 
-    public ExtenderSubsystem(MotorAbsEncoderComboSubsystem pivot) {
+    public ExtenderSubsystem() {
         kMotorID = ExtenderConstants.kMotorID;
         mMotor = new CANSparkMax(kMotorID, MotorType.kBrushed);
         mMotor.restoreFactoryDefaults();
@@ -58,7 +57,6 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mPIDController.setFF(0.00008);
 
         mEncoder.setPosition(kPositionPad);
-        mPivot = pivot;
         targetReference = 0;
 
         mMotor.burnFlash();
