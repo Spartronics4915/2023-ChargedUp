@@ -6,7 +6,7 @@ import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.ArmJointAbstractSubsystem;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
-import com.spartronics4915.frc2023.subsystems.ExtenderSubsystem;
+import com.spartronics4915.frc2023.subsystems.ExtenderComponent;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -192,7 +192,7 @@ public final class DebugTeleopCommands {
 
         }
 
-        public void update(ExtenderSubsystem subsystem) {
+        public void update(ExtenderComponent subsystem) {
             extenderPos.setDouble(subsystem.getPosition());
             PIDSpeed.setDouble(subsystem.getMotor().getAppliedOutput());
             targetRef.setDouble(subsystem.getReference());

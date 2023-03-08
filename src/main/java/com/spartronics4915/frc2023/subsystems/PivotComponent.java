@@ -5,9 +5,9 @@ import com.spartronics4915.frc2023.subsystems.ArmJointAbstractSubsystem;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class PivotSubsystem extends ArmJointAbstractSubsystem {
+public class PivotComponent extends ArmJointAbstractSubsystem {
     
-    public PivotSubsystem() {
+    public PivotComponent() {
         super(Arm.kPivotMotorConstants);
     }
 

@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExtenderSubsystem  {
+public class ExtenderComponent  {
 
     private final int kMotorID;
     private CANSparkMax mMotor;
@@ -36,7 +36,7 @@ public class ExtenderSubsystem  {
     private final double kMaxDist = 12;
     private final double kPosTolerance = 0.2;
 
-    public ExtenderSubsystem() {
+    public ExtenderComponent() {
         kMotorID = ExtenderConstants.kMotorID;
         mMotor = new CANSparkMax(kMotorID, MotorType.kBrushed);
         mMotor.restoreFactoryDefaults();

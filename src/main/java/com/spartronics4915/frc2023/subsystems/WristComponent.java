@@ -5,11 +5,11 @@ import com.spartronics4915.frc2023.subsystems.ArmJointAbstractSubsystem;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class WristSubsystem extends ArmJointAbstractSubsystem {
+public class WristComponent extends ArmJointAbstractSubsystem {
 
-    private PivotSubsystem mPivotMotor;
+    private PivotComponent mPivotMotor;
 
-    public WristSubsystem(PivotSubsystem pivotMotor) {
+    public WristComponent(PivotComponent pivotMotor) {
         super(Arm.kWristMotorConstants);
         mPivotMotor = pivotMotor;
     }

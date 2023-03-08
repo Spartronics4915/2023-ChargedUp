@@ -1,13 +1,14 @@
 package com.spartronics4915.frc2023.commands;
 
-import com.spartronics4915.frc2023.subsystems.ExtenderSubsystem;
+import com.spartronics4915.frc2023.subsystems.ExtenderComponent;
+import com.spartronics4915.frc2023.subsystems.ExtenderComponent;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public final class ExtenderCommands {
     
-    private final ExtenderSubsystem mExtender;
-    public ExtenderCommands(ExtenderSubsystem mExtender) {
+    private final ExtenderComponent mExtender;
+    public ExtenderCommands(ExtenderComponent mExtender) {
         this.mExtender = mExtender;
     }
     
