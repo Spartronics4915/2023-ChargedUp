@@ -20,6 +20,7 @@ public class PivotSubsystem extends SubsystemBase {
     private SparkMaxPIDController mPIDController;
     private final ArmMotorConstants kConstants;
     private Rotation2d currentRefrence;
+    private boolean setRef;
     
     //important notes: the mpidcontroller can only work in native units
 
@@ -29,7 +30,7 @@ public class PivotSubsystem extends SubsystemBase {
         motorInit();
         encoderInit();
         pidControllerInit();
-
+        setRef = false;
         currentRefrence = new Rotation2d(0);
     }
 
@@ -101,17 +102,21 @@ public class PivotSubsystem extends SubsystemBase {
     }
 
     private void setNativeReference(Rotation2d ref) {
-
-        mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion);
+        currentRefrence = ref;
+        setRef = true;
+        // mPIDController.setReference(ref.getRadians(), ControlType.kSmartMotion, 0, Math.cos(getHorizonPosition().getRadians()));
     }
 
     //feedforward update
     @Override
     public void periodic() {
         super.periodic();
-        //FIXME need to add horizon and native units back for this to work huzah 
-        double ffComponent = -mPIDController.getFF() * Math.cos(getHorizonPosition().getRadians());
-        mPIDController.setFF(ffComponent);
+        if (setRef)
+            mPIDController.setReference(
+                currentRefrence.getRadians(), 
+                ControlType.kSmartMotion, 0, 
+                Math.cos(getHorizonPosition().getRadians())
+            );
 
     }
 
