@@ -265,6 +265,15 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
     
+
+    @Override
+    public void periodic() {
+        // TODO Auto-generated method stub
+        super.periodic();
+        mPivotMotor.onPeriodic();
+        mWristMotor.onPeriodic();
+        mExtenderSubsystem.onPeriodic();
+    }
     // public void transformState(Rotation2d armDelta, Rotation2d wristDelta) {
     //     ArmPosition current = getPosition();
         

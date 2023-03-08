@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExtenderSubsystem extends SubsystemBase  {
+public class ExtenderSubsystem  {
 
     private final int kMotorID;
     private CANSparkMax mMotor;
@@ -169,8 +169,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         }
     }
 
-    @Override
-    public void periodic() {
+    public void onPeriodic() {
         limitSwitchUpdate();
     }
 }

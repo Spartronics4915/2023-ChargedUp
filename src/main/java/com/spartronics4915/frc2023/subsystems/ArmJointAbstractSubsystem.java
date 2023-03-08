@@ -10,7 +10,7 @@ import com.spartronics4915.frc2023.Constants.Arm.CanSparkMaxMotorConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class ArmJointAbstractSubsystem extends SubsystemBase{
+public abstract class ArmJointAbstractSubsystem{
 
     protected CANSparkMax mMotor;
     protected SparkMaxAbsoluteEncoder mAbsEncoder;
@@ -111,9 +111,7 @@ public abstract class ArmJointAbstractSubsystem extends SubsystemBase{
     //periodic methodds:
     abstract protected double calculateFeedforwardValue();
 
-    @Override
-    public void periodic() {
-        super.periodic();
+    public void onPeriodic() {
         if (setRef)
             mPIDController.setReference(
                 currentRefrence.getRadians(), 
