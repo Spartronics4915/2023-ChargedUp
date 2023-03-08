@@ -92,7 +92,6 @@ public abstract class ArmJointAbstractSubsystem extends SubsystemBase{
 
     //setters for position:
     public void setHorizonReference(Rotation2d ref) {
-        //TODO add saftey method
         setNativeReference(HorizonToNative(ref));
     }
 
