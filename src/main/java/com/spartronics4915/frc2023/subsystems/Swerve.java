@@ -211,7 +211,7 @@ public class Swerve extends SubsystemBase {
         return mIMU;
     }
 
-    public Rotation2d getYaw() {
+    public Rotation2d getIMUYaw() {
         return Rotation2d.fromDegrees(mIMU.getYaw());
     }
 
@@ -247,12 +247,12 @@ public class Swerve extends SubsystemBase {
         mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
     }
 
-    public Pose2d getPose() {
+    public Pose2d getPoseEstimatorPose() {
         return mPoseEstimator.getEstimatedPosition();
     }
 
-	public Rotation2d getEstimatedYaw() {
-		return getPose().getRotation();
+	public Rotation2d getPoseEstimatorYaw() {
+		return getPoseEstimatorPose().getRotation();
 	}
 
 	public void setYaw(Rotation2d yaw) {
@@ -355,21 +355,13 @@ public class Swerve extends SubsystemBase {
 		VisionMeasurement vision = getVisionMeasurement();
 		if (vision != null)
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
-        mPoseEstimator.update(getEstimatedYaw(), getPositions());
+        mPoseEstimator.update(get(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 
     @Override
     public void periodic() {
         updatePoseEstimator();
-        for (SwerveModule mod : mModules) {
-            mod.putSmartDashboardValues();
-        }
-        SmartDashboard.putNumber("pose x", getPose().getX());
-        SmartDashboard.putNumber("pose y", getPose().getY());
-        SmartDashboard.putNumber("pose rotation degrees", getPose().getRotation().getDegrees());
-
-        SmartDashboard.putBoolean("field relative", mIsFieldRelative);
 
         mLastLastPitch = mLastPitch;
         mLastPitch = getPitch();

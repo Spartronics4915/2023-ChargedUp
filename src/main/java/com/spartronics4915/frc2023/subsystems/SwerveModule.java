@@ -264,7 +264,11 @@ public class SwerveModule {
     }
 
     public SwerveModulePosition getPosition() {
-        double drivePosition = mDriveEncoder.getPosition();
+        // Examining the WPILib example 
+        // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/swervebot/SwerveModule.java
+        // The position in this case is not the position of the wheel because that is in angles.
+        // It is the distance, so the call below should be getDistance
+        double drivePosition = mDriveEncoder.getDistance();
         Rotation2d angle = getState().angle;
         return new SwerveModulePosition(drivePosition, angle);
     }

@@ -7,6 +7,7 @@ import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -157,6 +158,14 @@ public class SwerveTrajectoryFollowerCommands {
 			
 			SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
 			SmartDashboard.putNumber("Swerve thetaPID Position Error", mThetaPID.getPositionError());
+		}
+	}
+
+	public class DriveToRelativePointCommand extends CommandBase {
+
+		public DriveToRelativePointCommand(Pose2d relativePosition, Rotation2d deltaYaw) {
+			
+
 		}
 	}
 }
