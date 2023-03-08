@@ -4,8 +4,6 @@
 
 package com.spartronics4915.frc2023;
 
-import java.util.HashMap;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 
 import com.ctre.phoenix.sensors.BasePigeon;
@@ -18,7 +16,6 @@ import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -51,8 +48,8 @@ public final class Constants {
 	public static final class Trajectory {
 		public static final double kLinearP = 0.01;
 		public static final double kThetaP = 0.01;
-		public static final double kMaxVelocity = 0.5;
-		public static final double kMaxAccel = 0.4;
+		public static final double kMaxVelocity = 2.5;
+		public static final double kMaxAccel = 2.5;
 		public static final double kBackUpDistance = 2;
 	}
 
