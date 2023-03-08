@@ -208,7 +208,7 @@ public class SwerveCommands {
             // double 
             
             double vx = mXVelocityPIDController.calculate(mSwerve.getPitch().getRadians());
-            double omega = mRotationPIDController.calculate(mSwerve.getPoseEstimatorYaw().getRadians());
+            double omega = mRotationPIDController.calculate(mSwerve.getEstimatedYaw().getRadians());
 
             ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
             
@@ -243,7 +243,7 @@ public class SwerveCommands {
 
         @Override
         public void initialize() {
-            var yaw = mSwerve.getPoseEstimatorYaw();
+            var yaw = mSwerve.getEstimatedYaw();
 
             Rotation2d newYaw = yaw.plus(mDegreeRotate);
             var newCommand = new RotateToYaw(newYaw);
@@ -279,7 +279,7 @@ public class SwerveCommands {
 
         @Override
         public void execute() {
-            double yaw = mSwerve.getPoseEstimatorYaw().getRadians();
+            double yaw = mSwerve.getEstimatedYaw().getRadians();
             double goal = mDestinationYaw.getRadians();
             var currState = new TrapezoidProfile.State(yaw, mlastVelocity);
             var goalState = new TrapezoidProfile.State(goal, 0);
@@ -304,7 +304,7 @@ public class SwerveCommands {
         }
         @Override
         public boolean isFinished() {
-            double yaw = mSwerve.getPoseEstimatorYaw().getDegrees();
+            double yaw = mSwerve.getEstimatedYaw().getDegrees();
             double goal = mDestinationYaw.getDegrees();
             boolean positionFine = (Math.abs(yaw - goal) < mYawToleranceDegrees);
             // // boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
@@ -318,11 +318,11 @@ public class SwerveCommands {
 
     public class RotateYaw extends RotateToYaw {
         public RotateYaw(Rotation2d deltaYaw) {
-            super(deltaYaw.plus(mSwerve.getIMUYaw()));
+            super(deltaYaw.plus(mSwerve.getEstimatedYaw()));
         }
 
         public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
-            super(deltaYaw.plus(mSwerve.getIMUYaw()), widget);
+            super(deltaYaw.plus(mSwerve.getEstimatedYaw()), widget);
         }
 
     }
