@@ -12,6 +12,9 @@ import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
 import java.util.List;
 import java.util.function.Function;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
@@ -25,6 +28,7 @@ import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
+import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowTrajectoryCommand;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
@@ -221,18 +225,13 @@ public class RobotContainer {
                 "follow test trajectory",
                 (Pose2d initialPose) -> {
                     initialPose = new Pose2d();
-                    var cfg = new TrajectoryConfig(0.5, 0.5).setKinematics(kKinematics);
-                    var trajectory = TrajectoryGenerator.generateTrajectory(
-                        initialPose,
-                        List.of(
-                            initialPose.getTranslation().plus(new Translation2d(1, 2)),
-                            initialPose.getTranslation().plus(new Translation2d(3, 3))
-                        ),
-                        initialPose.plus(new Transform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90))),
-                        cfg
+                    var trajectory = PathPlanner.generatePath(
+                        new PathConstraints(2.5, 2.5), 
+                        new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
+                        new PathPoint(new Translation2d(1, 1), new Rotation2d(), Rotation2d.fromDegrees(-90))
                     );
                     return new SequentialCommandGroup(
-                        new FollowTrajectoryCommand(trajectory),
+                        new FollowSingleTrajectoryCommand(trajectory),
                         mSwerve.driveCommand(new ChassisSpeeds(), true, true)
                     );
                 }
@@ -241,17 +240,13 @@ public class RobotContainer {
                 "follow straight 2m test trajectory",
                 (Pose2d initialPose) -> {
                     initialPose = Swerve.getInstance().getPose();
-                    var cfg = new TrajectoryConfig(0.5, 0.5).setKinematics(kKinematics);
-                    var trajectory = TrajectoryGenerator.generateTrajectory(
-                        initialPose,
-                        List.of(
-                            initialPose.getTranslation().plus(new Translation2d(1, 0))
-                        ),
-                        initialPose.plus(new Transform2d(new Translation2d(2, 0), Rotation2d.fromDegrees(179))),
-                        cfg
+                    var trajectory = PathPlanner.generatePath(
+                        new PathConstraints(2.5, 2.5),
+                        new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
+                        new PathPoint(new Translation2d(2, 0), new Rotation2d(), Rotation2d.fromDegrees(90))
                     );
                     return new SequentialCommandGroup(
-                        new FollowTrajectoryCommand(trajectory),
+                        new FollowSingleTrajectoryCommand(trajectory),
                         mSwerve.driveCommand(new ChassisSpeeds(), true, true)
                     );
                 }
