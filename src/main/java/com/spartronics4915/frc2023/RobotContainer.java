@@ -223,11 +223,12 @@ public class RobotContainer {
                     initialPose = new Pose2d();
                     var cfg = new TrajectoryConfig(2.5, 2.5).setKinematics(kKinematics);
                     var trajectory = TrajectoryGenerator.generateTrajectory(
+                        initialPose,
                         List.of(
-                            initialPose,
-                            initialPose.plus(new Transform2d(new Translation2d(1, 2), Rotation2d.fromDegrees(150))),
-                            initialPose.plus(new Transform2d(new Translation2d(3, 3), Rotation2d.fromDegrees(210)))
+                            initialPose.getTranslation().plus(new Translation2d(1, 2)),
+                            initialPose.getTranslation().plus(new Translation2d(3, 3))
                         ),
+                        initialPose.plus(new Transform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90))),
                         cfg
                     );
                     return new SequentialCommandGroup(
