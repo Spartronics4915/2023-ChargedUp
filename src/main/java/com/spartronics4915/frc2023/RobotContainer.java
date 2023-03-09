@@ -84,7 +84,7 @@ public class RobotContainer {
     
     private final boolean useJoystick = true;
     private final boolean useSwerveChassis = true;
-    private final boolean useArm = false;
+    private final boolean useArm = true;
     // private final Command mTestingCommand;
     
     /**
@@ -221,7 +221,7 @@ public class RobotContainer {
                 "follow test trajectory",
                 (Pose2d initialPose) -> {
                     initialPose = new Pose2d();
-                    var cfg = new TrajectoryConfig(2.5, 2.5).setKinematics(kKinematics);
+                    var cfg = new TrajectoryConfig(0.5, 0.5).setKinematics(kKinematics);
                     var trajectory = TrajectoryGenerator.generateTrajectory(
                         initialPose,
                         List.of(
@@ -229,6 +229,25 @@ public class RobotContainer {
                             initialPose.getTranslation().plus(new Translation2d(3, 3))
                         ),
                         initialPose.plus(new Transform2d(new Translation2d(3, 4), Rotation2d.fromDegrees(90))),
+                        cfg
+                    );
+                    return new SequentialCommandGroup(
+                        new FollowTrajectoryCommand(trajectory),
+                        mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+                    );
+                }
+            ),
+            mAutos.new Strategy(
+                "follow straight 2m test trajectory",
+                (Pose2d initialPose) -> {
+                    initialPose = Swerve.getInstance().getPose();
+                    var cfg = new TrajectoryConfig(0.5, 0.5).setKinematics(kKinematics);
+                    var trajectory = TrajectoryGenerator.generateTrajectory(
+                        initialPose,
+                        List.of(
+                            initialPose.getTranslation().plus(new Translation2d(1, 0))
+                        ),
+                        initialPose.plus(new Transform2d(new Translation2d(2, 0), Rotation2d.fromDegrees(179))),
                         cfg
                     );
                     return new SequentialCommandGroup(
@@ -261,7 +280,7 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new ResetYaw());
                 
                 mDriverController.y()
-                .onTrue(mSwerveCommands.new ResetOdometry());
+                .onTrue(mSwerveCommands.new ResetPose());
                 
                 mDriverController.rightTrigger(kTriggerDeadband)
                 .onTrue(mSwerveCommands.new EnableSprintMode())

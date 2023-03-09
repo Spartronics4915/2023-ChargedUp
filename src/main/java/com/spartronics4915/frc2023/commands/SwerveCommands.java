@@ -78,8 +78,8 @@ public class SwerveCommands {
     /**
      * Mainly for debugging, probably shouldn't be used during a match
      */
-    public class ResetOdometry extends InstantCommand {
-        public ResetOdometry() {
+    public class ResetPose extends InstantCommand {
+        public ResetPose() {
 			
 		}
 		
@@ -106,7 +106,7 @@ public class SwerveCommands {
 			mSwerve.resetToAbsolute();
             mSwerve.stop();
 			mSwerve.alignModules();
-			mSwerve.setPose(mInitialPose);
+			mSwerve.setPose(new Pose2d());
 		}
     }
 
