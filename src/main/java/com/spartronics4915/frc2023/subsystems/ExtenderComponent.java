@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExtenderComponent  {
+public class ExtenderComponent {
 
     private final int kMotorID;
     private CANSparkMax mMotor;
@@ -52,7 +52,7 @@ public class ExtenderComponent  {
         mPIDController = mMotor.getPIDController();
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
-        mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
+        mEncoder.setPositionConversionFactor(1.0/kRevPerInch ); //kRevPerInch
         mPIDController.setP(0.00007);
         mPIDController.setFF(0.00008);
 
