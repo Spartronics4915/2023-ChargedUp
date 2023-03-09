@@ -1,11 +1,11 @@
 package com.spartronics4915.frc2023.subsystems;
 
 import com.spartronics4915.frc2023.Constants.Arm;
-import com.spartronics4915.frc2023.subsystems.ArmJointAbstractSubsystem;
+import com.spartronics4915.frc2023.subsystems.ArmJointAbstractComponent;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class WristComponent extends ArmJointAbstractSubsystem {
+public class WristComponent extends ArmJointAbstractComponent {
 
     private PivotComponent mPivotMotor;
 

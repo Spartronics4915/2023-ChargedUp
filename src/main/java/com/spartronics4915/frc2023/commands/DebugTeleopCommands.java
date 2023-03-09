@@ -4,7 +4,7 @@ import com.spartronics4915.frc2023.subsystems.Swerve;
 import com.spartronics4915.frc2023.subsystems.SwerveModule;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
-import com.spartronics4915.frc2023.subsystems.ArmJointAbstractSubsystem;
+import com.spartronics4915.frc2023.subsystems.ArmJointAbstractComponent;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.ExtenderComponent;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
@@ -261,7 +261,7 @@ public final class DebugTeleopCommands {
         public void update(ArmSubsystem module) {
             ArmPosition current = module.getLocalPosition();
             ArmState desired = module.getDesiredGlobalState();
-            ArmJointAbstractSubsystem[] motors = module.getMotors();
+            ArmJointAbstractComponent[] motors = module.getMotors();
             // linActDistance.setDouble(current.armRadius);
             // stateRadius.setDouble(desired.armRadius);
 

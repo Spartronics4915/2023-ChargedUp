@@ -10,7 +10,7 @@ import com.spartronics4915.frc2023.Constants.Arm.CanSparkMaxMotorConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class ArmJointAbstractSubsystem{
+public abstract class ArmJointAbstractComponent{
 
     protected CANSparkMax mMotor;
     protected SparkMaxAbsoluteEncoder mAbsEncoder;
@@ -19,7 +19,7 @@ public abstract class ArmJointAbstractSubsystem{
     protected Rotation2d currentRefrence;
     protected boolean setRef;
 
-    public ArmJointAbstractSubsystem(ArmMotorConstants constants) {
+    public ArmJointAbstractComponent(ArmMotorConstants constants) {
         super();
         kConstants = constants;
         motorInit();

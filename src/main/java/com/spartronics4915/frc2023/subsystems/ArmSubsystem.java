@@ -133,8 +133,8 @@ public class ArmSubsystem extends SubsystemBase {
         return mExtenderComponent;
     }
     
-    public ArmJointAbstractSubsystem[] getMotors() {
-        ArmJointAbstractSubsystem[] x = { mPivotMotor, mWristMotor };
+    public ArmJointAbstractComponent[] getMotors() {
+        ArmJointAbstractComponent[] x = { mPivotMotor, mWristMotor };
         return x;
     }
 
