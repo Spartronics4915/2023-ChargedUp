@@ -191,7 +191,9 @@ public class ArmSubsystem extends SubsystemBase {
         // Global state has all of the angles in global coordinates (0 is the horizon)
 
         Rotation2d newPivotAngle = localArmPosition.armTheta;
-        Rotation2d newWristAngle = localArmPosition.wristTheta.plus(localArmPosition.armTheta);
+        Rotation2d newWristAngle = (newPivotAngle.getDegrees() > 90) ? Rotation2d.fromDegrees(180).plus(localArmPosition.wristTheta.unaryMinus()) : localArmPosition.wristTheta;
+        newWristAngle = newWristAngle.plus(localArmPosition.armTheta);
+
         var newExtension = localArmPosition.armRadius;
 
         return new ArmPosition(newExtension, newPivotAngle, newWristAngle);
@@ -203,6 +205,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         Rotation2d newPivotAngle = globalArmPosition.armTheta;
         Rotation2d newWristAngle = globalArmPosition.wristTheta.minus(globalArmPosition.armTheta);
+        newWristAngle = (newPivotAngle.getDegrees() > 90) ? Rotation2d.fromDegrees(180).minus(newWristAngle).unaryMinus() : newWristAngle;
         var newExtension = globalArmPosition.armRadius;
 
         return new ArmPosition(newExtension, newPivotAngle, newWristAngle);
@@ -211,7 +214,7 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO determine zero offsets
     // TODO add extender motor
     private void setDesiredLocalPosition(ArmPosition state) {
-        mExtenderComponent.extendToNInches(state.armRadius).schedule(); 
+        // mExtenderComponent.extendToNInches(state.armRadius).schedule(); 
         mPivotMotor.setHorizonReference(state.armTheta);
         mWristMotor.setHorizonReference(state.wristTheta);
     }
@@ -232,7 +235,7 @@ public class ArmSubsystem extends SubsystemBase {
         setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
-    private Rotation2d getCorrectAngleDEPRECATE(Rotation2d armAngle) {
+    private Rotation2d getCorrectLocalWristAngle(Rotation2d armAngle, Rotation2d wristAngle) {
         // assuming 0 on the arm is straight up
         // assuming 0 on the wrist is level with arm (makes a straight line),
         // specifically 180 is level with the arm, 0 is opposite
