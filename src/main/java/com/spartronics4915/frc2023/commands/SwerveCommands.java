@@ -8,6 +8,9 @@ import static com.spartronics4915.frc2023.Constants.Swerve.kMaxSpeed;
 import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeAngularSpeedMultiplier;
 import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeSpeedMultiplier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.spartronics4915.frc2023.Constants.Swerve.BalanceConstants;
@@ -234,6 +237,26 @@ public class SwerveCommands {
 
     private double applyResponseCurve(double c) {
         return Math.signum(c) * Math.pow(Math.abs(c), kResponseCurveExponent);
+    }
+
+    public Pose2d getCone(){
+        List<Pose2d> cones = new ArrayList<Pose2d>();
+        cones.add(new Pose2d(14.6,0.51, new Rotation2d()));
+        cones.add(new Pose2d(14.6,1.63, new Rotation2d()));
+        cones.add(new Pose2d(14.6,2.19, new Rotation2d()));
+        cones.add(new Pose2d(14.6,3.31, new Rotation2d()));
+        cones.add(new Pose2d(14.6,3.87, new Rotation2d()));
+        cones.add(new Pose2d(14.6,4.98, new Rotation2d()));
+        
+        cones.add(new Pose2d(1.93,0.51, new Rotation2d()));
+        cones.add(new Pose2d(1.93,1.63, new Rotation2d()));
+        cones.add(new Pose2d(1.93,2.19, new Rotation2d()));
+        cones.add(new Pose2d(1.93,3.31, new Rotation2d()));
+        cones.add(new Pose2d(1.93,3.87, new Rotation2d()));
+        cones.add(new Pose2d(1.93,4.98, new Rotation2d()));
+
+
+        return mSwerve.getPose().nearest(cones);
     }
 
     public class RotateDegrees extends CommandBase {
