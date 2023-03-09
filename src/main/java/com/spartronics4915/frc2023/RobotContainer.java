@@ -258,22 +258,22 @@ public class RobotContainer {
                     * Extend to High tier - cone		Y   
                     * */
                 mOperatorController.button(kWindowButtonId) //should be window
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.new SetArmState(ArmState.FLOOR_POS));
 
                 mOperatorController.button(kMenuButtonId) //should be menu
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.DOUBLE_SUBSTATION));
+                    .onTrue(mArmCommands.new SetArmState(ArmState.DOUBLE_SUBSTATION));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CUBE_LEVEL_1));
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_1));
                 
                 mOperatorController.x()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_1));
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_1));
                 
                 mOperatorController.b()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CUBE_LEVEL_2));
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CUBE_LEVEL_2));
                 
                 mOperatorController.y()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_2));
+                    .onTrue(mArmCommands.new SetArmState(ArmState.CONE_LEVEL_2));
 
                 /**
                  * Eject game piece		    RT
