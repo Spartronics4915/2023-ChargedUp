@@ -4,14 +4,21 @@
 
 package com.spartronics4915.frc2023;
 
+import java.util.HashMap;
 import java.util.function.IntFunction;
 
 import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.pathplanner.lib.PathConstraints;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.spartronics4915.frc2023.commands.ArmCommands;
+import com.spartronics4915.frc2023.commands.IntakeCommands;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
+import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
@@ -22,6 +29,9 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import static com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 
@@ -46,11 +56,32 @@ import static com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
     
 public final class Constants {
 	public static final class Trajectory {
-		public static final double kLinearP = 0.01;
-		public static final double kThetaP = 0.01;
-		public static final double kMaxVelocity = 2.5;
-		public static final double kMaxAccel = 2.5;
-		public static final double kBackUpDistance = 2;
+		public static final double kLinearP = 0.1;
+		public static final double kThetaP = 0.1;
+		public static final double kMaxVelocity = 3;
+		public static final double kMaxAccel = 5;
+
+        public static final PathConstraints kPathConstraints = new PathConstraints(kMaxVelocity, kMaxAccel);
+        public static final HashMap<String, Command> kEventMap = new HashMap<>();
+
+        static {
+            IntakeCommands intakeCommands = new IntakeCommands(com.spartronics4915.frc2023.subsystems.Intake.getInstance());
+            ArmCommands armCommands = new ArmCommands(ArmSubsystem.getInstance(), intakeCommands);
+            
+            kEventMap.put("placeHighConePosition", armCommands.new SetArmLocalState(ArmState.CONE_LEVEL_2));
+            kEventMap.put("ejectCone", new SequentialCommandGroup(
+                intakeCommands.new SetIntakeState(IntakeState.PLACE_CONE),
+                new WaitCommand(0.25),
+                intakeCommands.new SetIntakeState(IntakeState.OFF)
+            ));
+            kEventMap.put("retractArm", armCommands.new SetArmLocalState(ArmState.RETRACTED_PRIOR));
+            kEventMap.put("deployIntake", armCommands.new SetArmLocalState(ArmState.FLOOR_POS));
+            kEventMap.put("enableIntakeIn", intakeCommands.new SetIntakeState(IntakeState.IN));
+            kEventMap.put("disableIntake", intakeCommands.new SetIntakeState(IntakeState.OFF));
+            kEventMap.put("retractIntake", armCommands.new SetArmLocalState(ArmState.RETRACTED_PRIOR));
+            kEventMap.put("shootCubeHighPosition", armCommands.new SetArmLocalState(ArmState.SHOOT_HIGH_CUBE));
+            kEventMap.put("shootCube", intakeCommands.new SetIntakeState(IntakeState.SHOOT_CUBE));
+        }
 	}
 
     public static final class Swerve {
@@ -490,8 +521,12 @@ public final class Constants {
 
         public static final boolean kIsInverted = false;
 
+        public static final double kOffSpeed = 0.015;
         public static final double kInSpeed = 0.8;
-        public static final double kOutSpeed = -0.6; // -0.2
+        public static final double kShootCubeSpeed = -0.6;
+        public static final double kPlaceCubeSpeed = -0.1; // random placeholder numbers
+        public static final double kPlaceConeSpeed = -0.15;
+        public static final double kDefaultOutSpeed = -0.3;
 
         public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
     }

@@ -14,6 +14,9 @@ public class Intake extends SubsystemBase {
     public enum IntakeState {
         IN,
         OFF,
+        SHOOT_CUBE,
+        PLACE_CUBE,
+        PLACE_CONE,
         OUT
     }
 
@@ -51,11 +54,12 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         switch(mState) {
-            case IN: mMotor.set(kInSpeed);
-            break;
-            case OUT: mMotor.set(kOutSpeed);
-            break;
-            default: mMotor.set(0.01);
+            case IN: mMotor.set(kInSpeed); break;
+            case SHOOT_CUBE: mMotor.set(kShootCubeSpeed); break;
+            case PLACE_CUBE: mMotor.set(kPlaceCubeSpeed); break;
+            case PLACE_CONE: mMotor.set(kPlaceConeSpeed); break;
+            case OUT: mMotor.set(kDefaultOutSpeed); break; 
+            default: mMotor.set(kOffSpeed);
         }
     }
 }

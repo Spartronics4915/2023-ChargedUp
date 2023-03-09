@@ -86,7 +86,7 @@ public class SwerveCommands {
 		@Override
 		public void initialize() {
 			super.initialize();
-            mSwerve.setPose(new Pose2d(0, 0, new Rotation2d(0)));
+            mSwerve.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
 		}
     }
 
@@ -106,7 +106,7 @@ public class SwerveCommands {
 			mSwerve.resetToAbsolute();
             mSwerve.stop();
 			mSwerve.alignModules();
-			mSwerve.setPose(new Pose2d());
+			mSwerve.resetPose(new Pose2d());
 		}
     }
 

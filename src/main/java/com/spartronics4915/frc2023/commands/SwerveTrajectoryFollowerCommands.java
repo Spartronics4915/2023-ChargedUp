@@ -3,6 +3,8 @@ package com.spartronics4915.frc2023.commands;
 import static com.spartronics4915.frc2023.Constants.Trajectory.*;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;

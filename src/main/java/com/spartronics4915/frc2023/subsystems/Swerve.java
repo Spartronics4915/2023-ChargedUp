@@ -243,7 +243,7 @@ public class Swerve extends SubsystemBase {
      * Resets the pose estimator to the specified pose. 
      * @param pose The pose to reset the pose estimator to.
      */
-    public void setPose(Pose2d pose) {
+    public void resetPose(Pose2d pose) {
         mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
     }
 

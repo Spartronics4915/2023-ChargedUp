@@ -9,7 +9,6 @@ import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
 import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
 import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
 
-import java.util.List;
 import java.util.function.Function;
 
 import com.pathplanner.lib.PathConstraints;
@@ -18,6 +17,7 @@ import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
+import static com.spartronics4915.frc2023.commands.Autos.autoBuilder;
 
 import com.spartronics4915.frc2023.Constants.OI;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
@@ -29,7 +29,6 @@ import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand;
-import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowTrajectoryCommand;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
@@ -39,11 +38,8 @@ import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -250,6 +246,10 @@ public class RobotContainer {
                         mSwerve.driveCommand(new ChassisSpeeds(), true, true)
                     );
                 }
+            ),
+            mAutos.new Strategy(
+                "2-piece test", 
+                (Pose2d initialPose) -> autoBuilder.fullAuto(Autos.test2PieceTrajectory)
             )
 		};
 		for (Autos.Strategy strat : autoStrategies) {
