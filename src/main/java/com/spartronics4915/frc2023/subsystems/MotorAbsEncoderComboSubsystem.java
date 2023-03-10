@@ -23,8 +23,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * These are "native coordinates", the coordinates of the actual encoder
  * They should be strictly internal and all other systems should use arm coordinates.
  */
+@Deprecated(forRemoval =  true)
 public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
+    @Deprecated(forRemoval =  true)
     public interface AngleWithEarthProvider {
         Rotation2d getAngleWithEarth();
     }

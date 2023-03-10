@@ -21,8 +21,9 @@ import static com.spartronics4915.frc2023.Constants.Arm.*;
 /**
  * this is the main subsytem responsible for controlling and managing the arm
  */
-public class ArmSubsystem extends SubsystemBase {
+ public class ArmSubsystem extends SubsystemBase {
 
+    @Deprecated(forRemoval =  true)
     private class WristAngleProvider implements AngleWithEarthProvider {
         MotorAbsEncoderComboSubsystem mPivot, mWrist;
         public WristAngleProvider(MotorAbsEncoderComboSubsystem pivot, MotorAbsEncoderComboSubsystem wrist)
@@ -235,7 +236,8 @@ public class ArmSubsystem extends SubsystemBase {
         setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
     }
 
-    private Rotation2d getCorrectLocalWristAngle(Rotation2d armAngle, Rotation2d wristAngle) {
+    @Deprecated(forRemoval =  true)
+    private Rotation2d getCorrectLocalWristAngle(Rotation2d armAngle) {
         // assuming 0 on the arm is straight up
         // assuming 0 on the wrist is level with arm (makes a straight line),
         // specifically 180 is level with the arm, 0 is opposite
