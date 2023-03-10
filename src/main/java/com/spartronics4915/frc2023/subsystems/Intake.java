@@ -14,7 +14,8 @@ public class Intake extends SubsystemBase {
     public enum IntakeState {
         IN,
         OFF,
-        OUT
+        CUBE_OUT,
+        CONE_OUT
     }
 
     private static Intake mInstance;
@@ -52,9 +53,11 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         switch(mState) {
             case IN: mMotor.set(kInSpeed);
-            break;
-            case OUT: mMotor.set(kOutSpeed);
-            break;
+                break;
+            case CUBE_OUT: mMotor.set(kCubeOutSpeed);
+                break;
+            case CONE_OUT: mMotor.set(kConeOutSpeed);
+                break;
             default: mMotor.set(0.01);
         }
     }
