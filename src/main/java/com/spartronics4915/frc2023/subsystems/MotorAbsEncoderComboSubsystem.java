@@ -54,7 +54,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public boolean isArm;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
-        motionConstraints = new TrapezoidProfile.Constraints(Math.PI/3., Math.PI/1.5);
+        motionConstraints = new TrapezoidProfile.Constraints(MotorConstants.kMaxVelocity, MotorConstants.kMaxAccel);
         mModeledVelocity = 0;
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
