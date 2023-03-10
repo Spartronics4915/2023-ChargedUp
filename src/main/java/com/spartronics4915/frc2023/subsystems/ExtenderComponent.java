@@ -52,7 +52,7 @@ public class ExtenderComponent {
         mPIDController = mMotor.getPIDController();
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
-        mEncoder.setPositionConversionFactor((1.0/kRevPerInch)*39.37); //kRevPerInch
+        mEncoder.setPositionConversionFactor((1.0/kRevPerInch)/39.37); //kRevPerInch
         mPIDController.setP(0.00007);
         mPIDController.setFF(0.00008);
 
