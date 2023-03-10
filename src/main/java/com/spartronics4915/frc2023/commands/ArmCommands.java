@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import static com.spartronics4915.frc2023.Constants.Arm.Auto.*;
+
+import javax.lang.model.element.Element;
+
 import static com.spartronics4915.frc2023.Constants.Arm.kArmRetractedPriorWaitDuration;;
 
 
@@ -109,4 +112,28 @@ public class ArmCommands {
 			super(armState, IntakeState.OUT);
 		}
 	}
+
+    public class WaitForPivotToArrive extends CommandBase{
+        double mDegreesTolerance;
+        Rotation2d mTargetAngle;
+
+        public WaitForPivotToArrive(Rotation2d targetAngle, double degreesTolerance) {
+            mDegreesTolerance = degreesTolerance;
+            mTargetAngle = targetAngle;
+
+        }
+
+        @Override
+        public boolean isFinished() {
+
+            Rotation2d currPos = mArm.getPivot().getModeledPosition();
+            if (Math.abs(currPos.minus(mTargetAngle).getDegrees()) < mDegreesTolerance) 
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
 }

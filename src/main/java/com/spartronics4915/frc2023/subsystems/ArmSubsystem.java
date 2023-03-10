@@ -129,7 +129,7 @@ public class ArmSubsystem extends SubsystemBase {
         if(mWristMotor != null) {
             mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
         }
-        // mPivotMotor.setActive(true);
+        //mPivotMotor.setActive(false);
     }
 
     public Intake getIntake() {
@@ -179,6 +179,10 @@ public class ArmSubsystem extends SubsystemBase {
         );
     }
 
+    public ArmPosition getGlobalPosition () {
+        return localToGlobalPosition(this.getLocalPosition());
+    }
+
     public ArmPosition  getLocalReference() {
         Rotation2d pivotReference = mPivotMotor.getCurrentReferenceArm();
         Rotation2d wristReference = mWristMotor.getCurrentReferenceArm();
@@ -214,6 +218,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         return new ArmPosition(newExtension, newPivotAngle, newWristAngle);
     }
+    
 
     // TODO determine zero offsets
     // TODO add extender motor
@@ -259,9 +264,10 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotMotor.stopMotor();
     }
 
-    public Rotation2d getRef() {
-        return mPivotMotor.getCurrentReference();
-    }
+    // // Probably should remove
+    // public Rotation2d getRef() {
+    //     return mPivotMotor.getCurrentReference();
+    // }
 
     // TODO make a way
     /**
@@ -277,7 +283,7 @@ public class ArmSubsystem extends SubsystemBase {
             current.armTheta.plus(armDelta),
             current.wristTheta.plus(wristDelta));
         setDesiredLocalPosition(transformed);
-        System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.armTheta.getDegrees() + " " + wristDelta);
+        System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.wristTheta.getRadians() + " " + wristDelta);
 
     }
     
