@@ -106,7 +106,7 @@ public class ArmCommands {
 	
 	public class ReleasePiece extends PieceInteractCommand {
 		public ReleasePiece(ArmState armState) {
-			super(armState, IntakeState.OUT);
+			super(armState, IntakeState.CUBE_OUT);
 		}
 	}
 }

@@ -280,7 +280,7 @@ public class RobotContainer {
                  * Intake game piece		LT
                  */
                 mOperatorController.rightTrigger(kTriggerDeadband)
-                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.OUT))
+                    .onTrue(mIntakeCommands.new SetIntakeState(IntakeState.CUBE_OUT))
                     .onFalse(mIntakeCommands.new SetIntakeState(IntakeState.OFF));
                 
                 mOperatorController.leftTrigger(kTriggerDeadband)
