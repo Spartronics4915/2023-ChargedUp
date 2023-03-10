@@ -6,6 +6,7 @@ import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,30 +28,10 @@ public class ArmCommands {
 		mIntakeCommands = intakeCommands;
     }
 
-    public class SetArmStateComplex extends SequentialCommandGroup {
-        public SetArmStateComplex(ArmState armState) {
-            if (mArm.getDesiredGlobalState() == ArmState.RETRACTED || armState == ArmState.RETRACTED)
-                addCommands(
-                    new InstantCommand(() -> {
-                        mArm.setDesiredGlobalState(ArmState.RETRACTED_PRIOR);
-                    }, mArm),
-                    new WaitCommand(kArmRetractedPriorWaitDuration),
-                    new InstantCommand(() -> {
-                        mArm.setDesiredGlobalState(armState);
-                    }, mArm)
-                );
-            else addCommands(
-                new InstantCommand(() -> {
-                    mArm.setDesiredGlobalState(armState);
-                }, mArm)
-            );
-        }
-    }
-
-    public class SetArmLocalState extends CommandBase {
+    public class SetArmPivotWristLocalState extends CommandBase {
         ArmState mArmState;
 
-        public SetArmLocalState(ArmState armState) {
+        public SetArmPivotWristLocalState(ArmState armState) {
             mArmState = armState;
         }
 
@@ -135,5 +116,9 @@ public class ArmCommands {
                 return false;
             }
         }
+    }
+
+    public CommandBase getGoToPresetArmStateCommand(ArmState armState) {
+        var seqCommands = new SequentialCommandGroup(new SetArmPivotWristLocalState(armState));
     }
 }

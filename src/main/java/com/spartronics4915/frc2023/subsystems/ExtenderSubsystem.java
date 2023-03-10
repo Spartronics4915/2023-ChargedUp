@@ -26,7 +26,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     public double targetReference;
 
     private DigitalInput mLimitSwitchZero;
-
+    private boolean mIsActive;
 
     // This is to work around a bug in the encoder class
     // The RelativeEncoder class cannot be negative. So we have to pad it out to 
@@ -61,9 +61,19 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mPivot = pivot;
         targetReference = 0;
 
+        mIsActive = true;
+
         mMotor.burnFlash();
     }
 
+    public boolean isActive() {
+        return mIsActive;
+    }
+
+    public void setIsActive(boolean active) {
+        mIsActive = active;
+    }
+    
     public void setZero() {
         mEncoder.setPosition(kPositionPad);
 
