@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.SparkMaxPIDController.AccelStrategy;
 import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import com.spartronics4915.frc2023.Constants.Arm.CanSparkMaxMotorConstants;
 
@@ -57,9 +58,9 @@ public abstract class ArmJointAbstractComponent {
         mPIDController.setD(kConstants.kPIDConstants.kD);
         mPIDController.setFF(kConstants.kPIDConstants.kFF);
 
-        mPIDController.setSmartMotionMaxAccel(kConstants.kSmartMotionsConstants.kSmartMotionMaxAccel, 0);
-        mPIDController.setSmartMotionMaxVelocity(kConstants.kSmartMotionsConstants.kSmartMotionMaxVelocity, 0);
-        mPIDController.setSmartMotionMinOutputVelocity(kConstants.kSmartMotionsConstants.kSmartMotionMinOutputVelocity, 0);
+        // mPIDController.setSmartMotionMaxAccel(kConstants.kSmartMotionsConstants.kSmartMotionMaxAccel, 0);
+        // mPIDController.setSmartMotionMaxVelocity(kConstants.kSmartMotionsConstants.kSmartMotionMaxVelocity, 0);
+        // mPIDController.setSmartMotionMinOutputVelocity(kConstants.kSmartMotionsConstants.kSmartMotionMinOutputVelocity, 0);
     }
 
 
@@ -115,9 +116,10 @@ public abstract class ArmJointAbstractComponent {
         if (setRef)
             mPIDController.setReference(
                 currentRefrence.getRadians(), 
-                ControlType.kSmartMotion, 0, 
+                ControlType.kPosition, 0, 
                 calculateFeedforwardValue()
             );
+            
     }
 
     //getters for debug teleop:
