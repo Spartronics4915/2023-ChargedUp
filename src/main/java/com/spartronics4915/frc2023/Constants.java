@@ -416,8 +416,8 @@ public final class Constants {
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(-35),
-            Rotation2d.fromDegrees(0)
+            Rotation2d.fromDegrees(-28),
+            Rotation2d.fromDegrees(30)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
