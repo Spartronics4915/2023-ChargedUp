@@ -9,6 +9,7 @@ import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import com.spartronics4915.frc2023.Constants.Arm.CanSparkMaxMotorConstants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.LogMessage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class ArmJointAbstractComponent {
@@ -45,7 +46,7 @@ public abstract class ArmJointAbstractComponent {
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         mAbsEncoder.setZeroOffset(motorConstants.kZeroOffset.getRotations()); //this is in rotation because the encoder's position conversion factor hasn't been set yet
         mAbsEncoder.setPositionConversionFactor(motorConstants.kPositionConversionFactor);
-        mAbsEncoder.setInverted(motorConstants.kInverted);
+        // mAbsEncoder.setInverted(motorConstants.kInverted);
     }
 
     protected void pidControllerInit() {
@@ -119,7 +120,7 @@ public abstract class ArmJointAbstractComponent {
                 ControlType.kPosition, 0, 
                 calculateFeedforwardValue()
             );
-            
+        // System.out.println(currentRefrence.getDegrees() + " : " + calculateFeedforwardValue());
     }
 
     //getters for debug teleop:
