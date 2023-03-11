@@ -239,7 +239,7 @@ public final class DebugTeleopCommands {
 
             wristRaw = wristLayout.add("Wrist (Raw rad)", 0).getEntry();
             wristNative = wristLayout.add("Wrist (Native deg)", 0).getEntry();
-            wristArm = wristLayout.add("Wrist (Arm deg)", 0).getEntry();
+            wristArm = wristLayout.add("Wrist (horizon deg)", 0).getEntry();
             wristArmMinus30Native = wristLayout.add("Wrist Native w Arm at -30", 0).getEntry();
             wristArmPlus30Native = wristLayout.add("Wrist Native w Arm at +30", 0).getEntry();
             wristSpeed = wristLayout.add("Wrist Speed Command",0).getEntry();
@@ -247,7 +247,7 @@ public final class DebugTeleopCommands {
 
             shoulderRaw = armModule.add("Shoulder (Raw)", 0).getEntry();
             shoulderNative = armModule.add("Shoulder (Native)", 0).getEntry();
-            shoulderArm = armModule.add("Shoulder (Arm)", 0).getEntry();
+            shoulderArm = armModule.add("Shoulder (horizon)", 0).getEntry();
             shouldArmMinus30Native = armModule.add("Native w Arm at -30", 0).getEntry();
             shoulderArmPlus30Native = armModule.add("Native w Arm at +30", 0).getEntry();
             stateShoulderRotation = armModule.add("desired shoulder angle", 0).getEntry();

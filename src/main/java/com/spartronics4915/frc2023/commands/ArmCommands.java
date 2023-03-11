@@ -54,7 +54,7 @@ public class ArmCommands {
         @Override
         public void execute()
         {
-            mArm.setDesiredGlobalState(mArmState);
+            mArm.setDesiredLocalState(mArmState);
 
         }
         @Override
