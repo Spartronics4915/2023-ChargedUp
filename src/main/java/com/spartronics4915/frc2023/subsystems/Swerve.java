@@ -1,6 +1,8 @@
 package com.spartronics4915.frc2023.subsystems;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.common.hardware.VisionLEDMode;
 
 import com.ctre.phoenix.sensors.BasePigeon;
@@ -9,6 +11,7 @@ import com.spartronics4915.frc2023.Constants.Swerve.Module0;
 import com.spartronics4915.frc2023.Constants.Swerve.Module1;
 import com.spartronics4915.frc2023.Constants.Swerve.Module2;
 import com.spartronics4915.frc2023.Constants.Swerve.Module3;
+import com.spartronics4915.frc2023.Constants.NodePoseConstants;
 import com.spartronics4915.frc2023.PhotonCameraWrapper;
 import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.spartronics4915.frc2023.commands.PrintPos;
@@ -28,7 +31,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -335,6 +340,30 @@ public class Swerve extends SubsystemBase {
 		if (vision != null)
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
+    }
+
+    /**
+     * Checks if a given pose is within the alignment area in,
+     * which is past the charge station within the community
+     * @param pose The pose you wish to check
+     * @return If the pose is within the alignment area
+     */
+    private static boolean getAbleToAlign(Pose2d pose) {
+        //TODO: what values are within community?
+        //TODO: should this be in this file?
+    }
+
+    /**
+     * @return Whether the operation was successful
+     */
+    public boolean alignToNearestNode() {
+        Pose2d currentPose = mPoseEstimator.getEstimatedPosition();
+        if (!getAbleToAlign(currentPose)) return false; //if we are outside the area we cannot align
+        Alliance currentAlliance = DriverStation.getAlliance(); //our alliance determines the values
+        Pose2d[] nodePoses = (currentAlliance == Alliance.Red ?
+            NodePoseConstants.redAlliance :
+            NodePoseConstants.blueAlliance);
+        Pose2d desiredPose = currentPose.nearest(Arrays.asList(nodePoses)); //gets the closest node
     }
 
     @Override
