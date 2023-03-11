@@ -540,13 +540,4 @@ public final class Constants {
         // static final String cameraName = "OV5647";
         static final String cameraName = "Arducam_OV9281_USB_Camera";
     }
-
-    public static final class NodePoseConstants {
-        public static final Pose2d[] redAlliance = [
-            //TODO: find the poses that correspond to the red alliance's nodes
-        ];
-        public static final Pose2d[] blueAlliance = [
-            //TODO: find the poses that correspond to the blue alliance's nodes
-        ];
-    }
 }

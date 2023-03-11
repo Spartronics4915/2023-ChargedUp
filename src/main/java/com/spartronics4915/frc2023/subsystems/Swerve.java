@@ -361,11 +361,14 @@ public class Swerve extends SubsystemBase {
     public boolean alignToNearestNode() {
         Pose2d currentPose = mPoseEstimator.getEstimatedPosition();
         if (!getAbleToAlign(currentPose)) return false; //if we are outside the area we cannot align
-        Alliance currentAlliance = DriverStation.getAlliance(); //our alliance determines the values
-        Pose2d[] nodePoses = (currentAlliance == Alliance.Red ?
-            NodePoseConstants.redAlliance :
-            NodePoseConstants.blueAlliance); //this doesnt account for if alliance is Invalid
-        Pose2d desiredPose = currentPose.nearest(Arrays.asList(nodePoses)); //gets the closest node
+        // There's already a getCone() method in Swerve Commands which gets the nearest
+        // cone node. I think it would be best to just iterate on this to include
+        // cube nodes and use that
+        // Alliance currentAlliance = DriverStation.getAlliance(); //our alliance determines the values
+        // Pose2d[] nodePoses = (currentAlliance == Alliance.Red ?
+        //     NodePoseConstants.redAlliance :
+        //     NodePoseConstants.blueAlliance); //this doesnt account for if alliance is Invalid
+        // Pose2d desiredPose = currentPose.nearest(Arrays.asList(nodePoses)); //gets the closest node
     }
 
     @Override

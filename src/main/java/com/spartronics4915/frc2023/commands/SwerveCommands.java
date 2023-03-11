@@ -238,7 +238,7 @@ public class SwerveCommands {
     private double applyResponseCurve(double c) {
         return Math.signum(c) * Math.pow(Math.abs(c), kResponseCurveExponent);
     }
-
+    //TODO: edit this to also provide cube poses
     public Pose2d getCone(){
         List<Pose2d> cones = new ArrayList<Pose2d>();
         cones.add(new Pose2d(14.6,0.51, new Rotation2d()));
