@@ -354,6 +354,8 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Aligns the robot to the nearest node, provided the robot is
+     * within the alignment area
      * @return Whether the operation was successful
      */
     public boolean alignToNearestNode() {
@@ -362,7 +364,7 @@ public class Swerve extends SubsystemBase {
         Alliance currentAlliance = DriverStation.getAlliance(); //our alliance determines the values
         Pose2d[] nodePoses = (currentAlliance == Alliance.Red ?
             NodePoseConstants.redAlliance :
-            NodePoseConstants.blueAlliance);
+            NodePoseConstants.blueAlliance); //this doesnt account for if alliance is Invalid
         Pose2d desiredPose = currentPose.nearest(Arrays.asList(nodePoses)); //gets the closest node
     }
 
