@@ -1,20 +1,37 @@
 package com.spartronics4915.frc2023.commands;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.type.ArrayType;
 import com.spartronics4915.frc2023.subsystems.ExtenderSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public final class ExtenderCommands {
     
-    private final ExtenderSubsystem mExtender;
+    HashSet<Subsystem> mReq;
+private final ExtenderSubsystem mExtender;
     public ExtenderCommands(ExtenderSubsystem mExtender) {
         this.mExtender = mExtender;
+    
+        mReq = new HashSet<Subsystem>();
+        mReq.add(mExtender);
     }
     
     public class Extend extends CommandBase{
-        public Extend() {
+        public      Extend() {
             super();
         }
+
+        @Override
+        public Set<Subsystem> getRequirements() {
+            
+           return mReq; 
+        }
+
 
         @Override
         public void initialize() {
@@ -49,6 +66,13 @@ public final class ExtenderCommands {
             super.end(interrupted);
             mExtender.stopMotor();
         }
+
+        @Override
+        public Set<Subsystem> getRequirements() {
+            
+           return mReq; 
+        }
+
     }
 
    
