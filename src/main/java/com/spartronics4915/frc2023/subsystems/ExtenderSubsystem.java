@@ -148,7 +148,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public CommandBase extendToNInches(double N) {
-        return Commands.runEnd(()->{
+        return runEnd(()->{
             if(getPosition() < N){
                 startExtending();
             }else{
@@ -160,7 +160,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
 
     // Note, you need to set the target first!
     public CommandBase extendToTarget() {
-        return Commands.runEnd(()->{
+        return runEnd(()->{
             if(getPosition() < targetReference){
                 startExtending();
             }else{
