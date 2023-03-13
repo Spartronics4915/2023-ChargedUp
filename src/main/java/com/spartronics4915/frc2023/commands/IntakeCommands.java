@@ -22,6 +22,7 @@ public class IntakeCommands {
                 },
                 mIntake
             );
+            addRequirements(mIntake);
         }
     }
 }

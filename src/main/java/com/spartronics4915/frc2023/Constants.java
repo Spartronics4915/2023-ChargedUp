@@ -365,13 +365,13 @@ public final class Constants {
 
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             new CanSparkMaxMotorConstants(15, Math.PI*2, MotorType.kBrushless, IdleMode.kBrake, false, Rotation2d.fromDegrees(66)), 
-            new PIDConstants(0.2, 0, 0, 0.04), 
+            new PIDConstants(0.3, 0, 0, 0.05), 
             new SmartMotionsConstants(Math.PI/8, 1, 0), 
             Rotation2d.fromDegrees(180)
         );
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             new CanSparkMaxMotorConstants(19, Math.PI*2,MotorType.kBrushed, IdleMode.kBrake, true, Rotation2d.fromDegrees(136)), 
-            new PIDConstants(0.3, 0, 0, 0.03), 
+            new PIDConstants(0.6, 0, 0, 0.04), 
             new SmartMotionsConstants(1, 1, 0), 
             Rotation2d.fromDegrees(180)
         );
@@ -416,8 +416,8 @@ public final class Constants {
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(-28),
-            Rotation2d.fromDegrees(30)
+            Rotation2d.fromDegrees(-25),
+            Rotation2d.fromDegrees(96)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(

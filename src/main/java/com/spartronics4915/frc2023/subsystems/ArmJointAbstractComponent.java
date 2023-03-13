@@ -97,7 +97,7 @@ public abstract class ArmJointAbstractComponent {
         setNativeReference(HorizonToNative(ref));
     }
 
-    private void setNativeReference(Rotation2d ref) {
+    protected void setNativeReference(Rotation2d ref) {
         if(isNativeRefSafe(ref)){
             currentRefrence = ref;
             setRef = true;

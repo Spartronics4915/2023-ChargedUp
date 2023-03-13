@@ -26,6 +26,7 @@ public class ArmCommands {
 
     public class SetArmState extends SequentialCommandGroup {
         public SetArmState(ArmState armState) {
+            addRequirements(mArm);
             if (mArm.getDesiredGlobalState() == ArmState.RETRACTED || armState == ArmState.RETRACTED)
                 addCommands(
                     new InstantCommand(() -> {
@@ -48,6 +49,7 @@ public class ArmCommands {
         ArmState mArmState;
 
         public SetArmLocalStateSimple(ArmState armState) {
+            addRequirements(mArm);
             mArmState = armState;
         }
 
@@ -69,6 +71,7 @@ public class ArmCommands {
         private Rotation2d mArmDelta, mWristDelta;
 
         public TransformArmState(double extensionDelta, Rotation2d armDelta, Rotation2d wristDelta) {
+            addRequirements(mArm);
             mExtensionDelta = extensionDelta;
             mArmDelta = armDelta;
             mWristDelta = wristDelta;
