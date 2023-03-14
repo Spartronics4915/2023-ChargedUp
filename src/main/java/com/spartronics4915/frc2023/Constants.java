@@ -365,8 +365,8 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
             15,  //actual value 15
             Math.PI * 2, false,
-            0.30, 0, 0, 0.05,// 0.25, ..., 0.04
-            Math.PI, Math.PI/2, 
+            0.750, 0, 0, 0.05,// 0.25, ..., 0.04
+            Math.PI/2, Math.PI/4, 
             Rotation2d.fromDegrees(66), 10, false,
             MotorType.kBrushless,
             Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80)
@@ -446,9 +446,9 @@ public final class Constants {
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
-            2.9,
-            Rotation2d.fromDegrees(137.1),
-            Rotation2d.fromDegrees(17.5)
+            9.8,
+            Rotation2d.fromDegrees(135),
+            Rotation2d.fromDegrees(25.9)
         );
 
         public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(

@@ -312,7 +312,7 @@ public class RobotContainer {
                     .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CUBE_LEVEL_2));
                 
                 mOperatorController.y()
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CONE_LEVEL_2));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2, false));
 
                 /**
                  * Eject game piece		    RT
