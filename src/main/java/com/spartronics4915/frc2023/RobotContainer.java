@@ -20,6 +20,7 @@ import com.spartronics4915.frc2023.Constants.Arm;
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
 
 import com.spartronics4915.frc2023.Constants.OI;
+import com.spartronics4915.frc2023.Constants.Swerve.InitialPose;
 import com.spartronics4915.frc2023.Constants.Trajectory;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
@@ -32,6 +33,7 @@ import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.PrintPos;
 import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
+import com.spartronics4915.frc2023.commands.SwerveCommands.MoveToCone;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
@@ -236,10 +238,10 @@ public class RobotContainer {
                 .onTrue((new PrintPos()));
                 
                 mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                .whileTrue(mSwerveCommands.new MoveToCone());
                 
                 mDriverController.leftBumper() // TODO: remove before comp
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(ClimbState.LEVEL_ROBOT_SETUP));    
+                .whileTrue(new PrintPos());    
             }
             
             // OPERATOR CONTROLS

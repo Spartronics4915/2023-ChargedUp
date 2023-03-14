@@ -4,8 +4,6 @@
 
 package com.spartronics4915.frc2023;
 
-import java.util.HashMap;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 
 import com.ctre.phoenix.sensors.BasePigeon;
@@ -19,7 +17,6 @@ import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -29,8 +26,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-
-import static com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -532,10 +527,10 @@ public final class Constants {
     public static final class VisionConstants {
         static final Transform3d robotToCam =
                 new Transform3d(
-                        new Translation3d(0.5, 0.0, 0.5),
+                        new Translation3d(-0.2547112, 0.061722, 0.6889242),
                         new Rotation3d(
                                 0, 0,
-                                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+                                0)); // Cam mounted facing forward
         // from center.
         // static final String cameraName = "OV5647";
         static final String cameraName = "Arducam_OV9281_USB_Camera";

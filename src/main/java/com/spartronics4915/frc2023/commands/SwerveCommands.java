@@ -2,7 +2,6 @@ package com.spartronics4915.frc2023.commands;
 
 import static com.spartronics4915.frc2023.Constants.OI.kResponseCurveExponent;
 import static com.spartronics4915.frc2023.Constants.OI.kStickDeadband;
-import static com.spartronics4915.frc2023.Constants.Swerve.kMaxAcceleration;
 import static com.spartronics4915.frc2023.Constants.Swerve.kMaxAngularSpeed;
 import static com.spartronics4915.frc2023.Constants.Swerve.kMaxSpeed;
 import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeAngularSpeedMultiplier;
@@ -13,6 +12,7 @@ import java.util.List;
 
 import org.photonvision.targeting.PhotonPipelineResult;
 
+import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Swerve.BalanceConstants;
 import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
@@ -20,7 +20,6 @@ import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -35,11 +34,13 @@ public class SwerveCommands {
     private final CommandXboxController mDriverController;
 
     private final Swerve mSwerve;
+    private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     private boolean mIsSprintMode = false;
 
     public SwerveCommands(CommandXboxController controller) {
         mDriverController = controller;
         mSwerve = Swerve.getInstance();
+        mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
     }
 
     public class SetFieldRelative extends InstantCommand {
@@ -248,15 +249,35 @@ public class SwerveCommands {
         cones.add(new Pose2d(14.6,3.87, new Rotation2d()));
         cones.add(new Pose2d(14.6,4.98, new Rotation2d()));
         
-        cones.add(new Pose2d(1.93,0.51, new Rotation2d()));
-        cones.add(new Pose2d(1.93,1.63, new Rotation2d()));
-        cones.add(new Pose2d(1.93,2.19, new Rotation2d()));
-        cones.add(new Pose2d(1.93,3.31, new Rotation2d()));
-        cones.add(new Pose2d(1.93,3.87, new Rotation2d()));
-        cones.add(new Pose2d(1.93,4.98, new Rotation2d()));
+        cones.add(new Pose2d(1.93,0.51, Rotation2d.fromDegrees(180)));
+        cones.add(new Pose2d(1.93,1.63, Rotation2d.fromDegrees(180)));
+        cones.add(new Pose2d(1.93,2.19, Rotation2d.fromDegrees(180)));
+        cones.add(new Pose2d(1.93,3.31, Rotation2d.fromDegrees(180)));
+        cones.add(new Pose2d(1.93,3.87, Rotation2d.fromDegrees(180)));
+        cones.add(new Pose2d(1.93,4.98, Rotation2d.fromDegrees(180)));
 
 
         return mSwerve.getPose().nearest(cones);
+    }
+
+    public class MoveToCone extends CommandBase {
+        public MoveToCone() {
+            addRequirements(mSwerve);
+        }
+
+        @Override
+        public void execute() {
+            Pose2d cone = getCone();
+            SmartDashboard.putNumber("Cone X", cone.getX());
+            SmartDashboard.putNumber("Cone Y", cone.getY());
+            SmartDashboard.putNumber("Cone Rotation", cone.getRotation().getRadians());
+			mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
+				new ArrayList<>(List.of(
+					new PathPoint(mSwerve.getPose().getTranslation(), mSwerve.getPose().getRotation(), new Rotation2d(0)),
+					new PathPoint(cone.getTranslation(), cone.getRotation(), new Rotation2d(0))
+				))
+			).schedule();
+        }
     }
 
     public class RotateDegrees extends CommandBase {
