@@ -222,32 +222,30 @@ public class ArmSubsystem extends SubsystemBase {
 
     // TODO determine zero offsets
     // TODO add extender motor
-    private void setDesiredLocalPosition(ArmPosition state) {
-        // mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
-        mExtenderSubsystem.setTarget(state.armRadius);
-        mPivotMotor.setArmReference(state.armTheta);
-        mWristMotor.setArmReference(state.wristTheta);
+    private void setDesiredLocalPivotWristPosition(Rotation2d armTheta, Rotation2d wristTheta) {
+        mPivotMotor.setArmReference(armTheta);
+        mWristMotor.setArmReference(wristTheta);
     }
 
-    public CommandBase setDesiredLocalStateCommand(ArmPosition state) {
-        return runOnce(() -> setDesiredLocalPosition(state));
-    }
+    // public CommandBase setDesiredLocalStateCommand(ArmPosition state) {
+    //     return runOnce(() -> setDesiredLocalPosition(state));
+    // }
 
-    private void setDesiredGlobalPosition(ArmPosition pos) {
-        setDesiredLocalPosition(globalToLocalState(pos));
-    }
+    // private void setDesiredGlobalPosition(ArmPosition pos) {
+    //     setDesiredLocalPosition(globalToLocalState(pos));
+    // }
 
     public void setDesiredLocalState(ArmState state) {
         // Global state has all of the angles in global coordinates (0 is the horizon)
         mDesiredState = state;
-        setDesiredLocalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+        setDesiredLocalPivotWristPosition(state.armTheta, state.wristTheta);
     }
 
-    public void setDesiredGlobalState(ArmState state) {
-        // Global state has all of the angles in global coordinates (0 is the horizon)
-        mDesiredState = state;
-        setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
-    }
+    // public void setDesiredGlobalState(ArmState state) {
+    //     // Global state has all of the angles in global coordinates (0 is the horizon)
+    //     mDesiredState = state;
+    //     setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+    // }
 
     private Rotation2d getCorrectAngleDEPRECATE(Rotation2d armAngle) {
         // assuming 0 on the arm is straight up
@@ -272,7 +270,7 @@ public class ArmSubsystem extends SubsystemBase {
     // TODO make a way
     /**
      * this method transform the arm based on its current position
-     * @param exstensionDelta distance in inches to tranform the arm by
+     * @param exstensionDelta distance in inches to tranform the arm by - Extension currently not supported.
      * @param armDelta  amount to rotate the arm by
      * @param wristDelta amount to rotate the wrist by
      */
@@ -282,7 +280,7 @@ public class ArmSubsystem extends SubsystemBase {
             current.armRadius + exstensionDelta, 
             current.armTheta.plus(armDelta),
             current.wristTheta.plus(wristDelta));
-        setDesiredLocalPosition(transformed);
+        setDesiredLocalPivotWristPosition(transformed.armTheta, transformed.wristTheta);
         System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.wristTheta.getRadians() + " " + wristDelta);
 
     }

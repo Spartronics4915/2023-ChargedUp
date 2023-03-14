@@ -305,7 +305,7 @@ public final class DebugTeleopCommands {
         IntakeTab(Intake intakeSubsystem) {
             tab = Shuffleboard.getTab("Intake Tab");
             controlLayout = tab.getLayout("Controls", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "TOP"));
-            currShootSpeedSelector = controlLayout.add("Current Shoot Speed Selector", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 1)).getEntry();
+            currShootSpeedSelector = controlLayout.add("Current Shoot Speed Selector", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 0)).getEntry();
             currShootSpeed = controlLayout.add("Current Shoot Speed", 0).getEntry();
             mIntake = intakeSubsystem;
         }

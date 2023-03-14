@@ -65,6 +65,7 @@ public class Intake extends SubsystemBase {
             case IN: mMotor.set(kInSpeed);
             break;
             case OUT: mMotor.set(outSpeed);
+            System.out.println("OutSpeed: " + outSpeed);
             break;
             default: mMotor.set(0.01);
         }

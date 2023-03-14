@@ -91,7 +91,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getModeledPosition() {
-        return nativeToArm(Rotation2d.fromDegrees(mModeledPosition));
+        return nativeToArm(Rotation2d.fromRadians(mModeledPosition));
     }
 
     public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
@@ -118,7 +118,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
      */
     public void setArmReference(Rotation2d ref) {
         // This is designed to ignore unsafe arm positions.
-        if (Math.abs(ref.getDegrees()) > 100)
+        if (ref.getDegrees() > mMaxRotation.getDegrees())
         {
             System.out.println("Arm:" + isArm +" Unsafe arm position requested (setArmReference): " + ref);
             return;

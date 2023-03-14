@@ -328,9 +328,8 @@ public final class Constants {
             public final double kI;
             public final double kD;
             public final double kFF;
-            public final double kSmartMotionMaxAccel;
-            public final double kSmartMotionMaxVelocity;
-            public final double kSmartMotionMinOutputVelocity;
+            public final double kMaxAccel;
+            public final double kMaxVelocity;
             public final Rotation2d kZeroOffset;
             public final int kFollowerMotorID;
             public final boolean kInvertMotor;
@@ -338,7 +337,7 @@ public final class Constants {
             public final Rotation2d mMaxRotation, mMinRotation;
 
             public ArmMotorConstants(int MotorID, double PositionConversionFactor, boolean Inverted, double P, double I, double D, double FF, 
-            double SmartMotionMaxAccel, double SmartMotionMaxVelocity, double SmartMotionMinOutputVelocity, Rotation2d zeroOffset, 
+            double maxAccel, double maxVelocity, Rotation2d zeroOffset, 
             int followerMotorID, boolean motorInverted, MotorType motorType, 
             //These are in local coordinates
             Rotation2d maxRotation, Rotation2d minRotation) {
@@ -349,9 +348,8 @@ public final class Constants {
                 this.kP = P;
                 this.kI = I;
                 this.kD = D;
-                this.kSmartMotionMaxAccel = SmartMotionMaxAccel; 
-                this.kSmartMotionMaxVelocity = SmartMotionMaxVelocity;
-                this.kSmartMotionMinOutputVelocity = SmartMotionMinOutputVelocity;
+                this.kMaxAccel = maxAccel; 
+                this.kMaxVelocity = maxVelocity;
                 this.kZeroOffset = zeroOffset;
                 this.kFollowerMotorID = followerMotorID;
                 this.kInvertMotor = motorInverted;
@@ -368,20 +366,20 @@ public final class Constants {
             15,  //actual value 15
             Math.PI * 2, false,
             0.30, 0, 0, 0.05,// 0.25, ..., 0.04
-            Math.PI/8, 1, 0,
+            Math.PI, Math.PI/2, 
             Rotation2d.fromDegrees(66), 10, false,
             MotorType.kBrushless,
-            Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-90)
+            Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80)
         ); 
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             19, 
             Math.PI * 2, true,
-            0.6, 0, 0, 0.04,// 0.3, ..., 0.03
-            1, 1, 0, //maybe try lowering max velocity, maybe add limiter variables for smart motion
+            0.6, 0, 0, 0.04,// 0.3, ..., 0.03.
+            Math.PI, Math.PI/4,
             Rotation2d.fromDegrees(136),-1, true,
             MotorType.kBrushed,
-            Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-90)
+            Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90)
         ); 
 
         public static final int kPivotFollowerID = 16; //actual value: 16
@@ -430,15 +428,15 @@ public final class Constants {
         );
 
         public static final ArmPositionConstants kFloorPositionConstants = new ArmPositionConstants(
-            8,
+            0,
             Rotation2d.fromDegrees(-28),
             Rotation2d.fromDegrees(30)
         );
 
         public static final ArmPositionConstants kDoubleSubstationConstants = new ArmPositionConstants(
             0,
-            Rotation2d.fromDegrees(0),
-            Rotation2d.fromDegrees(0)
+            Rotation2d.fromDegrees(120.6),
+            Rotation2d.fromDegrees(87.4)
         );
         
         public static final ArmPositionConstants kConeLevel1Constants = new ArmPositionConstants(
@@ -448,9 +446,9 @@ public final class Constants {
         );
 
         public static final ArmPositionConstants kConeLevel2Constants = new ArmPositionConstants(
-            14,
-            Rotation2d.fromDegrees(18),
-            Rotation2d.fromDegrees(38)
+            2.9,
+            Rotation2d.fromDegrees(137.1),
+            Rotation2d.fromDegrees(17.5)
         );
 
         public static final ArmPositionConstants kCubeLevel1Constants = new ArmPositionConstants(

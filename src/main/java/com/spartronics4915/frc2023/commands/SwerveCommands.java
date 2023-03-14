@@ -326,4 +326,21 @@ public class SwerveCommands {
         }
 
     }
+    public class DriveStraightToPoint extends CommandBase {
+
+        Pose2d mTarget;
+        public DriveStraightToPoint(Pose2d target) {
+
+            mTarget = target;
+
+        }
+
+        @Override
+        public void execute() {
+            Pose2d currPose = mSwerve.getPose();
+            Translation2d translationErrVec = mTarget.getTranslation().minus(currPose.getTranslation());
+            double distToGoal = translationErrVec.getNorm();
+
+        }
+    }
 }
