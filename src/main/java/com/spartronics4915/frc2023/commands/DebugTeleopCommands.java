@@ -425,7 +425,8 @@ public final class DebugTeleopCommands {
         public void initialize() {
 
             mArmTab = useArm ? new ArmTab(mArmSubsystem, mArmCommands) : null;
-            mIntakeTab = useArm ? new IntakeTab(mArmSubsystem.getIntake()) : null;
+            // mIntakeTab = useArm ? new IntakeTab(mArmSubsystem.getIntake()) : null;
+            mIntakeTab = null;
             mSwerveTab = useSwerve ? new SwerveTab(mSwerve, mSwerveCommands) : null;
         }
 
@@ -434,7 +435,7 @@ public final class DebugTeleopCommands {
         public void execute() {
             if (useArm) { 
                 mArmTab.update(); 
-                mIntakeTab.update();
+                // mIntakeTab.update();
             }
             if (useSwerve) { mSwerveTab.update(); }
         }

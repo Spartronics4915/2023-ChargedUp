@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.spartronics4915.frc2023.Constants.Arm.ArmPositionConstants.ArmSettingsConstants;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem.AngleWithEarthProvider;
 
@@ -67,11 +68,14 @@ public class ArmSubsystem extends SubsystemBase {
         public final double armRadius;
         public final Rotation2d armTheta;
         public final Rotation2d wristTheta;
+        public final double outSpeed;
 
-        private ArmState(ArmPositionConstants armPositionConstants) {
+        private ArmState(ArmSettingsConstants armConstants) {
+            var armPositionConstants = armConstants.mArmPositionConstants;
             armRadius = armPositionConstants.armRadius;
             armTheta = armPositionConstants.armTheta;
             wristTheta = armPositionConstants.wristTheta;
+            outSpeed = armConstants.mOutSpeed;
         }
     }
 

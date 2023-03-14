@@ -1,5 +1,6 @@
 package com.spartronics4915.frc2023.subsystems;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.spartronics4915.frc2023.Constants.Intake.*;
@@ -44,6 +45,12 @@ public class Intake extends SubsystemBase {
 
     }
 
+    public CommandBase setOutSpeedCommand(double newSpeed) {
+
+        return this.runOnce(() -> setOutSpeed(
+                newSpeed));
+    }
+
     public static Intake getInstance() {
         if (mInstance == null) {
             mInstance = new Intake();
@@ -61,13 +68,16 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        switch(mState) {
-            case IN: mMotor.set(kInSpeed);
-            break;
-            case OUT: mMotor.set(outSpeed);
-            System.out.println("OutSpeed: " + outSpeed);
-            break;
-            default: mMotor.set(0.01);
+        switch (mState) {
+            case IN:
+                mMotor.set(kInSpeed);
+                break;
+            case OUT:
+                mMotor.set(outSpeed);
+                System.out.println("OutSpeed: " + outSpeed);
+                break;
+            default:
+                mMotor.set(0.01);
         }
     }
 }

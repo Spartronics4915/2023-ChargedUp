@@ -143,6 +143,7 @@ public class ArmCommands {
     public CommandBase getGoToPresetArmStatePivotFirstCommand(ArmState armState, boolean waitForExtender) {
         var untuckCommand = new UntuckWristIfNecessary().withTimeout(1);
         var seqCommands = new SequentialCommandGroup(
+            mIntakeCommands.getOutSpeedCommand(armState.outSpeed),
             untuckCommand,
             new SetArmPivotWristLocalState(armState),
             new WaitForPivotToArrive(armState.armTheta, 5)
