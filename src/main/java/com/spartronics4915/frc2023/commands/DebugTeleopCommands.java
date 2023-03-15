@@ -6,6 +6,7 @@ import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.ExtenderSubsystem;
+import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -291,6 +292,28 @@ public final class DebugTeleopCommands {
         }
     }
 
+    public static class IntakeTab {
+
+        ShuffleboardTab tab;
+        ShuffleboardLayout controlLayout;
+        GenericEntry currShootSpeed, currShootSpeedSelector;
+        Intake mIntake;
+        IntakeTab(Intake intakeSubsystem) {
+            tab = Shuffleboard.getTab("Intake Tab");
+            controlLayout = tab.getLayout("Controls", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "TOP"));
+            currShootSpeedSelector = controlLayout.add("Current Shoot Speed Selector", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 1)).getEntry();
+            currShootSpeed = controlLayout.add("Current Shoot Speed", 0).getEntry();
+            mIntake = intakeSubsystem;
+        }
+
+        public void update() {
+            mIntake.setOutSpeed(currShootSpeedSelector.getDouble(0));
+
+            currShootSpeed.setDouble(mIntake.getOutSpeed());
+        }
+
+    }
+
     public static class ArmTab {
         ArmWidget widget0;
         ExtenderWidget extenderWidget;
@@ -376,6 +399,7 @@ public final class DebugTeleopCommands {
         ArmTab mArmTab;
         ArmCommands mArmCommands;
 
+        IntakeTab mIntakeTab;
         Swerve mSwerve;
         SwerveCommands mSwerveCommands;
         SwerveTab mSwerveTab;
@@ -389,6 +413,7 @@ public final class DebugTeleopCommands {
 
             mSwerve = swerve;
             mSwerveCommands = swerveCommands;
+
         }
         // Called when the command is initially scheduled.
 
@@ -396,13 +421,17 @@ public final class DebugTeleopCommands {
         public void initialize() {
 
             mArmTab = useArm ? new ArmTab(mArmSubsystem, mArmCommands) : null;
+            mIntakeTab = useArm ? new IntakeTab(mArmSubsystem.getIntake()) : null;
             mSwerveTab = useSwerve ? new SwerveTab(mSwerve, mSwerveCommands) : null;
         }
 
         // Called every time the scheduler runs while the command is scheduled.
         @Override
         public void execute() {
-            if (useArm) { mArmTab.update(); }
+            if (useArm) { 
+                mArmTab.update(); 
+                mIntakeTab.update();
+            }
             if (useSwerve) { mSwerveTab.update(); }
         }
 

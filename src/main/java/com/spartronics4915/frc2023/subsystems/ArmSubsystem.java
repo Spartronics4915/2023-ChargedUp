@@ -132,6 +132,10 @@ public class ArmSubsystem extends SubsystemBase {
         // mPivotMotor.setActive(true);
     }
 
+    public Intake getIntake() {
+        return mIntake;
+    }
+    
     public ExtenderSubsystem getExtender() {
         return mExtenderSubsystem;
     }
