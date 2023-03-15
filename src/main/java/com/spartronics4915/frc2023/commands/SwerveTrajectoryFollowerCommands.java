@@ -18,9 +18,9 @@ import com.spartronics4915.frc2023.subsystems.Swerve;
 public class SwerveTrajectoryFollowerCommands {
 	private SwerveTrajectoryFollowerCommands() {}
 	
-	private static final PIDController mXPID = new PIDController(kLinearP * 10, 0, 0);
-	private static final PIDController mYPID = new PIDController(kLinearP * 10, 0, 0);
-	private static final PIDController mThetaPID = new PIDController(0.1, 0.01, 0);
+	private static final PIDController mXPID = new PIDController(kLinearP * 2, 0, 0);
+	private static final PIDController mYPID = new PIDController(kLinearP * 2, 0, 0);
+	private static final PIDController mThetaPID = new PIDController(0.03, 0.0, 0.0);
 	
 	public static class FollowTrajectoryCommand extends PPSwerveControllerCommand {
 		public FollowTrajectoryCommand(PathPlannerTrajectory trajectory) {

@@ -13,11 +13,13 @@ import java.util.function.Function;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
 import static com.spartronics4915.frc2023.commands.Autos.autoBuilder;
+import static com.spartronics4915.frc2023.Constants.Trajectory.k2pTestTraj;
 
 import com.spartronics4915.frc2023.Constants.OI;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
@@ -28,6 +30,7 @@ import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
+import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
@@ -40,11 +43,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -250,6 +255,19 @@ public class RobotContainer {
             mAutos.new Strategy(
                 "2-piece test", 
                 (Pose2d initialPose) -> autoBuilder.fullAuto(Autos.test2PieceTrajectory)
+            ),
+            mAutos.new Strategy(
+                "2-piece test, trajectory only",
+                (Pose2d initialPose) -> {
+                    var trajectory = PathPlannerTrajectory.transformTrajectoryForAlliance(k2pTestTraj, Alliance.Red);
+                    final var startPose = trajectory.getInitialHolonomicPose();
+                    return new SequentialCommandGroup(
+                        new InstantCommand(() -> Swerve.getInstance().resetPose(startPose), Swerve.getInstance()),
+                        new SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand(
+                            trajectory
+                        )
+                    );
+                }
             )
 		};
 		for (Autos.Strategy strat : autoStrategies) {

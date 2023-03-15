@@ -11,6 +11,8 @@ import com.ctre.phoenix.sensors.BasePigeon;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -30,6 +32,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -63,6 +66,9 @@ public final class Constants {
 
         public static final PathConstraints kPathConstraints = new PathConstraints(kMaxVelocity, kMaxAccel);
         public static final HashMap<String, Command> kEventMap = new HashMap<>();
+        public static final HashMap<String, Command> kDebugEventMap = new HashMap<>();
+        
+        public static final PathPlannerTrajectory k2pTestTraj = PathPlanner.loadPath("Test 2-piece", new PathConstraints(0.5, 0.5));
 
         static {
             IntakeCommands intakeCommands = new IntakeCommands(com.spartronics4915.frc2023.subsystems.Intake.getInstance());
@@ -81,6 +87,16 @@ public final class Constants {
             kEventMap.put("retractIntake", armCommands.new SetArmLocalState(ArmState.RETRACTED_PRIOR));
             kEventMap.put("shootCubeHighPosition", armCommands.new SetArmLocalState(ArmState.SHOOT_HIGH_CUBE));
             kEventMap.put("shootCube", intakeCommands.new SetIntakeState(IntakeState.SHOOT_CUBE));
+            
+            kDebugEventMap.put("placeHighConePosition", Commands.runOnce(() -> System.out.println("placeHighConePosition")));
+            kDebugEventMap.put("ejectCone", Commands.runOnce(() -> System.out.println("ejectCone")));
+            kDebugEventMap.put("retractArm", Commands.runOnce(() -> System.out.println("retractArm")));
+            kDebugEventMap.put("deployIntake", Commands.runOnce(() -> System.out.println("deployIntake")));
+            kDebugEventMap.put("enableIntakeIn", Commands.runOnce(() -> System.out.println("enableIntakeIn")));
+            kDebugEventMap.put("disableIntake", Commands.runOnce(() -> System.out.println("disableIntake")));
+            kDebugEventMap.put("retractIntake", Commands.runOnce(() -> System.out.println("retractIntake")));
+            kDebugEventMap.put("shootCubeHighPosition", Commands.runOnce(() -> System.out.println("shootCubeHighPosition")));
+            kDebugEventMap.put("shootCube", Commands.runOnce(() -> System.out.println("shootCube")));
         }
 	}
 
