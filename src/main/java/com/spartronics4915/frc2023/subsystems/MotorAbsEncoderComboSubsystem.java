@@ -75,9 +75,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mMotor.setSmartCurrentLimit(40);
         mActive = true;
         mReferenceSet = false;
-        mCurrentReference = getNativePosition();
-        mModeledPosition = getNativePosition().getRadians();
-        mReferenceRadians = mCurrentReference.getRadians();
+
+        makeModeledPositionsMatchPhysical();
+
         mLastSpeedOutput = 0;
         mAngleProvider = null;
         kP = MotorConstants.kP;
@@ -88,6 +88,12 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mMinRotation = MotorConstants.mMinRotation;
         isArm = (mAngleProvider==null);
 
+    }
+
+    public void makeModeledPositionsMatchPhysical() {
+        mCurrentReference = getNativePosition();
+        mModeledPosition = getNativePosition().getRadians();
+        mReferenceRadians = mCurrentReference.getRadians();
     }
 
     public Rotation2d getModeledPosition() {
@@ -258,10 +264,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             double total_output = ffComponent + kP*pidErr;
 
 
-            if(total_output > 0.6) {
-                total_output = 0.6;
-            } else if (total_output < -0.6) {
-                total_output = -0.6;
+            if(total_output > 0.8) {
+                total_output = 0.8;
+            } else if (total_output < -0.8) {
+                total_output = -0.8;
             }
 
             if(mActive && mReferenceSet) {

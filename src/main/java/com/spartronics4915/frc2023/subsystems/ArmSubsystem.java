@@ -136,6 +136,10 @@ public class ArmSubsystem extends SubsystemBase {
         //mPivotMotor.setActive(false);
     }
 
+    public void makeModeledPositionsMatchPhysical() {
+
+    }
+
     public Intake getIntake() {
         return mIntake;
     }
@@ -262,6 +266,11 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
 
+    public void clearReference() {
+        mPivotMotor.clearReference();
+        mWristMotor.clearReference();
+    }
+    
     public void stopPivot() {
         mPivotMotor.stopMotor();
     }
