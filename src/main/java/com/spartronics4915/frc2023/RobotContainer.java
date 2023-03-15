@@ -31,7 +31,6 @@ import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
-import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
@@ -73,6 +72,7 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final Swerve mSwerve;
     private final SwerveCommands mSwerveCommands;
+    private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
@@ -103,8 +103,9 @@ public class RobotContainer {
             mSwerve = Swerve.getInstance();
             mSwerveCommands = new SwerveCommands(mDriverController);
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
+            mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
             
-            mAutos = new Autos(mSwerveCommands);
+            mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand(new Pose2d()); // remove before comp as pose will be unknown after auto
         } else {
@@ -112,6 +113,7 @@ public class RobotContainer {
             mAutos = null;
             mSwerve = null;
             mSwerveCommands = null;
+            mSwerveTrajectoryFollowerCommands = null;
         }
         
         if (useArm) {
@@ -222,53 +224,53 @@ public class RobotContainer {
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
             ),
-            mAutos.new Strategy(
-                "follow test trajectory",
-                (Pose2d initialPose) -> {
-                    initialPose = new Pose2d();
-                    var trajectory = PathPlanner.generatePath(
-                        new PathConstraints(2.5, 2.5), 
-                        new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                        new PathPoint(new Translation2d(1, 1), new Rotation2d(), Rotation2d.fromDegrees(-90))
-                    );
-                    return new SequentialCommandGroup(
-                        new FollowSingleTrajectoryCommand(trajectory),
-                        mSwerve.driveCommand(new ChassisSpeeds(), true, true)
-                    );
-                }
-            ),
-            mAutos.new Strategy(
-                "follow straight 2m test trajectory",
-                (Pose2d initialPose) -> {
-                    initialPose = Swerve.getInstance().getPose();
-                    var trajectory = PathPlanner.generatePath(
-                        new PathConstraints(2.5, 2.5),
-                        new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
-                        new PathPoint(new Translation2d(2, 0), new Rotation2d(), Rotation2d.fromDegrees(90))
-                    );
-                    return new SequentialCommandGroup(
-                        new FollowSingleTrajectoryCommand(trajectory),
-                        mSwerve.driveCommand(new ChassisSpeeds(), true, true)
-                    );
-                }
-            ),
+            // mAutos.new Strategy(
+            //     "follow test trajectory",
+            //     (Pose2d initialPose) -> {
+            //         initialPose = new Pose2d();
+            //         var trajectory = PathPlanner.generatePath(
+            //             new PathConstraints(2.5, 2.5), 
+            //             new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
+            //             new PathPoint(new Translation2d(1, 1), new Rotation2d(), Rotation2d.fromDegrees(-90))
+            //         );
+            //         return new SequentialCommandGroup(
+            //             new FollowSingleTrajectoryCommand(trajectory),
+            //             mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+            //         );
+            //     }
+            // ),
+            // mAutos.new Strategy(
+            //     "follow straight 2m test trajectory",
+            //     (Pose2d initialPose) -> {
+            //         initialPose = Swerve.getInstance().getPose();
+            //         var trajectory = PathPlanner.generatePath(
+            //             new PathConstraints(2.5, 2.5),
+            //             new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
+            //             new PathPoint(new Translation2d(2, 0), new Rotation2d(), Rotation2d.fromDegrees(90))
+            //         );
+            //         return new SequentialCommandGroup(
+            //             new FollowSingleTrajectoryCommand(trajectory),
+            //             mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+            //         );
+            //     }
+            // ),
             mAutos.new Strategy(
                 "2-piece test", 
                 (Pose2d initialPose) -> autoBuilder.fullAuto(Autos.test2PieceTrajectory)
             ),
-            mAutos.new Strategy(
-                "2-piece test, trajectory only",
-                (Pose2d initialPose) -> {
-                    var trajectory = PathPlannerTrajectory.transformTrajectoryForAlliance(k2pTestTraj, Alliance.Red);
-                    final var startPose = trajectory.getInitialHolonomicPose();
-                    return new SequentialCommandGroup(
-                        new InstantCommand(() -> Swerve.getInstance().resetPose(startPose), Swerve.getInstance()),
-                        new SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand(
-                            trajectory
-                        )
-                    );
-                }
-            )
+            // mAutos.new Strategy(
+            //     "2-piece test, trajectory only",
+            //     (Pose2d initialPose) -> {
+            //         var trajectory = PathPlannerTrajectory.transformTrajectoryForAlliance(k2pTestTraj, Alliance.Red);
+            //         final var startPose = trajectory.getInitialHolonomicPose();
+            //         return new SequentialCommandGroup(
+            //             new InstantCommand(() -> Swerve.getInstance().resetPose(startPose), Swerve.getInstance()),
+            //             new SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand(
+            //                 trajectory
+            //             )
+            //         );
+            //     }
+            // )
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat::getCommand);

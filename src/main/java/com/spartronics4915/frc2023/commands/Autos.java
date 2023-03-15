@@ -4,15 +4,19 @@
 
 package com.spartronics4915.frc2023.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.spartronics4915.frc2023.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -44,12 +48,14 @@ public final class Autos {
 
 	private final Swerve mSwerve;
 	private final boolean mIsOpenLoop = true;
+	private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
 	private final SwerveCommands mSwerveCommands;
 			
 
-    public Autos(SwerveCommands swerveCommands) {
+    public Autos(SwerveCommands swerveCommands, SwerveTrajectoryFollowerCommands swerveTrajectoryFollowerCommands) {
 		mSwerve = Swerve.getInstance();
 		mSwerveCommands = swerveCommands;
+		mSwerveTrajectoryFollowerCommands = swerveTrajectoryFollowerCommands;
     }
 
 	public class MoveForwardCommand extends SequentialCommandGroup {
@@ -62,6 +68,78 @@ public final class Autos {
 			);
 		}
 	}
+
+	public class MoveForwardCommandFancy extends SequentialCommandGroup {
+		public MoveForwardCommandFancy() {
+			addRequirements(mSwerve);
+			addCommands(
+				mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					new ArrayList<>(List.of(
+						new PathPoint(new Translation2d(0, 0), new Rotation2d(0)),
+						new PathPoint(new Translation2d(3, 0), new Rotation2d(Math.PI / 2.))
+					))
+				),
+				new InstantCommand(() -> {
+					mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+					for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+				})
+			);
+		}
+		// public MoveForwardCommandFancy() {
+		// 	addRequirements(mSwerve);
+		// 	addCommands(
+		// 		mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+		// 			new ArrayList<>(List.of(
+		// 				new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+		// 				new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+		// 			))
+		// 		),
+		// 		new InstantCommand(() -> {
+		// 			mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+		// 			for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+		// 		})
+		// 	);
+		// }
+	}
+	
+	// public class MoveForwardCommandDynamic extends SequentialCommandGroup {
+	// 	public MoveForwardCommandDynamic() {
+	// 		addRequirements(mSwerve);
+	// 		addCommands(
+	// 			mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
+	// 				new ArrayList<>(List.of(
+	// 					new PathPoint(new Translation2d(0, 0), new Rotation2d(0), new Rotation2d(0)),
+	// 					new PathPoint(new Translation2d(3, 0), new Rotation2d(0), new Rotation2d(Math.PI / 2))
+	// 				))
+	// 			),
+	// 			new InstantCommand(() -> {
+	// 				mSwerve.drive(new Translation2d(), 0, mIsOpenLoop);
+	// 				for (int i = 0; i < 100; i++) System.out.println("Finally finished the gauntlet!");
+	// 			})
+	// 		);
+	// 	}
+	// }
+
+	// public class MoveBackAndForthFancy extends SequentialCommandGroup {
+	// 	public MoveBackAndForthFancy() {
+	// 		PathPoint aprilTag1 = new PathPoint(new Translation2d(0, 0), new Rotation2d(Math.PI / 2));
+	// 		PathPoint aprilTag2 = new PathPoint(new Translation2d(0, 6), new Rotation2d(-Math.PI / 2));
+	// 		addCommands(
+	// 			mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+	// 				new ArrayList<>(List.of(
+	// 					aprilTag1,
+	// 					aprilTag2
+	// 				))
+	// 			),
+	// 			mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+	// 				new ArrayList<>(List.of(
+	// 					aprilTag2,
+	// 					aprilTag1
+	// 				))
+	// 			)
+	// 		);
+	// 	}
+	// }
 
 	public class Strategy {
 		private final Function<Pose2d, CommandBase> mGetCommand;
