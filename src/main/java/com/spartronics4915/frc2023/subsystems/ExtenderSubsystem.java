@@ -33,7 +33,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     // a large value.
     private final double kPositionPad = 24;
     private final double kMinDist = 0.5;
-    private final double kMaxDist = 12;
+    private final double kMaxDist = 10;
     private final double kPosTolerance = 0.2;
     private MotorAbsEncoderComboSubsystem mPivot;
 
