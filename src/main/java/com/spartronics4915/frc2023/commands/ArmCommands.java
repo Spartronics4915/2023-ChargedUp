@@ -89,6 +89,12 @@ public class ArmCommands {
         }
     }
 
+    public class ResetCommand extends CommandBase{
+        public ResetCommand(){
+            mArm.clearReferences();
+        }
+    }
+
 	public class PieceInteractCommand extends SequentialCommandGroup {
 		public PieceInteractCommand(ArmState armState, IntakeState intakeState) {
 			super(

@@ -220,6 +220,12 @@ import static com.spartronics4915.frc2023.Constants.Arm.*;
         mWristMotor.setHorizonReference(state.wristTheta);
     }
 
+    //reset command for teleop init
+    public void clearReferences() {
+        mPivotMotor.setRef = false;
+        mWristMotor.setRef = false;
+    }
+
     private void setDesiredGlobalPosition(ArmPosition pos) {
         setDesiredLocalPosition(globalToLocalState(pos));
     }
