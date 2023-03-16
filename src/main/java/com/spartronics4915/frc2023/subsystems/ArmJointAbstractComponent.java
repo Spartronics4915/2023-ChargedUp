@@ -5,10 +5,12 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.SparkMaxPIDController.AccelStrategy;
+import com.spartronics4915.frc2023.Constants.Arm;
 import com.spartronics4915.frc2023.Constants.Arm.ArmMotorConstants;
 import com.spartronics4915.frc2023.Constants.Arm.CanSparkMaxMotorConstants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.LogMessage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -106,6 +108,16 @@ public abstract class ArmJointAbstractComponent {
         }
     }
 
+    protected double calculateTrapazoidSetpoint(){
+        double currVelocity = mAbsEncoder.getVelocity();
+        double currPosNative = getNativePosition().getRadians();
+        var currState = new TrapezoidProfile.State(currPosNative, currVelocity);
+        var goalState = new TrapezoidProfile.State(currentRefrence.getRadians(), 0);
+        TrapezoidProfile currMotionProfile = new TrapezoidProfile(kConstants.kTrapazoidConstraints, goalState, currState);
+
+        return currMotionProfile.calculate(Arm.ticLength).position;
+    }
+
     abstract protected boolean isNativeRefSafe(Rotation2d ref);
 
     abstract protected void onUnsafeNativeRef(Rotation2d ref);
@@ -116,7 +128,7 @@ public abstract class ArmJointAbstractComponent {
     public void onPeriodic() {
         if (setRef)
             mPIDController.setReference(
-                currentRefrence.getRadians(), 
+                calculateTrapazoidSetpoint(), 
                 ControlType.kPosition, 0, 
                 calculateFeedforwardValue()
             );
