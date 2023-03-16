@@ -350,15 +350,27 @@ public final class Constants {
             public final CanSparkMaxMotorConstants kMotorConstants;
             public final PIDConstants kPIDConstants;
             public final SmartMotionsConstants kSmartMotionsConstants;
-            public final Rotation2d kHorizonDeflection;
             public final Constraints kTrapazoidConstraints;
-            public ArmMotorConstants( CanSparkMaxMotorConstants kMotorConstants, PIDConstants kPIDConstants, SmartMotionsConstants kSmartMotionsConstants, Constraints kTrapazoidConstraints, Rotation2d kHorizonDeflection) {
+            public final Rotation2d kHorizonDeflection;
+            public final Rotation2d kMaxRotation;
+            public final Rotation2d kMinRotation;
+
+            public ArmMotorConstants( 
+                CanSparkMaxMotorConstants kMotorConstants, 
+                PIDConstants kPIDConstants, 
+                SmartMotionsConstants kSmartMotionsConstants, 
+                Constraints kTrapazoidConstraints, 
+                Rotation2d kHorizonDeflection, 
+                Rotation2d kMaxRotation, 
+                Rotation2d kMinRotation) {
                 super();
                 this.kPIDConstants = kPIDConstants;
                 this.kSmartMotionsConstants = kSmartMotionsConstants;
                 this.kMotorConstants = kMotorConstants;
                 this.kHorizonDeflection = kHorizonDeflection;
                 this.kTrapazoidConstraints = kTrapazoidConstraints;
+                this.kMaxRotation = kMaxRotation;
+                this.kMinRotation = kMinRotation;
             }
         }
 
@@ -370,15 +382,17 @@ public final class Constants {
             new CanSparkMaxMotorConstants(15, Math.PI*2, MotorType.kBrushless, IdleMode.kBrake, false, Rotation2d.fromDegrees(66)), 
             new PIDConstants(0.3, 0, 0, 0.05), 
             new SmartMotionsConstants(Math.PI/8, 1, 0), 
-            new Constraints(Math.PI / 4, Math.PI / 3),
-            Rotation2d.fromDegrees(180)
+            new Constraints(Math.PI / 3, Math.PI / 4),
+            Rotation2d.fromDegrees(180),
+            Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80)
         );
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
             new CanSparkMaxMotorConstants(19, Math.PI*2,MotorType.kBrushed, IdleMode.kBrake, true, Rotation2d.fromDegrees(136)), 
             new PIDConstants(0.6, 0, 0, 0.04), 
             new SmartMotionsConstants(1, 1, 0), 
-            new Constraints(Math.PI/3, Math.PI / 5),
-            Rotation2d.fromDegrees(180)
+            new Constraints(Math.PI / 5, Math.PI/3),
+            Rotation2d.fromDegrees(180),
+            Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90)
         );
 
         public static final int kPivotFollowerID = 16; //actual value: 16

@@ -29,11 +29,12 @@ public class WristComponent extends ArmJointAbstractComponent {
 
     @Override
     protected boolean isNativeRefSafe(Rotation2d ref) {
-        return true;
+        Rotation2d horizon = nativeToHorizon(ref);
+        return (horizon.getDegrees() > kConstants.kMinRotation.getDegrees()) && (horizon.getDegrees() < kConstants.kMaxRotation.getDegrees());
     }
 
     @Override
     protected void onUnsafeNativeRef(Rotation2d ref) {
-        System.out.println("unsafe ref, not setting");
+        System.out.println("unsafe ref, not setting ref: " + nativeToHorizon(ref));
     }
 }
