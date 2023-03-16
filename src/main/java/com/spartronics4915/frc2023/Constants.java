@@ -457,8 +457,8 @@ public final class Constants {
 
         public static final ArmSettingsConstants kFloorPositionConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-28),
-                Rotation2d.fromDegrees(30));
+                Rotation2d.fromDegrees(-40),
+                Rotation2d.fromDegrees(32.9));
 
         public static final ArmSettingsConstants kDoubleSubstationConstants = new ArmSettingsConstants(
                 0,
@@ -476,7 +476,7 @@ public final class Constants {
                 Rotation2d.fromDegrees(25.9));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
-                0,//1.25
+                1.25,
                 Rotation2d.fromDegrees(11),
                 Rotation2d.fromDegrees(-16));
 

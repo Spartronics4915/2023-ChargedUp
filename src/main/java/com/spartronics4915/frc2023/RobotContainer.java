@@ -297,7 +297,7 @@ public class RobotContainer {
                     * Extend to High tier - cone		Y   
                     * */
                 mOperatorController.button(kWindowButtonId) //should be window
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_POS, false));
 
                 mOperatorController.button(kMenuButtonId) //should be menu
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.DOUBLE_SUBSTATION, false));
@@ -309,7 +309,7 @@ public class RobotContainer {
                     .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CONE_LEVEL_1));
                 
                 mOperatorController.b()
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CUBE_LEVEL_2));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, false));
                 
                 mOperatorController.y()
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2, false));
