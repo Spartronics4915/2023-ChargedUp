@@ -395,7 +395,7 @@ public final class Constants {
                 15, // actual value 15
                 Math.PI * 2, false,
                 0.750, 0, 0, 0.05, // 0.25, ..., 0.04
-                Math.PI / 2, Math.PI / 4,
+                Math.PI / 4, Math.PI / 3,
                 Rotation2d.fromDegrees(66), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80));
@@ -404,7 +404,7 @@ public final class Constants {
                 19,
                 Math.PI * 2, true,
                 0.6, 0, 0, 0.04, // 0.3, ..., 0.03.
-                Math.PI, Math.PI / 4,
+                Math.PI/3, Math.PI / 5,
                 Rotation2d.fromDegrees(136), -1, true,
                 MotorType.kBrushed,
                 Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90));
@@ -476,7 +476,7 @@ public final class Constants {
                 Rotation2d.fromDegrees(25.9));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
-                1.25,
+                0,//1.25
                 Rotation2d.fromDegrees(11),
                 Rotation2d.fromDegrees(-16));
 

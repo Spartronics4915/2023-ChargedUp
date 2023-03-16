@@ -94,6 +94,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         mCurrentReference = getNativePosition();
         mModeledPosition = getNativePosition().getRadians();
         mReferenceRadians = mCurrentReference.getRadians();
+        mModeledVelocity = 0;
     }
 
     public Rotation2d getModeledPosition() {
@@ -133,6 +134,13 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
        // System.out.println("Arm:" + isArm +" setArmReference: " + nativeRef.getDegrees() + " " + ref.getDegrees());
         setNativeReference(nativeRef);
     }
+
+    public void clearReference() {
+        mReferenceSet = false;
+        this.stopMotor();
+
+    }
+
 
     public void setActive(boolean active) {
         mActive = active;
@@ -264,19 +272,22 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             double total_output = ffComponent + kP*pidErr;
 
 
-            if(total_output > 0.8) {
-                total_output = 0.8;
-            } else if (total_output < -0.8) {
-                total_output = -0.8;
+            if(total_output > 0.6) {
+                total_output = 0.6;
+            } else if (total_output < -0.6) {
+                total_output = -0.6;
             }
 
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
                 if(isArm) {
-                // System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + mReferenceRadians + " " + err);}
+                System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + "modeledPos: " + mModeledPosition + "mRef " + mCurrentReference );
                 }
-        }
+            } else {
+                this.makeModeledPositionsMatchPhysical();
+                stopMotor();
+            }
     }
 
 }

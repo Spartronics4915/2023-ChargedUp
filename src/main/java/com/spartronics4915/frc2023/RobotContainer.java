@@ -392,6 +392,13 @@ public class RobotContainer {
         if (mSwerve != null) {
             mSwerve.resetYaw();
         }
+
+        System.out.println("TeleopInit Called");
+        if(mArm != null) {
+            mArm.clearReference();
+            System.out.println("Reference reset");
+
+        }
     }
 
     public void resetForAuto() {
