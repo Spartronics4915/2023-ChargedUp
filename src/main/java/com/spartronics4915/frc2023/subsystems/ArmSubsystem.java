@@ -118,7 +118,7 @@ import static com.spartronics4915.frc2023.Constants.Arm.*;
         mPivotFollower = kNeoConstructor.apply(kPivotFollowerID);
         mPivotFollower.restoreFactoryDefaults();
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
-        mPivotFollower.setSmartCurrentLimit(20);
+        mPivotFollower.setSmartCurrentLimit(60);
         mPivotFollower.setIdleMode(IdleMode.kBrake);
         mExtenderComponent = new ExtenderComponent();
 

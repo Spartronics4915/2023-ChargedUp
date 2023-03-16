@@ -2,12 +2,14 @@ package com.spartronics4915.frc2023.commands;
 
 import com.spartronics4915.frc2023.subsystems.Swerve;
 import com.spartronics4915.frc2023.subsystems.SwerveModule;
+import com.spartronics4915.frc2023.subsystems.WristComponent;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.ArmJointAbstractComponent;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.ExtenderComponent;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
+import com.spartronics4915.frc2023.subsystems.PivotComponent;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -255,6 +257,7 @@ public final class DebugTeleopCommands {
 
             wristRef = combinedLayout.add("Wrist Reference",0).withWidget(BuiltInWidgets.kGraph).getEntry();
             shoulderRef = combinedLayout.add("Shoulder Reference", 0).getEntry();
+            
             exOutput = combinedLayout.add("Ex Output", 0).getEntry();
         }
 
@@ -290,7 +293,7 @@ public final class DebugTeleopCommands {
     }
 
     public static class ArmTab {
-        ArmWidget widget0;
+        ArmJointWidget widget0;
         ExtenderWidget extenderWidget;
         ShuffleboardTab tab;
         ArmSubsystem mArmSubsystem;
@@ -304,7 +307,7 @@ public final class DebugTeleopCommands {
             // module1 = new SwerveModuleWidget(tab, "Module 1");
             // module2 = new SwerveModuleWidget(tab, "Module 2");
             // module3 = new SwerveModuleWidget(tab, "Module 3");
-            widget0 = new ArmWidget(tab, "arm widget");
+            widget0 = new ArmJointWidget(tab, "arm widget");
             extenderWidget = new ExtenderWidget(tab);
 
             powerWidget = new PowerWidget(tab);
@@ -365,6 +368,64 @@ public final class DebugTeleopCommands {
         }
     }
 
+    public static class ArmJointWidget{
+
+        private GenericEntry wristAngleWithEarth;
+        
+        private GenericEntry wristCurrentHorizonRef; 
+        private GenericEntry wristCurrentNativeRef; 
+        private GenericEntry wristHorizonAngle;
+        private GenericEntry wristNativeAngle;
+
+        private GenericEntry pivotCurrentHorizonRef; 
+        private GenericEntry pivotCurrentNativeRef; 
+        private GenericEntry pivotHorizonAngle;
+        private GenericEntry pivotNativeAngle;
+
+        public ArmJointWidget(ShuffleboardTab tab, String name) {
+            super();
+            
+            ShuffleboardLayout wristLayout = tab.getLayout("Wrist", BuiltInLayouts.kList).withSize(2, 2)
+            .withProperties(Map.of("Label position", "LEFT"));
+            ShuffleboardLayout pivotLayout = tab.getLayout("Pivot", BuiltInLayouts.kList).withSize(2, 2)
+            .withProperties(Map.of("Label position", "LEFT"));
+
+            //wrist entries:
+            wristAngleWithEarth = wristLayout.add("Calculated Wrist Angle to Earth",0).getEntry();
+            wristCurrentHorizonRef = wristLayout.add("CurrentHorizonRef", 0).getEntry();
+            wristCurrentNativeRef = wristLayout.add("CurrentNativeRef", 0).getEntry();
+            wristHorizonAngle = wristLayout.add("HorizonAngle", 0).getEntry();
+            wristNativeAngle = wristLayout.add("NativeAngle", 0).getEntry();
+
+            //pivot entries:
+            pivotCurrentHorizonRef = pivotLayout.add("CurrentHorizonRef", 0).getEntry();
+            pivotCurrentNativeRef = pivotLayout.add("CurrentNativeRef", 0).getEntry();
+            pivotHorizonAngle = pivotLayout.add("HorizonAngle", 0).getEntry();
+            pivotNativeAngle = pivotLayout.add("NativeAngle", 0).getEntry();
+        }
+
+        public void update(ArmSubsystem module) {
+            PivotComponent pivot = module.getPivot();
+            WristComponent wrist = module.getWrist();
+
+            //pivot entry update
+            pivotCurrentHorizonRef.setDouble(pivot.nativeToHorizon(pivot.getCurrentReference()).getDegrees());
+            pivotCurrentNativeRef.setDouble(pivot.getCurrentReference().getDegrees());
+            pivotHorizonAngle.setDouble(pivot.getHorizonPosition().getDegrees());
+            pivotNativeAngle.setDouble(pivot.getNativePosition().getDegrees());
+            
+            //wrist entry update
+            wristAngleWithEarth.setDouble(module.getWrist().getAngleWithEarth().getDegrees());
+            wristCurrentHorizonRef.setDouble(wrist.nativeToHorizon(wrist.getCurrentReference()).getDegrees());
+            wristCurrentNativeRef.setDouble(wrist.getCurrentReference().getDegrees());
+            wristHorizonAngle.setDouble(wrist.getHorizonPosition().getDegrees());
+            wristNativeAngle.setDouble(wrist.getNativePosition().getDegrees());
+
+        }
+        
+    }
+
+    
     public static class ShuffleboardUpdateCommand extends CommandBase {
 
         boolean useArm;

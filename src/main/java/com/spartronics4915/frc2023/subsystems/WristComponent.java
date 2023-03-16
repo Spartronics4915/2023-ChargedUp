@@ -15,7 +15,7 @@ public class WristComponent extends ArmJointAbstractComponent {
     }
 
 
-    private Rotation2d getAngleWithEarth() {
+    public Rotation2d getAngleWithEarth() {
         Rotation2d pivotArmAngle = mPivotMotor.getHorizonPosition();
         Rotation2d wristArmAngle = getHorizonPosition();
         Rotation2d wristAngleWithEarth = pivotArmAngle.plus(wristArmAngle);
