@@ -425,14 +425,52 @@ public final class DebugTeleopCommands {
         
     }
 
-    
+    public static class ArmJointTab{
+        ShuffleboardTab tab;
+        
+        ArmJointWidget pivotWristWidget;
+        ExtenderWidget extenderWidget;
+        PowerWidget powerWidget;
+        
+        ArmCommands mArmCommands;
+        ArmSubsystem mArmSubsystem;
+
+        ArmJointTab(ArmSubsystem armSubsystem, ArmCommands armCommands) {
+            //tab init
+            tab = Shuffleboard.getTab("Arm Tab");
+            mArmCommands = armCommands;
+            mArmSubsystem = armSubsystem;
+
+            //widget init
+            pivotWristWidget = new ArmJointWidget(tab, "Pivot and Wrist widget");
+            extenderWidget = new ExtenderWidget(tab);
+            powerWidget = new PowerWidget(tab);
+
+            //command widget
+            ShuffleboardLayout armControlLayout = tab.getLayout("Control", BuiltInLayouts.kList)
+                .withSize(2, 3)
+                .withProperties(Map.of("Label position", "HIDDEN")); // hide labels for commands
+
+
+            armControlLayout.add(Commands.runOnce(()->mArmCommands.new ResetCommand()).withName("Disable Reference"));
+        }
+
+        public void update() {
+
+            pivotWristWidget.update(mArmSubsystem);
+            extenderWidget.update(mArmSubsystem.getExtender());
+            powerWidget.update();
+        }
+        
+    }
+
     public static class ShuffleboardUpdateCommand extends CommandBase {
 
         boolean useArm;
         boolean useSwerve;
 
         ArmSubsystem mArmSubsystem;
-        ArmTab mArmTab;
+        ArmJointTab mArmTab;
         ArmCommands mArmCommands;
 
         Swerve mSwerve;
@@ -454,7 +492,7 @@ public final class DebugTeleopCommands {
         @Override
         public void initialize() {
 
-            mArmTab = useArm ? new ArmTab(mArmSubsystem, mArmCommands) : null;
+            mArmTab = useArm ? new ArmJointTab(mArmSubsystem, mArmCommands) : null;
             mSwerveTab = useSwerve ? new SwerveTab(mSwerve, mSwerveCommands) : null;
         }
 

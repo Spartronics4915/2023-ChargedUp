@@ -382,7 +382,7 @@ public final class Constants {
             new CanSparkMaxMotorConstants(15, Math.PI*2, MotorType.kBrushless, IdleMode.kBrake, false, Rotation2d.fromDegrees(66)), 
             new PIDConstants(0.3, 0, 0, 0.05), 
             new SmartMotionsConstants(Math.PI/8, 1, 0), 
-            new Constraints(Math.PI / 3, Math.PI / 4),
+            new Constraints(Math.PI / 4, Math.PI / 2),
             Rotation2d.fromDegrees(180),
             Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80)
         );
@@ -390,7 +390,7 @@ public final class Constants {
             new CanSparkMaxMotorConstants(19, Math.PI*2,MotorType.kBrushed, IdleMode.kBrake, true, Rotation2d.fromDegrees(136)), 
             new PIDConstants(0.6, 0, 0, 0.04), 
             new SmartMotionsConstants(1, 1, 0), 
-            new Constraints(Math.PI / 5, Math.PI/3),
+            new Constraints(Math.PI / 4, Math.PI),
             Rotation2d.fromDegrees(180),
             Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90)
         );
