@@ -52,7 +52,7 @@ public class ExtenderComponent {
         mPIDController = mMotor.getPIDController();
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
-        mEncoder.setPositionConversionFactor((1.0/kRevPerInch)/39.37); //kRevPerInch
+        mEncoder.setPositionConversionFactor((1.0/kRevPerInch)); //kRevPerInch //divide by 39.37 to be in meters 
         mPIDController.setP(0.00007);
         mPIDController.setFF(0.00008);
 
@@ -131,7 +131,7 @@ public class ExtenderComponent {
         return (Math.abs(getPosition() - pos) < kPosTolerance);
     }
 
-    public CommandBase extendToNMeters(double N) {
+    public CommandBase extendToNInches(double N) {
         return Commands.runEnd(()->{
             if(getPosition() < N){
                 startExtending();
