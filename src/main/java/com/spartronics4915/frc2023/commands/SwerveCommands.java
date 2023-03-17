@@ -8,11 +8,15 @@ import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeAngularSpeed
 import static com.spartronics4915.frc2023.Constants.Swerve.kSlowModeSpeedMultiplier;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.imageio.stream.FileCacheImageInputStream;
 
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.pathplanner.lib.PathPoint;
+import com.spartronics4915.frc2023.Constants.FieldConstants;
 import com.spartronics4915.frc2023.Constants.Swerve.BalanceConstants;
 import com.spartronics4915.frc2023.PhotonCameraWrapper.VisionMeasurement;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands.PIDWidget;
@@ -241,42 +245,41 @@ public class SwerveCommands {
     }
 
     public Pose2d getCone(){
-        List<Pose2d> cones = new ArrayList<Pose2d>();
-        cones.add(new Pose2d(14.6,0.51, new Rotation2d()));
-        cones.add(new Pose2d(14.6,1.63, new Rotation2d()));
-        cones.add(new Pose2d(14.6,2.19, new Rotation2d()));
-        cones.add(new Pose2d(14.6,3.31, new Rotation2d()));
-        cones.add(new Pose2d(14.6,3.87, new Rotation2d()));
-        cones.add(new Pose2d(14.6,4.98, new Rotation2d()));
-        
-        cones.add(new Pose2d(1.93,0.51, Rotation2d.fromDegrees(180)));
-        cones.add(new Pose2d(1.93,1.63, Rotation2d.fromDegrees(180)));
-        cones.add(new Pose2d(1.93,2.19, Rotation2d.fromDegrees(180)));
-        cones.add(new Pose2d(1.93,3.31, Rotation2d.fromDegrees(180)));
-        cones.add(new Pose2d(1.93,3.87, Rotation2d.fromDegrees(180)));
-        cones.add(new Pose2d(1.93,4.98, Rotation2d.fromDegrees(180)));
-
-
-        return mSwerve.getPose().nearest(cones);
+        return mSwerve.getPose().nearest(FieldConstants.kCones);
     }
 
-    public class MoveToCone extends CommandBase {
-        public MoveToCone() {
+    public Pose2d getNextCone() {
+        return FieldConstants.kCones.get(FieldConstants.kCones.indexOf(getCone()) + 1);
+    }
+
+    public Pose2d getPreviousCone() {
+        return FieldConstants.kCones.get(FieldConstants.kCones.indexOf(getCone()) - 1);
+    }
+
+    public class MoveToPose extends CommandBase {
+        Pose2d pose;
+
+        public MoveToPose(Pose2d p) {
+            pose = p;
             addRequirements(mSwerve);
         }
 
         @Override
-        public void execute() {
-            Pose2d cone = getCone();
-            SmartDashboard.putNumber("Cone X", cone.getX());
-            SmartDashboard.putNumber("Cone Y", cone.getY());
-            SmartDashboard.putNumber("Cone Rotation", cone.getRotation().getRadians());
+        public void initialize() {;
+            SmartDashboard.putNumber("Goal X", pose.getX());
+            SmartDashboard.putNumber("Goal Y", pose.getY());
+            SmartDashboard.putNumber("Goal Rotation", pose.getRotation().getRadians());
 			mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
 				new ArrayList<>(List.of(
 					new PathPoint(mSwerve.getPose().getTranslation(), mSwerve.getPose().getRotation(), new Rotation2d(0)),
-					new PathPoint(cone.getTranslation(), cone.getRotation(), new Rotation2d(0))
+					new PathPoint(pose.getTranslation(), pose.getRotation(), new Rotation2d(0))
 				))
 			).schedule();
+        }
+
+        @Override
+        public boolean isFinished() {
+            return true;
         }
     }
 

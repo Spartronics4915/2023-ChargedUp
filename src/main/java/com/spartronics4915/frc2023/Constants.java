@@ -4,6 +4,9 @@
 
 package com.spartronics4915.frc2023;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.IntFunction;
 
 import com.ctre.phoenix.sensors.BasePigeon;
@@ -111,7 +114,7 @@ public final class Constants {
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			12
 		);
-		public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
+		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
 
 
 		public static final class Drive {
@@ -522,17 +525,34 @@ public final class Constants {
     public static final class FieldConstants {
         static final double length = Units.feetToMeters(54);
         static final double width = Units.feetToMeters(27);
+        public static final List<Pose2d> kCones = new ArrayList<Pose2d>(Arrays.asList(
+            (new Pose2d(14.6,0.51, new Rotation2d())),
+            (new Pose2d(14.6,1.63, new Rotation2d())),
+            (new Pose2d(14.6,2.19, new Rotation2d())),
+            (new Pose2d(14.6,3.31, new Rotation2d())),
+            (new Pose2d(14.6,3.87, new Rotation2d())),
+            (new Pose2d(14.6,4.98, new Rotation2d())),
+
+            (new Pose2d(1.93,0.51, Rotation2d.fromDegrees(180))),
+            (new Pose2d(1.93,1.63, Rotation2d.fromDegrees(180))),
+            (new Pose2d(1.93,2.19, Rotation2d.fromDegrees(180))),
+            (new Pose2d(1.93,3.31, Rotation2d.fromDegrees(180))),
+            (new Pose2d(1.93,3.87, Rotation2d.fromDegrees(180))),
+            (new Pose2d(1.93,4.98, Rotation2d.fromDegrees(180)))
+            )
+        );
     }
 
     public static final class VisionConstants {
         static final Transform3d robotToCam =
                 new Transform3d(
-                        new Translation3d(-0.2547112, 0.061722, 0.6889242),
+                        // new Translation3d(-0.2547112, 0.061722, 0.6889242),
+                        new Translation3d(0.33, 0.0, 0.5),
                         new Rotation3d(
                                 0, 0,
                                 0)); // Cam mounted facing forward
         // from center.
-        // static final String cameraName = "OV5647";
-        static final String cameraName = "Arducam_OV9281_USB_Camera";
+        static final String cameraName = "OV5647";
+        // static final String cameraName = "Arducam_OV9281_USB_Camera";
     }
 }

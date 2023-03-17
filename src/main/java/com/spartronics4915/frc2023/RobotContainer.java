@@ -33,7 +33,7 @@ import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.PrintPos;
 import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
-import com.spartronics4915.frc2023.commands.SwerveCommands.MoveToCone;
+import com.spartronics4915.frc2023.commands.SwerveCommands.MoveToPose;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
@@ -238,10 +238,16 @@ public class RobotContainer {
                 .onTrue((new PrintPos()));
                 
                 mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(mSwerveCommands.new MoveToCone());
+                .whileTrue(mSwerveCommands.new MoveToPose(mSwerveCommands.getCone()));
                 
                 mDriverController.leftBumper() // TODO: remove before comp
-                .whileTrue(new PrintPos());    
+                .whileTrue(new PrintPos());
+
+                mDriverController.povLeft()
+                .onTrue(mSwerveCommands.new MoveToPose(mSwerveCommands.getPreviousCone()));
+                
+                mDriverController.povRight()
+                .onTrue(mSwerveCommands.new MoveToPose(mSwerveCommands.getNextCone()));
             }
             
             // OPERATOR CONTROLS
