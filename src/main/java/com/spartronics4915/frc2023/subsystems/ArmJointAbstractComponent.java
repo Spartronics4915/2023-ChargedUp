@@ -22,6 +22,7 @@ public abstract class ArmJointAbstractComponent {
     protected final ArmMotorConstants kConstants;
     protected Rotation2d currentRefrence;
     protected boolean setRef;
+    protected boolean disableMotor;
 
     public ArmJointAbstractComponent(ArmMotorConstants constants) {
         super();
@@ -47,6 +48,13 @@ public abstract class ArmJointAbstractComponent {
         CanSparkMaxMotorConstants motorConstants =  kConstants.kMotorConstants;
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         mAbsEncoder.setZeroOffset(motorConstants.kZeroOffset.getRotations()); //this is in rotation because the encoder's position conversion factor hasn't been set yet
+        
+        //if zero offset wasn't actually applied then the encoder is unplugged
+        if((mAbsEncoder.getPosition() == 0) && motorConstants.kZeroOffset.getDegrees() > 0) {
+            disableMotor = true;
+            System.out.println("zero offset not applied, disabling");
+        } else disableMotor = false;
+
         mAbsEncoder.setPositionConversionFactor(motorConstants.kPositionConversionFactor);
         // mAbsEncoder.setInverted(motorConstants.kInverted);
     }
@@ -100,7 +108,7 @@ public abstract class ArmJointAbstractComponent {
     }
 
     protected void setNativeReference(Rotation2d ref) {
-        if(isNativeRefSafe(ref)){
+        if(isNativeRefSafe(ref) && !disableMotor){
             currentRefrence = ref;
             setRef = true;
         } else {
