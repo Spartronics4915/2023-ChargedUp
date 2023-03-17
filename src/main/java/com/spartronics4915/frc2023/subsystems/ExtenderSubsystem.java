@@ -49,7 +49,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
-        mMotor.setSmartCurrentLimit(60);
+        mMotor.setSmartCurrentLimit(30);
         mPIDController = mMotor.getPIDController();
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
