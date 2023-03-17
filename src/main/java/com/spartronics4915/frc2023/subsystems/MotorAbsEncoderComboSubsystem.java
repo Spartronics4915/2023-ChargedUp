@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -68,6 +69,7 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
         if((mAbsEncoder.getPosition() == 0) && MotorConstants.kZeroOffset.getDegrees() > 0) {
             mActive = false;
             System.out.println("zero offset not applied, disabling");
+            SmartDashboard.putBoolean("disabled", true);
         } else mActive = true;
         if (MotorConstants.kInvertMotor) {
             mMotor.setInverted(true);
