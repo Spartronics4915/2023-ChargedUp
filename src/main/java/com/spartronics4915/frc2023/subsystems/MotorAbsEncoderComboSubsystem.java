@@ -65,12 +65,16 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             radianOffset += Math.PI * 2;
         }
         mAbsEncoder.setZeroOffset(radianOffset);
+        if((mAbsEncoder.getPosition() == 0) && MotorConstants.kZeroOffset.getDegrees() > 0) {
+            mActive = false;
+            System.out.println("zero offset not applied, disabling");
+        } else mActive = true;
         if (MotorConstants.kInvertMotor) {
             mMotor.setInverted(true);
         }
         mPIDController = null; //initializePIDController(MotorConstants);
         mMotor.setSmartCurrentLimit(60);
-        mActive = true;
+        // mActive = true;
         mReferenceSet = false;
         mCurrentReference = getNativePosition();
         mReferenceRadians = mCurrentReference.getRadians();
