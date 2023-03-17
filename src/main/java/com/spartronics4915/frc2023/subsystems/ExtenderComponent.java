@@ -48,14 +48,14 @@ public class ExtenderComponent {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
-        mMotor.setSmartCurrentLimit(60);
+        mMotor.setSmartCurrentLimit(30);
         mPIDController = mMotor.getPIDController();
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor((1.0/kRevPerInch)); //kRevPerInch //divide by 39.37 to be in meters 
         mPIDController.setP(0.00007);
         mPIDController.setFF(0.00008);
-
+        
         mEncoder.setPosition(kPositionPad);
         targetReference = 0;
 
