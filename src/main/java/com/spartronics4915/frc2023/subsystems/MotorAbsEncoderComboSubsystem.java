@@ -54,6 +54,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public boolean isArm;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
+
+        isArm = (mAngleProvider==null);
+
         motionConstraints = new TrapezoidProfile.Constraints(MotorConstants.kMaxVelocity, MotorConstants.kMaxAccel);
         mModeledVelocity = 0;
 
@@ -86,7 +89,6 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
         mMaxRotation = MotorConstants.mMaxRotation;
         mMinRotation = MotorConstants.mMinRotation;
-        isArm = (mAngleProvider==null);
 
     }
 
@@ -281,9 +283,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
-                if(isArm) {
-                System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + "modeledPos: " + mModeledPosition + "mRef " + mCurrentReference );
-                }
+                // if(isArm) {
+                // System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + "modeledPos: " + mModeledPosition + "mRef " + mCurrentReference );
+                // }
             } else {
                 this.makeModeledPositionsMatchPhysical();
                 stopMotor();
