@@ -114,7 +114,7 @@ public final class Constants {
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			12
 		);
-		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
+		public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
 
 
 		public static final class Drive {
@@ -546,13 +546,13 @@ public final class Constants {
     public static final class VisionConstants {
         static final Transform3d robotToCam =
                 new Transform3d(
-                        // new Translation3d(-0.2547112, 0.061722, 0.6889242),
-                        new Translation3d(0.33, 0.0, 0.5),
+                        new Translation3d(-0.2547112, 0.061722, 0.6889242),
+                        // new Translation3d(0.33, 0.0, 0.5),
                         new Rotation3d(
                                 0, 0,
                                 0)); // Cam mounted facing forward
         // from center.
-        static final String cameraName = "OV5647";
-        // static final String cameraName = "Arducam_OV9281_USB_Camera";
+        // static final String cameraName = "OV5647";
+        static final String cameraName = "Arducam_OV9281_USB_Camera";
     }
 }

@@ -256,7 +256,7 @@ public class SwerveCommands {
         return FieldConstants.kCones.get(FieldConstants.kCones.indexOf(getCone()) - 1);
     }
 
-    public class MoveToPose extends CommandBase {
+    public class MoveToPose extends CommandBase { // Camden was here
         Pose2d pose;
 
         public MoveToPose(Pose2d p) {
@@ -264,15 +264,23 @@ public class SwerveCommands {
             addRequirements(mSwerve);
         }
 
+        public MoveToPose() {
+            pose = null;
+            addRequirements(mSwerve);
+        }
+
         @Override
         public void initialize() {;
+            // if (pose == null) {
+                pose = getCone();
+            // }
             SmartDashboard.putNumber("Goal X", pose.getX());
             SmartDashboard.putNumber("Goal Y", pose.getY());
             SmartDashboard.putNumber("Goal Rotation", pose.getRotation().getRadians());
 			mSwerveTrajectoryFollowerCommands.new FollowDynamicTrajectory(
 				new ArrayList<>(List.of(
-					new PathPoint(mSwerve.getPose().getTranslation(), mSwerve.getPose().getRotation(), new Rotation2d(0)),
-					new PathPoint(pose.getTranslation(), pose.getRotation(), new Rotation2d(0))
+					new PathPoint(mSwerve.getPose().getTranslation(), mSwerve.getPose().getRotation(), mSwerve.getPose().getRotation()),
+					new PathPoint(pose.getTranslation(), pose.getRotation(), pose.getRotation())
 				))
 			).schedule();
         }

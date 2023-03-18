@@ -238,7 +238,7 @@ public class RobotContainer {
                 .onTrue((new PrintPos()));
                 
                 mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(mSwerveCommands.new MoveToPose(mSwerveCommands.getCone()));
+                .onTrue(mSwerveCommands.new MoveToPose());
                 
                 mDriverController.leftBumper() // TODO: remove before comp
                 .whileTrue(new PrintPos());
