@@ -11,6 +11,7 @@ import com.spartronics4915.frc2023.Constants.Arm.CanSparkMaxMotorConstants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.LogMessage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -22,7 +23,9 @@ public abstract class ArmJointAbstractComponent {
     protected final ArmMotorConstants kConstants;
     protected Rotation2d currentRefrence;
     protected boolean setRef;
-    protected boolean disableMotor;
+    protected boolean mDisableMotor;
+    protected double mModeledVelocity = 0;
+    protected double mModeledPosition = 0;
 
     public ArmJointAbstractComponent(ArmMotorConstants constants) {
         super();
@@ -47,14 +50,14 @@ public abstract class ArmJointAbstractComponent {
     protected void encoderInit() {
         CanSparkMaxMotorConstants motorConstants =  kConstants.kMotorConstants;
         mAbsEncoder = mMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-        mAbsEncoder.setZeroOffset(motorConstants.kZeroOffset.getRotations()); //this is in rotation because the encoder's position conversion factor hasn't been set yet
         
-        //if zero offset wasn't actually applied then the encoder is unplugged
-        if((mAbsEncoder.getPosition() == 0) && motorConstants.kZeroOffset.getDegrees() > 0) {
-            disableMotor = true;
-            System.out.println("zero offset not applied, disabling");
-        } else disableMotor = false;
-
+        // mAbsEncoder.setZeroOffset(0.5);
+        // //if zero offset wasn't actually applied then the encoder is unplugged
+        // mDisableMotor = mAbsEncoder.getZeroOffset() == 0;
+        // if(mDisableMotor) 
+        //     System.out.println("zero offset not applied, disabling");
+        
+        mAbsEncoder.setZeroOffset(motorConstants.kZeroOffset.getRotations()); //this is in rotation because the encoder's position conversion factor hasn't been set yet
         mAbsEncoder.setPositionConversionFactor(motorConstants.kPositionConversionFactor);
         // mAbsEncoder.setInverted(motorConstants.kInverted);
     }
@@ -108,22 +111,34 @@ public abstract class ArmJointAbstractComponent {
     }
 
     protected void setNativeReference(Rotation2d ref) {
-        if(isNativeRefSafe(ref) && !disableMotor){
+        System.out.println("native set ref called");
+
+        if(isNativeRefSafe(ref) && !mDisableMotor){
             currentRefrence = ref;
             setRef = true;
         } else {
+            System.out.println("testing please say this is not the issue");
             onUnsafeNativeRef(ref);
         }
     }
 
     protected double calculateTrapazoidSetpoint(){
-        double currVelocity = mAbsEncoder.getVelocity();
-        double currPosNative = getNativePosition().getRadians();
-        var currState = new TrapezoidProfile.State(currPosNative, currVelocity);
+        System.out.println("calc trapazoid running");
+        
+        // double currVelocity = mAbsEncoder.getVelocity();
+        // double mModeledPosition = getNativePosition().getRadians();
+        var currState = new TrapezoidProfile.State(mModeledPosition, mModeledVelocity);
         var goalState = new TrapezoidProfile.State(currentRefrence.getRadians(), 0);
         TrapezoidProfile currMotionProfile = new TrapezoidProfile(kConstants.kTrapazoidConstraints, goalState, currState);
+        System.out.println("vel: "+currMotionProfile.calculate(Arm.ticLength).velocity);
+        State calcState = currMotionProfile.calculate(Arm.ticLength);
+        mModeledVelocity = calcState.velocity;
+        mModeledPosition = calcState.position;
+        // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
 
-        return currMotionProfile.calculate(Arm.ticLength).position;
+        return calcState.position;
+
+        // return currentRefrence.getRadians();
     }
 
     abstract protected boolean isNativeRefSafe(Rotation2d ref);

@@ -273,7 +273,7 @@ import static com.spartronics4915.frc2023.Constants.Arm.*;
             current.wristTheta.plus(wristDelta));
         
         setDesiredLocalPosition(transformed);
-        System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.armTheta.getDegrees() + " " + wristDelta);
+        // System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.armTheta.getDegrees() + " " + wristDelta);
 
     }
     
