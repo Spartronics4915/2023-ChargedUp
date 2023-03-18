@@ -77,9 +77,9 @@ public final class DebugTeleopCommands {
             pitchEntry = chassisLayout.add("pitch (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
             rollEntry = chassisLayout.add("roll (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
 
-            vxEntry = chassisLayout.add("vx (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            vyEntry = chassisLayout.add("vy (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            omegaEntry = chassisLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
+            vxEntry = chassisLayout.add("vx (m per s)", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            vyEntry = chassisLayout.add("vy (m per s)", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            omegaEntry = chassisLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
         }
 
         public void update() {
