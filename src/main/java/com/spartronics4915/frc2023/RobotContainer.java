@@ -162,7 +162,7 @@ public class RobotContainer {
 				"High cube, Balance",
 				(Pose2d initialPose) -> new SequentialCommandGroup(		
 					mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
@@ -187,7 +187,7 @@ public class RobotContainer {
                 "place, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
                     new WaitCommand(2.5),
@@ -198,7 +198,7 @@ public class RobotContainer {
                 "cube high, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
                     new WaitCommand(2.5),
@@ -215,7 +215,7 @@ public class RobotContainer {
                 "place, move short (test)",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-0.5, 0, 0), false, true),
                     new WaitCommand(2),
@@ -305,10 +305,9 @@ public class RobotContainer {
                 // .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
                 mDriverController.leftBumper()
-                .onTrue(mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE));
+                .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE));
  
-                mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(mArm.getExtender().extendToTarget());
+                mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
                 
                 // This is to tuck into stow
                 mDriverController.povDown().onTrue(Commands.runOnce(()->mArm.stopPivot()));
@@ -333,22 +332,22 @@ public class RobotContainer {
                     * Extend to High tier - cone		Y   
                     * */
                 mOperatorController.button(kWindowButtonId) //should be window
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_POS, false));
 
                 mOperatorController.button(kMenuButtonId) //should be menu
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.DOUBLE_SUBSTATION));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.DOUBLE_SUBSTATION, false));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.FLOOR_POS));
                 
                 mOperatorController.x()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_1));
+                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CONE_LEVEL_1));
                 
                 mOperatorController.b()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CUBE_LEVEL_2));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, false));
                 
                 mOperatorController.y()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_2));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2, false));
 
                 /**
                  * Eject game piece		    RT
@@ -427,6 +426,13 @@ public class RobotContainer {
     public void resetForTeleop() {
         if (mSwerve != null) {
             mSwerve.resetYaw();
+        }
+
+        System.out.println("TeleopInit Called");
+        if(mArm != null) {
+            mArm.clearReference();
+            System.out.println("Reference reset");
+
         }
     }
 

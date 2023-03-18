@@ -13,6 +13,10 @@ public class IntakeCommands {
         mIntake = intake;
     }
 
+    public CommandBase getOutSpeedCommand(double outSpeed) {
+        return mIntake.setOutSpeedCommand(outSpeed);
+    }
+
     public class SetIntakeState extends InstantCommand {
         public SetIntakeState(IntakeState state) {
             super(
