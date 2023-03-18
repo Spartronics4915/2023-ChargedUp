@@ -394,6 +394,7 @@ public final class Constants {
             Rotation2d.fromDegrees(180),
             Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90)
         );
+        
 
         public static final int kPivotFollowerID = 16; //actual value: 16
         public static final double ticLength = 1.0/50;

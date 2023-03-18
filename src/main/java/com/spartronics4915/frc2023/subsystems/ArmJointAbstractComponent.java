@@ -30,9 +30,12 @@ public abstract class ArmJointAbstractComponent {
     public ArmJointAbstractComponent(ArmMotorConstants constants) {
         super();
         kConstants = constants;
+        
         motorInit();
         encoderInit();
         pidControllerInit();
+        mModeledVelocity = 0;
+        mModeledPosition = getNativePosition().getRadians();
         setRef = false;
         currentRefrence = HorizonToNative(Rotation2d.fromDegrees(0));
         
