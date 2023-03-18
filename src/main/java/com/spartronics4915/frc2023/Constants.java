@@ -139,14 +139,14 @@ public final class Constants {
         public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
 
         public static final class Drive {
-            public static final double kP = 0.0; // placeholder
-            public static final double kI = 0.0; // placeholder
-            public static final double kD = 0.0; // placeholder
-            public static final double kFF = 0.0; // placeholder
+            public static final double kP = 0.01;
+            public static final double kI = 0.0;
+            public static final double kD = 0.0;
+            public static final double kFF = 0.2262;
 
-            public static final double kS = 0.0; // placeholder
-            public static final double kV = 0.0; // placeholder
-            public static final double kA = 0.0; // placeholder
+            public static final double kS = 0.0;
+            public static final double kV = 0.0;
+            public static final double kA = 0.0;
 
             public static final int kContinuousCurrentLimit = 30;
 

@@ -155,7 +155,7 @@ public class SwerveCommands {
                 rotation *= kSlowModeAngularSpeedMultiplier;
             }
             
-            mSwerve.drive(translation, rotation, true);
+            mSwerve.drive(translation, rotation, false);
 
             // if (!mIsSprintMode) {
             //     x1 *= kSlowModeSpeedMultiplier;
