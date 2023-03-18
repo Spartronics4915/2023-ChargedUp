@@ -32,19 +32,19 @@ public final class Autos {
     //     return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
     // }
 
-	public static final SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-		Swerve.getInstance()::getPose,
-		Swerve.getInstance()::resetPose,
-		kKinematics,
-		new PIDConstants(0.1, 0.01, 0.01),
-		new PIDConstants(0.1, 0.01, 0.01),
-		Swerve.getInstance()::setModuleStates,
-		kEventMap,
-		true,
-		Swerve.getInstance()
-	);
+	// public static final SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+	// 	Swerve.getInstance()::getPose,
+	// 	Swerve.getInstance()::resetPose,
+	// 	kKinematics,
+	// 	new PIDConstants(0.1, 0.01, 0.01),
+	// 	new PIDConstants(0.1, 0.01, 0.01),
+	// 	Swerve.getInstance()::setModuleStates,
+	// 	kEventMap,
+	// 	true,
+	// 	Swerve.getInstance()
+	// );
 
-	public static final PathPlannerTrajectory test2PieceTrajectory = PathPlanner.loadPath("Test 2-Piece", kPathConstraints);
+	// public static final PathPlannerTrajectory test2PieceTrajectory = PathPlanner.loadPath("Test 2-Piece", kPathConstraints);
 
 	private final Swerve mSwerve;
 	private final boolean mIsOpenLoop = true;

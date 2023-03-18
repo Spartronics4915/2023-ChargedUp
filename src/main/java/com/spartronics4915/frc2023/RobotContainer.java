@@ -18,8 +18,7 @@ import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
-import static com.spartronics4915.frc2023.commands.Autos.autoBuilder;
-import static com.spartronics4915.frc2023.Constants.Trajectory.k2pTestTraj;
+// import static com.spartronics4915.frc2023.commands.Autos.autoBuilder;
 
 import com.spartronics4915.frc2023.Constants.OI;
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
@@ -254,10 +253,10 @@ public class RobotContainer {
             //         );
             //     }
             // ),
-            mAutos.new Strategy(
-                "2-piece test", 
-                (Pose2d initialPose) -> autoBuilder.fullAuto(Autos.test2PieceTrajectory)
-            ),
+            // mAutos.new Strategy(
+            //     "2-piece test", 
+            //     (Pose2d initialPose) -> autoBuilder.fullAuto(Autos.test2PieceTrajectory)
+            // ),
             // mAutos.new Strategy(
             //     "2-piece test, trajectory only",
             //     (Pose2d initialPose) -> {
