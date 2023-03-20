@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class BeltExtenderSubsystem extends SubsystemBase  {
 
@@ -55,12 +56,12 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
         mMotor.setInverted(true);
         mMotor.setIdleMode(IdleMode.kBrake);
         
-        mMotor.setSmartCurrentLimit(20);
+        mMotor.setSmartCurrentLimit(15);
         
         mPIDController = mMotor.getPIDController();
         mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        mPIDController.setP(0.00007);
+        mPIDController.setP(0.3);
         mPIDController.setFF(0.0000);
 
         mEncoder.setPosition(kPositionPad);
@@ -72,7 +73,7 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
         currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
         targetState = new TrapezoidProfile.State(currModeledState.position, 0);
 
-        mPIDController.setOutputRange(-0.5, 0.5);
+        mPIDController.setOutputRange(-0.2, 0.2);
         mMotor.burnFlash();
     }
 
@@ -180,6 +181,22 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
 
     }
 
+    public CommandBase setTargetCommandRunOnce(double target) {
+        var command = runOnce(()->setTarget(target));
+
+        return command;
+    }
+
+    public boolean modeledExtenderCloseEnoughToTarget() {
+        return (Math.abs(getModeledPosition() - getTarget()) <= Math.abs(kPosTolerance));
+    }
+
+    public CommandBase waitForModeledExtenderToArriveCommand() {
+
+        // This runs a no-op command and adds an until statement to it.
+        return  this.run(()->{}).until(()->modeledExtenderCloseEnoughToTarget());
+
+    }
 
     @Override
     public void periodic() {

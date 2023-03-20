@@ -76,7 +76,6 @@ public class RobotContainer {
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     private final Intake mIntake;
-    private final ExtenderCommands mExtenderCommands;
 
     private final IntakeCommands mIntakeCommands;
     
@@ -117,13 +116,11 @@ public class RobotContainer {
         
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
-            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
             mArmCommands = new ArmCommands(mArm, mIntakeCommands);
         } else {
             mArm = null;
-            mExtenderCommands = null;
             mIntake = null;
             mIntakeCommands = null;
             mArmCommands = null;
@@ -306,7 +303,8 @@ public class RobotContainer {
                 mDriverController.leftBumper()
                 .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE));
  
-                mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
+                // Disabled for now with the belt extender.
+                // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
                 
                 // This is to tuck into stow
                 mDriverController.povDown().onTrue(Commands.runOnce(()->mArm.stopPivot()));
@@ -376,11 +374,12 @@ public class RobotContainer {
                 mOperatorController.povDown()
                     .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
+                final double extensionIncrementPerTic = 3. / 50; // 3 inches/sec at 50Hz
                 mOperatorController.povRight()
-                    .whileTrue(mExtenderCommands.new Extend());
+                    .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(extensionIncrementPerTic));
 
                 mOperatorController.povLeft()
-                    .whileTrue(mExtenderCommands.new Retract());
+                .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(-extensionIncrementPerTic));
 
                 mOperatorController.leftBumper()
                     .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));

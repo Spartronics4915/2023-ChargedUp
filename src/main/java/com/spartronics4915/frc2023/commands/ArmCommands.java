@@ -146,19 +146,19 @@ public class ArmCommands {
             mIntakeCommands.getOutSpeedCommand(armState.outSpeed),
             untuckCommand,
             new SetArmPivotWristLocalState(armState),
-            new WaitForPivotToArrive(armState.armTheta, 5)
+            new WaitForPivotToArrive(armState.armTheta, 5),
+            mArm.getExtender().setTargetCommandRunOnce(armState.armRadius)
         );
 
         if(waitForExtender) {
-            seqCommands = seqCommands.andThen(mArm.getExtender().extendToNInches(armState.armRadius));
-        } else {
-            seqCommands = seqCommands.andThen(new ScheduleCommand(mArm.getExtender().extendToNInches(armState.armRadius)));
-        }
+            seqCommands = seqCommands.andThen(mArm.getExtender().waitForModeledExtenderToArriveCommand().withTimeout(3));
+        } 
         return  seqCommands;
     }
 
     public CommandBase getGoToPresetArmStateExtendFirstCommand(ArmState armState, boolean waitForPivot) {
-        var seqCommands = new SequentialCommandGroup(mArm.getExtender().extendToNInches(armState.armRadius),
+        var seqCommands = new SequentialCommandGroup(mArm.getExtender().setTargetCommandRunOnce(armState.armRadius),
+                                                    mArm.getExtender().waitForModeledExtenderToArriveCommand().withTimeout(3), 
                                                     new SetArmPivotWristLocalState(armState)
         );
 
