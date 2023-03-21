@@ -56,6 +56,8 @@ public final class Constants {
 		public static final double kMaxVelocity = 0.5;
 		public static final double kMaxAccel = 0.4;
 		public static final double kBackUpDistance = 2;
+        public static final double kLinearTolerance = 0.03;
+        public static final double kAngularToleranceDegrees = 3.0;
 	}
 
     public static final class Swerve {
@@ -114,7 +116,7 @@ public final class Constants {
 			(int id) -> { return (BasePigeon)(new PigeonIMU(id)); },
 			12
 		);
-		public static final ChassisConstants kChassisConstants = kMk4iChassisConstants;
+		public static final ChassisConstants kChassisConstants = kMk2ChassisConstants;
 
 
 		public static final class Drive {
@@ -546,13 +548,13 @@ public final class Constants {
     public static final class VisionConstants {
         static final Transform3d robotToCam =
                 new Transform3d(
-                        new Translation3d(-0.2547112, 0.061722, 0.6889242),
-                        // new Translation3d(0.33, 0.0, 0.5),
+                        // new Translation3d(-0.2547112, 0.061722, 0.6889242),
+                        new Translation3d(0.37, 0.0, 0.37),
                         new Rotation3d(
                                 0, 0,
                                 0)); // Cam mounted facing forward
         // from center.
-        // static final String cameraName = "OV5647";
-        static final String cameraName = "Arducam_OV9281_USB_Camera";
+        static final String cameraName = "OV5647";
+        // static final String cameraName = "Arducam_OV9281_USB_Camera";
     }
 }

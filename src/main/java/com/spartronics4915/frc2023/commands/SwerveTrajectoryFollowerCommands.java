@@ -7,6 +7,7 @@ import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -37,88 +38,9 @@ public class SwerveTrajectoryFollowerCommands {
 		mThetaPID.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
-	public class FollowDynamicTrajectory extends CommandBase {
-		private PathPlannerTrajectory mTrajectory;
-		private PPSwerveControllerCommand mControllerCommand;
-		private Thread mTrajectoryThread;
-
-		public FollowDynamicTrajectory(
-			ArrayList<PathPoint> waypoints, // meters
-			double maxVelocity, // meters per second
-			double maxAccel // meters per second squared	
-		) {
-			mTrajectoryThread = new Thread(() -> {
-				PathPlannerTrajectory traj = PathPlanner.generatePath(
-					new PathConstraints(maxVelocity, maxAccel),
-					waypoints
-				);
-				synchronized (this) {
-					mTrajectory = traj;
-				}
-			});
-			mTrajectoryThread.start();
-			addRequirements(mSwerve);
-		}
-		
-		public FollowDynamicTrajectory(
-			ArrayList<PathPoint> waypoints // meters
-		) {
-			this(waypoints, kMaxVelocity, kMaxAccel);
-		}
-
-		@Override
-		public void initialize() {
-			if (mControllerCommand != null)
-				mControllerCommand.initialize();
-		}
-
-		@Override
-		public void execute() {
-			if (mControllerCommand == null) 
-				synchronized (this) {
-					if (mTrajectory != null) {
-						mControllerCommand = new PPSwerveControllerCommand(
-							mTrajectory,
-							mSwerve::getPose,
-							kKinematics,
-							mXPID, mYPID,
-							mThetaPID,
-							mSwerve::setModuleStates,
-							true
-						);
-						mControllerCommand.initialize();
-					}
-				}
-			
-			if (mControllerCommand != null) {
-				mControllerCommand.execute();
-				
-				// debug
-				SmartDashboard.putNumber("Swerve xPID Setpoint", mXPID.getSetpoint());
-				SmartDashboard.putNumber("Swerve xPID Position Error", mXPID.getPositionError());
-				
-				SmartDashboard.putNumber("Swerve yPID Setpoint", mYPID.getSetpoint());
-				SmartDashboard.putNumber("Swerve yPID Position Error", mYPID.getPositionError());
-				
-				SmartDashboard.putNumber("Swerve thetaPID Setpoint", mThetaPID.getSetpoint());
-				SmartDashboard.putNumber("Swerve thetaPID Position Error", mThetaPID.getPositionError());
-			}
-		}
-		
-		@Override
-		public boolean isFinished() {
-			return mControllerCommand != null && mControllerCommand.isFinished(); 
-		}
-		
-		@Override
-		public void end(boolean interrupted) {
-			if (mControllerCommand != null)
-				mControllerCommand.end(interrupted);
-		}
-	}
-	
-	public class FollowStaticTrajectory extends PPSwerveControllerCommand {
-		public FollowStaticTrajectory(
+	public class FollowTrajectory extends PPSwerveControllerCommand {
+		private boolean withinErrorMargin;
+		public FollowTrajectory(
 			ArrayList<PathPoint> waypoints, // meters
 			double maxVelocity, // meters per second
 			double maxAccel // meters per second squared
@@ -136,12 +58,29 @@ public class SwerveTrajectoryFollowerCommands {
 				true,
 				mSwerve
 			);
+			withinErrorMargin = false;
+			setLoggingCallbacks(
+				null, null, null,
+				(Translation2d ds, Rotation2d dtheta) -> {
+					SmartDashboard.putNumber("Trajectory dx", Math.abs(ds.getX()));
+					SmartDashboard.putNumber("Trajectory dy", Math.abs(ds.getY()));
+					SmartDashboard.putNumber("Trajectory dtheta", Math.abs(dtheta.getDegrees()));
+					withinErrorMargin = Math.abs(ds.getX()) < kLinearTolerance &&
+										Math.abs(ds.getY()) < kLinearTolerance && 
+										Math.abs(dtheta.getDegrees()) < kAngularToleranceDegrees;
+				}
+			);
 		}
 
-		public FollowStaticTrajectory(
+		public FollowTrajectory(
 			ArrayList<PathPoint> waypoints // meters
 		) {
 			this(waypoints, kMaxVelocity, kMaxAccel);
+		}
+
+		@Override
+		public boolean isFinished() {
+			return super.isFinished() && withinErrorMargin;
 		}
 
 		@Override

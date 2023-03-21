@@ -177,7 +177,7 @@ public class RobotContainer {
 				"Drop, Leave, Pick-up",
 				(Pose2d initialPose) -> new SequentialCommandGroup(
 					mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
+					mSwerveTrajectoryFollowerCommands.new FollowTrajectory(
 						new ArrayList<>(List.of(
 							new PathPoint(
 								initialPose.getTranslation(),
@@ -244,10 +244,10 @@ public class RobotContainer {
                 .whileTrue(new PrintPos());
 
                 mDriverController.povLeft()
-                .onTrue(mSwerveCommands.new MoveToPose(mSwerveCommands.getPreviousCone()));
+                .onTrue(mSwerveCommands.new MoveToPose(-1));
                 
                 mDriverController.povRight()
-                .onTrue(mSwerveCommands.new MoveToPose(mSwerveCommands.getNextCone()));
+                .onTrue(mSwerveCommands.new MoveToPose(1));
             }
             
             // OPERATOR CONTROLS
