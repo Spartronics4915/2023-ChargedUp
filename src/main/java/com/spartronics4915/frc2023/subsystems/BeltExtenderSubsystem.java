@@ -210,8 +210,8 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
           
         final double ticLength = 1. / 50;
         TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, targetState, currModeledState);
-        var state = currMotionProfile.calculate(ticLength);
-        mPIDController.setReference(state.position, ControlType.kPosition);
+        currModeledState = currMotionProfile.calculate(ticLength);
+        mPIDController.setReference(currModeledState.position, ControlType.kPosition);
     }
 
 }
