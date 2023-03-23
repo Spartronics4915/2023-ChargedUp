@@ -187,7 +187,7 @@ public final class DebugTeleopCommands {
             ShuffleboardLayout module = tab.getLayout("Extender", BuiltInLayouts.kList).withSize(2, 3)
                     .withProperties(Map.of("Label position", "LEFT"));
             extenderPos = module.add("ExtenderPos", 0).getEntry();
-            PIDSpeed = module.add("PID Speed", 0).getEntry();
+            PIDSpeed = module.add("PID Speed", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
             targetRef = module.add("Target Reference", 0).getEntry();
             velocity = module.add("Velocity", 0).getEntry();
 

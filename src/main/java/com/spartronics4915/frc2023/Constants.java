@@ -399,12 +399,16 @@ public final class Constants {
             return new CANSparkMax(ID, MotorType.kBrushed);
         };
 
+        // For example, with the offset set to 0, the native shoulder coordinates
+        // read 241 with the arm at level.  We want it to read 180, so the
+        // offet is 61.
+
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
                 15, // actual value 15
                 Math.PI * 2, false,
                 0.750, 0, 0, 0.05, // 0.25, ..., 0.04
                 Math.PI / 4, Math.PI / 3,
-                Rotation2d.fromDegrees(66), 10, false,
+                Rotation2d.fromDegrees(61), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80));
 
@@ -413,7 +417,7 @@ public final class Constants {
                 Math.PI * 2, true,
                 0.6, 0, 0, 0.04, // 0.3, ..., 0.03.
                 Math.PI/3, Math.PI / 5,
-                Rotation2d.fromDegrees(136), -1, true,
+                Rotation2d.fromDegrees(6), -1, true,
                 MotorType.kBrushed,
                 Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90));
 

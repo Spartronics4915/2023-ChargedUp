@@ -24,7 +24,7 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
     private final int kMotorID;
     private CANSparkMax mMotor;
     public RelativeEncoder mEncoder;
-    private final double kRevPerInch = 24.0;
+    private final double kRevPerInch = 13.25/14.19;
     public SparkMaxPIDController mPIDController;
 
     private DigitalInput mLimitSwitchZero;
@@ -53,23 +53,20 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
 
-        mMotor.setInverted(true);
-        mMotor.setIdleMode(IdleMode.kBrake);
+        mMotor.setIdleMode(IdleMode.kCoast);
         
-        mMotor.setSmartCurrentLimit(15);
+        mMotor.setSmartCurrentLimit(40);
         
         mPIDController = mMotor.getPIDController();
-        mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        mPIDController.setP(0.3);
+        mPIDController.setP(0.5);
         mPIDController.setFF(0.0000);
-
         mEncoder.setPosition(kPositionPad);
         mPivot = pivot;
 
         mIsActive = true;
 
-        motionConstraints = new TrapezoidProfile.Constraints(3, 3);
+        motionConstraints = new TrapezoidProfile.Constraints(6, 12);
         currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
         targetState = new TrapezoidProfile.State(currModeledState.position, 0);
 
@@ -156,7 +153,9 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
 
     public void setZero() {
         mEncoder.setPosition(kPositionPad);
-        currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
+        if(getModeledPosition() < 0) {
+            currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
+        }
     }
 
     public void modifyTarget(double delta) {
