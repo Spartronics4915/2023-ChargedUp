@@ -335,10 +335,10 @@ public class RobotContainer {
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.DOUBLE_SUBSTATION, false));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_POS, false));
                 
                 mOperatorController.x()
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CONE_LEVEL_1));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_1, false);
                 
                 mOperatorController.b()
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, false));
