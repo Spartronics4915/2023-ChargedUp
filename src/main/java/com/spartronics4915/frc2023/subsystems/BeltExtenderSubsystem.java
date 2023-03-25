@@ -66,7 +66,7 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
 
         mIsActive = true;
 
-        motionConstraints = new TrapezoidProfile.Constraints(6, 12);
+        motionConstraints = new TrapezoidProfile.Constraints(10, 15);
         currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
         targetState = new TrapezoidProfile.State(currModeledState.position, 0);
 

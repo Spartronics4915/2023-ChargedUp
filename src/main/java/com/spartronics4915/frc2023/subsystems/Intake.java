@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
         mMotor = kMotorConstructor.apply(kIntakeMotorID);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(kIsInverted);
-        mMotor.setIdleMode(IdleMode.kCoast);
+        mMotor.setIdleMode(IdleMode.kBrake);
         mMotor.setSmartCurrentLimit(40);
         mMotor.burnFlash();
         mState = IntakeState.OFF;

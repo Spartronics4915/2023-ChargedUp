@@ -158,8 +158,7 @@ public class RobotContainer {
 				"High cube, Balance",
 				(Pose2d initialPose) -> new SequentialCommandGroup(		
 					mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
-                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
-                    new WaitCommand(1),
+                    mArmCommands.getGoToPresetArmStateExtendFirstCommand(ArmState.TUCK_INTERMEDIATE, true),
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
@@ -374,7 +373,7 @@ public class RobotContainer {
                 mOperatorController.povDown()
                     .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
-                final double extensionIncrementPerTic = 3. / 50; // 3 inches/sec at 50Hz
+                final double extensionIncrementPerTic = 5. / 50; // 3 inches/sec at 50Hz
                 mOperatorController.povRight()
                     .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(extensionIncrementPerTic));
 

@@ -85,8 +85,8 @@ public class ArmCommands {
 	public class PieceInteractCommand extends SequentialCommandGroup {
 		public PieceInteractCommand(ArmState armState, IntakeState intakeState) {
 			super(
-				new SetArmPivotWristLocalState(armState),
-				new WaitCommand(kArmStateChangeDuration),
+				getGoToPresetArmStatePivotFirstCommand(armState, true),
+                new WaitCommand(1.25),
 				mIntakeCommands.new SetIntakeState(intakeState),
 				new WaitCommand(kGrabDuration),
 				mIntakeCommands.new SetIntakeState(IntakeState.OFF)

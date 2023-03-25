@@ -121,6 +121,10 @@ public class Swerve extends SubsystemBase {
         drive(chassisSpeeds, isOpenLoop);
     }
 
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        drive(chassisSpeeds, false);
+    }
+
     /**
      * Drive the robot using a {@link ChassisSpeeds} based on the drivetrain's current field-oriented setting
      * @param chassisSpeeds The {@link ChassisSpeeds} to use.

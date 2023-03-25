@@ -81,7 +81,7 @@ public final class ChargeStationCommands {
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP: {
-                    final double climb_to_grip_target_pitch_deg = 10;
+                    final double climb_to_grip_target_pitch_deg = 9;
                     final double climb_to_grip_time_allowed = 5;
 
                     if (mCurrStateTimer.hasElapsed(climb_to_grip_time_allowed)) {
@@ -90,7 +90,7 @@ public final class ChargeStationCommands {
                         mCurrState = ClimbState.ERROR;
                         mLogString = "Climb_To_Grip Timeout";
                     }
-                    mSwerve.drive(new ChassisSpeeds(climb_to_grip_speed_m_s, 0, 0), true, true);
+                    mSwerve.drive(new ChassisSpeeds(climb_to_grip_speed_m_s, 0, 0), false, false);
                     if (Math.abs(mSwerve.getPitch().getDegrees()) > climb_to_grip_target_pitch_deg) {
                         mLastState = mCurrState;
                         mCurrState = ClimbState.GRIP_TO_PLATFORM;
@@ -101,8 +101,8 @@ public final class ChargeStationCommands {
                 }
 
                 case GRIP_TO_PLATFORM: {
-                    final double grip_to_platform_speed_m_s = -2. * 0.1875;
-                    final double grip_to_platform_target_roll_deg = 9;
+                    final double grip_to_platform_speed_m_s = -2. * 0.3; // 0.1875
+                    final double grip_to_platform_target_roll_deg = 7;
                     final double grip_to_platform_time_allowed = 5;
                     if (mCurrStateTimer.hasElapsed(grip_to_platform_time_allowed)) {
                         mSwerve.stop();
@@ -110,10 +110,11 @@ public final class ChargeStationCommands {
                         mCurrState = ClimbState.ERROR;
                         mLogString = "grip_to_platform Timeout";
                     }
-                    mSwerve.drive(new ChassisSpeeds(grip_to_platform_speed_m_s, 0, 0), true, true);
+                    mSwerve.drive(new ChassisSpeeds(grip_to_platform_speed_m_s, 0, 0), false, false);
                     if (Math.abs(mSwerve.getPitch().getDegrees()) < grip_to_platform_target_roll_deg) {
                         mLastState = mCurrState;
-                        mCurrState = ClimbState.STOP;
+                        System.out.println("Switching to LEVEL_ROBOT");
+                        mCurrState = ClimbState.LEVEL_ROBOT_SETUP;
                         mCurrStateTimer = null;
                     }
                     break;
@@ -126,16 +127,28 @@ public final class ChargeStationCommands {
                 }
 
                 case LEVEL_ROBOT: {
-                    double vx = mVXPID.calculate(mSwerve.getPitch().getRadians());
-                    double omega = mThetaPID.calculate(mSwerve.getYaw().getRadians());
+                    // double vx = mVXPID.calculate(mSwerve.getPitch().getRadians());
+                    // double omega = mThetaPID.calculate(mSwerve.getYaw().getRadians());
 
-                    ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
+                    // ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
 
-                    mSwerve.drive(chassisSpeeds, true, true);
+                    // mSwerve.drive(chassisSpeeds, true, true);
 
-                    if (mVXPID.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1) {
-                        mCurrState = ClimbState.STOP;
+                    // if (mVXPID.atSetpoint() && Math.abs(mSwerve.getPitchOmega()) <= 0.1) {
+                    //     mCurrState = ClimbState.STOP;
+                    // }
+                    // break;
+
+                    final double pitchControlThreshold = 6;
+                    final double vXMetersPerSecond = 0.3;
+
+                    if (Math.abs(mSwerve.getPitch().getDegrees()) > pitchControlThreshold) {
+                        ChassisSpeeds c = new ChassisSpeeds(Math.copySign(vXMetersPerSecond, mSwerve.getPitch().getDegrees()), 0, 0);
+                        mSwerve.drive(c, false, false);
+                    } else {
+                        mSwerve.drive(new ChassisSpeeds());
                     }
+
                     break;
                 }
 
