@@ -300,7 +300,7 @@ public class RobotContainer {
                 .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
                 mDriverController.leftBumper()
-                .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE));
+                .onTrue(mArmCommands.getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE));
  
                 // Disabled for now with the belt extender.
                 // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
@@ -334,7 +334,7 @@ public class RobotContainer {
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.DOUBLE_SUBSTATION, false));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_POS, false));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CUBE_LEVEL_1, false));
                 
                 mOperatorController.x()
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_1, false));
@@ -386,6 +386,10 @@ public class RobotContainer {
                 mOperatorController.rightBumper()
                     .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
                 
+
+                
+                mOperatorController.leftStick()
+                    .onTrue(mArmCommands.getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE));
             }
 
         }
@@ -397,7 +401,7 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
+        return mArm.getExtender().zeroExtenderCommand().andThen(mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected()));
         // return null;
     }
     

@@ -46,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
      * Represents the preset values for the arm
      */
     public enum ArmState {
-        TUCK_INTERMEDIATE(kReadyForTuck),
+        TUCK_INTERMEDIATE(kTuck),
         RETRACTED(kRetractedConstants),
         // GRAB_UPRIGHT(kGrabUprightConstants),
         // GRAB_FALLEN(kArmLowConstants),

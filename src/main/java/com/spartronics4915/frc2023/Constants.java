@@ -319,7 +319,7 @@ public final class Constants {
     public static final class Arm {
         public static class Auto {
             public static final double kArmStateChangeDuration = 3; // seconds
-            public static final double kGrabDuration = 2; // seconds
+            public static final double kGrabDuration = 0.5; // seconds
         }
 
         public static class PIDConstants {
@@ -419,7 +419,7 @@ public final class Constants {
                 Math.PI/3, Math.PI / 5,
                 Rotation2d.fromDegrees(6), -1, true,
                 MotorType.kBrushed,
-                Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90));
+                Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90));
 
         public static final int kPivotFollowerID = 16; // actual value: 16
 
@@ -462,20 +462,20 @@ public final class Constants {
         // Rotation2d.fromDegrees(0)
         // );
 
-        public static final ArmSettingsConstants kReadyForTuck = new ArmSettingsConstants(
+        public static final ArmSettingsConstants kTuck = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-25),
-                Rotation2d.fromDegrees(96));
+                Rotation2d.fromDegrees(-22),
+                Rotation2d.fromDegrees(116.5));
 
         public static final ArmSettingsConstants kFloorPositionConstants = new ArmSettingsConstants(
                 5.2,
                 Rotation2d.fromDegrees(-17.5),
-                Rotation2d.fromDegrees(19.9));
+                Rotation2d.fromDegrees(13.2));
 
         public static final ArmSettingsConstants kDoubleSubstationConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(120.6),
-                Rotation2d.fromDegrees(87.4));
+                Rotation2d.fromDegrees(45.4),
+                Rotation2d.fromDegrees(-29.64));
 
         public static final ArmSettingsConstants kConeLevel1Constants = new ArmSettingsConstants(
             16.4,
@@ -483,14 +483,14 @@ public final class Constants {
             Rotation2d.fromDegrees(37.1));
 
         public static final ArmSettingsConstants kConeLevel2Constants = new ArmSettingsConstants(
-                14.457,
-                Rotation2d.fromDegrees(156.72),
-                Rotation2d.fromDegrees(57.11));
+                16.45,
+                Rotation2d.fromDegrees(153.6),
+                Rotation2d.fromDegrees(70.1));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
-                1.25,
-                Rotation2d.fromDegrees(11),
-                Rotation2d.fromDegrees(-16));
+                0,
+                Rotation2d.fromDegrees(21.5),
+                Rotation2d.fromDegrees(-0.5));
 
         public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
                 11,

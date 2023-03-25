@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -138,6 +139,16 @@ public class ArmCommands {
         public Set<Subsystem> getRequirements() {
             return mArmReq;
         }
+    }
+
+    public Command getGoToPresetArmStateSimultaneousCommand(ArmState armState) {
+        var untuckCommand = new UntuckWristIfNecessary().withTimeout(1);
+        var commands = new ParallelCommandGroup(
+            mIntakeCommands.getOutSpeedCommand(armState.outSpeed),
+            new SetArmPivotWristLocalState(armState),
+            mArm.getExtender().setTargetCommandRunOnce(armState.armRadius)
+        );
+        return untuckCommand.andThen(commands);
     }
 
     public CommandBase getGoToPresetArmStatePivotFirstCommand(ArmState armState, boolean waitForExtender) {

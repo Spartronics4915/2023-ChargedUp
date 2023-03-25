@@ -59,18 +59,18 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
         
         mPIDController = mMotor.getPIDController();
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        mPIDController.setP(0.5);
+        mPIDController.setP(1.5);
         mPIDController.setFF(0.0000);
         mEncoder.setPosition(kPositionPad);
         mPivot = pivot;
 
         mIsActive = true;
 
-        motionConstraints = new TrapezoidProfile.Constraints(10, 15);
+        motionConstraints = new TrapezoidProfile.Constraints(20, 30);
         currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
         targetState = new TrapezoidProfile.State(currModeledState.position, 0);
 
-        mPIDController.setOutputRange(-0.2, 0.2);
+        mPIDController.setOutputRange(-0.6, 0.6);
         mMotor.burnFlash();
     }
 
@@ -195,6 +195,20 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
         // This runs a no-op command and adds an until statement to it.
         return  this.run(()->{}).until(()->modeledExtenderCloseEnoughToTarget());
 
+    }
+
+    public CommandBase zeroExtenderCommand() {
+        return new CommandBase() {
+            @Override
+            public void execute() {
+                setTarget(-20);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return !mLimitSwitchZero.get();
+            }
+        };
     }
 
     @Override
