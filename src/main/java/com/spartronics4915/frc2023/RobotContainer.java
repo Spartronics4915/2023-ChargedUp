@@ -297,8 +297,8 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
-                // mDriverController.rightBumper() // TODO: remove before comp
-                // .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                mDriverController.rightBumper() // TODO: remove before comp
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
                 mDriverController.leftBumper()
                 .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE));
