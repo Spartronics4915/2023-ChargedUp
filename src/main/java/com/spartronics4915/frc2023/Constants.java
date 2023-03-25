@@ -406,7 +406,7 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
                 15, // actual value 15
                 Math.PI * 2, false,
-                0.750, 0, 0, 0.05, // 0.25, ..., 0.04
+                0.5, 0, 0, 0.05, // 0.75, ..., 0.05
                 Math.PI / 4, Math.PI / 3,
                 Rotation2d.fromDegrees(61), 10, false,
                 MotorType.kBrushless,
@@ -415,7 +415,7 @@ public final class Constants {
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
                 19,
                 Math.PI * 2, true,
-                0.6, 0, 0, 0.04, // 0.3, ..., 0.03.
+                0.5, 0, 0, 0.04, // 0.6, ..., 0.04.
                 Math.PI/3, Math.PI / 5,
                 Rotation2d.fromDegrees(6), -1, true,
                 MotorType.kBrushed,
@@ -468,9 +468,9 @@ public final class Constants {
                 Rotation2d.fromDegrees(96));
 
         public static final ArmSettingsConstants kFloorPositionConstants = new ArmSettingsConstants(
-                0,
-                Rotation2d.fromDegrees(-40),
-                Rotation2d.fromDegrees(32.9));
+                5.2,
+                Rotation2d.fromDegrees(-17.5),
+                Rotation2d.fromDegrees(19.9));
 
         public static final ArmSettingsConstants kDoubleSubstationConstants = new ArmSettingsConstants(
                 0,
@@ -478,14 +478,14 @@ public final class Constants {
                 Rotation2d.fromDegrees(87.4));
 
         public static final ArmSettingsConstants kConeLevel1Constants = new ArmSettingsConstants(
-                4,
-                Rotation2d.fromDegrees(12),
-                Rotation2d.fromDegrees(-5));
+            16.4,
+            Rotation2d.fromDegrees(31.3),
+            Rotation2d.fromDegrees(37.1));
 
         public static final ArmSettingsConstants kConeLevel2Constants = new ArmSettingsConstants(
-                9.8,
-                Rotation2d.fromDegrees(135),
-                Rotation2d.fromDegrees(25.9));
+                14.457,
+                Rotation2d.fromDegrees(156.72),
+                Rotation2d.fromDegrees(57.11));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
                 1.25,
@@ -498,8 +498,8 @@ public final class Constants {
                 Rotation2d.fromDegrees(-36), -0.24);
 
         public static final ArmSettingsConstants kCubeTopShootConstants = new ArmSettingsConstants(
-                0,
-                Rotation2d.fromDegrees(9.996031),
+                3.25,
+                Rotation2d.fromDegrees(27.5),
                 Rotation2d.fromDegrees(30.441));
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
@@ -526,7 +526,7 @@ public final class Constants {
             public double mOutSpeed;
             public ArmSettingsConstants(double armRadius, Rotation2d armTheta, Rotation2d wristTheta) {
                     mArmPositionConstants = new ArmPositionConstants(armRadius, armTheta, wristTheta);
-                    mOutSpeed = -0.6;
+                    mOutSpeed = 0.6;
                 }
             public ArmSettingsConstants(double armRadius, Rotation2d armTheta, Rotation2d wristTheta, double outSpeed) {
                     mArmPositionConstants = new ArmPositionConstants(armRadius, armTheta, wristTheta);
@@ -542,12 +542,12 @@ public final class Constants {
 
         public static final boolean kIsInverted = false;
 
-        public static final double kOffSpeed = 0.015;
-        public static final double kInSpeed = 0.8;
-        public static final double kShootCubeSpeed = -0.6;
-        public static final double kPlaceCubeSpeed = -0.1; // random placeholder numbers
-        public static final double kPlaceConeSpeed = -0.15;
-        public static final double kDefaultOutSpeed = -0.3;
+        public static final double kOffSpeed = -0.015;
+        public static final double kInSpeed = -0.8;
+        public static final double kShootCubeSpeed = 0.6;
+        public static final double kPlaceCubeSpeed = 0.1; // random placeholder numbers
+        public static final double kPlaceConeSpeed = 0.15;
+        public static final double kDefaultOutSpeed = 0.3;
 
         public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
     }

@@ -268,16 +268,17 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
             mModeledPosition = state.position;
 
-            double ffComponent = -kFF * Math.cos(angleWithEarth);
+            double ffComponent = -kFF * (Math.copySign(0.1, Math.cos(angleWithEarth)) + Math.cos(angleWithEarth));
             pidErr = (pidReferenceRadians - currPosNative);
             
             double total_output = ffComponent + kP*pidErr;
 
+            double maxSpeed = 0.4;
 
-            if(total_output > 0.6) {
-                total_output = 0.6;
-            } else if (total_output < -0.6) {
-                total_output = -0.6;
+            if(total_output > maxSpeed) {
+                total_output = maxSpeed;
+            } else if (total_output < -maxSpeed) {
+                total_output = -maxSpeed;
             }
 
             if(mActive && mReferenceSet) {

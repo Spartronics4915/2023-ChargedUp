@@ -80,7 +80,7 @@ public class Intake extends SubsystemBase {
                 System.out.println("OutSpeed: " + outSpeed);
                 break;
             default:
-                mMotor.set(0.01);
+                mMotor.set(-0.02);
         }
     }
 }
