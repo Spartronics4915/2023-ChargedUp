@@ -49,10 +49,16 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     private final TrapezoidProfile.Constraints motionConstraints;
     private double mModeledVelocity;
     public double trapezoidTarget;
+    public double pidErr;
     public double mModeledPosition;
+    private final Rotation2d mMaxRotation, mMinRotation;
+    public boolean isArm;
 
     public MotorAbsEncoderComboSubsystem(ArmMotorConstants MotorConstants, MotorType motorType) {
-        motionConstraints = new TrapezoidProfile.Constraints(Math.PI/6., Math.PI/6);
+
+        isArm = (mAngleProvider==null);
+
+        motionConstraints = new TrapezoidProfile.Constraints(MotorConstants.kMaxVelocity, MotorConstants.kMaxAccel);
         mModeledVelocity = 0;
 
         mMotor = new CANSparkMax(MotorConstants.kMotorID, motorType);
@@ -75,20 +81,38 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             mMotor.setInverted(true);
         }
         mPIDController = null; //initializePIDController(MotorConstants);
-        mMotor.setSmartCurrentLimit(60);
-        // mActive = true;
+        mMotor.setSmartCurrentLimit(40);
+        mActive = true;
         mReferenceSet = false;
-        mCurrentReference = getNativePosition();
-        mReferenceRadians = mCurrentReference.getRadians();
+
+        makeModeledPositionsMatchPhysical();
+
         mLastSpeedOutput = 0;
         mAngleProvider = null;
         kP = MotorConstants.kP;
         kFF = MotorConstants.kFF;
         mMotor.burnFlash();
+
+        mMaxRotation = MotorConstants.mMaxRotation;
+        mMinRotation = MotorConstants.mMinRotation;
+
+    }
+
+    public void makeModeledPositionsMatchPhysical() {
+        mCurrentReference = getNativePosition();
+        mModeledPosition = getNativePosition().getRadians();
+        mReferenceRadians = mCurrentReference.getRadians();
+        mModeledVelocity = 0;
+    }
+
+    public Rotation2d getModeledPosition() {
+        return nativeToArm(Rotation2d.fromRadians(mModeledPosition));
     }
 
     public void setAngleWithEarthProvider(AngleWithEarthProvider angleProvider) {
         mAngleProvider = angleProvider;
+        isArm = (mAngleProvider==null);
+
     }
 
     private SparkMaxPIDController initializePIDController(ArmMotorConstants MotorConstants) {
@@ -109,14 +133,22 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
      */
     public void setArmReference(Rotation2d ref) {
         // This is designed to ignore unsafe arm positions.
-        if (Math.abs(ref.getDegrees()) > 100)
+        if (ref.getDegrees() > mMaxRotation.getDegrees())
         {
-            System.out.println("Unsafe arm position requested (setArmReference): " + ref);
+            System.out.println("Arm:" + isArm +" Unsafe arm position requested (setArmReference): " + ref);
             return;
         }
-        mModeledPosition = getRawPosition();
-        setNativeReference(armToNative(ref));
+        Rotation2d nativeRef = armToNative(ref);
+       // System.out.println("Arm:" + isArm +" setArmReference: " + nativeRef.getDegrees() + " " + ref.getDegrees());
+        setNativeReference(nativeRef);
     }
+
+    public void clearReference() {
+        mReferenceSet = false;
+        this.stopMotor();
+
+    }
+
 
     public void setActive(boolean active) {
         mActive = active;
@@ -140,8 +172,18 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
 
     private void setNativeReference(Rotation2d ref) {
 
-        if (Math.abs(mCurrentReference.minus(ref).getDegrees()) > 120) {
+        if (false){//{(Math.abs(mCurrentReference.minus(ref).getDegrees()) > 120) {
             System.out.println("setNativeReference illegal request:" + ref);
+            return;
+        }
+
+        Rotation2d refArm = nativeToArm(ref);
+        if(refArm.getDegrees() > mMaxRotation.getDegrees()) {
+            System.out.println("Arm:" + isArm +" Requested ref " + refArm + " greater than max " +mMaxRotation);
+            return;
+        } else
+        if(refArm.getDegrees() < mMinRotation.getDegrees()) {
+            System.out.println("Requested ref " + refArm + " less than min " +mMaxRotation);
             return;
         }
         mCurrentReference = ref;
@@ -207,11 +249,9 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
     public void periodic() {
 
             double angleWithEarth;
-            boolean isArm=false;
             if(mAngleProvider==null) {
 
               angleWithEarth = getArmPosition().getRadians();
-              isArm=true;
             }
             else {
                 angleWithEarth = mAngleProvider.getAngleWithEarth().getRadians();
@@ -220,41 +260,42 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             // double currVelocity = getVelocity().getRadians();
             double currPosNative = getNativePosition().getRadians();
 
-            // var currState = new TrapezoidProfile.State(mModeledPosition, mModeledVelocity);
-            // var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
-            // TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
-            // double ticLength = 1./50; // Robot runs at 50Hz
-            // var state = currMotionProfile.calculate(ticLength);
+            var currState = new TrapezoidProfile.State(mModeledPosition, mModeledVelocity);
+            var goalState = new TrapezoidProfile.State(mReferenceRadians, 0);
+            TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, goalState, currState);
+            double ticLength = 1./50; // Robot runs at 50Hz
+            var state = currMotionProfile.calculate(ticLength);
+           
+            // double pidReferenceRadians = mReferenceRadians;//state.position;
+            double pidReferenceRadians = state.position;
+            trapezoidTarget = state.position;
 
-            // // Trapezoid profiling not working, so this effectively disables it.
-            
-            double pidReferenceRadians = mReferenceRadians;//state.position;
-            //trapezoidTarget = state.position;
-
-            //mModeledVelocity = state.velocity;
+            mModeledVelocity = state.velocity;
             // By doing this, we are just playing back the motion profile in case the PID controller doesn't keep up.
-            //mModeledPosition = state.position;
-            // currPosArm=nativeToArm(Rotation2d.fromDegrees(180)).getRadians();
-            // currPosNative = Rotation2d.fromDegrees(180).getRadians();
+            mModeledPosition = state.position;
 
             double ffComponent = -kFF * Math.cos(angleWithEarth);
-            double err = (pidReferenceRadians - currPosNative);
+            pidErr = (pidReferenceRadians - currPosNative);
+            
+            double total_output = ffComponent + kP*pidErr;
 
-            double total_output = ffComponent + kP*err;
 
-            if(total_output > 1.0) {
-                total_output = 1;
-            } else if (total_output < -1.0) {
-                total_output = -1.0;
+            if(total_output > 0.6) {
+                total_output = 0.6;
+            } else if (total_output < -0.6) {
+                total_output = -0.6;
             }
 
             if(mActive && mReferenceSet) {
                 mMotor.set(total_output);
                 mLastSpeedOutput = total_output;
-                if(isArm) {
-                System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + mReferenceRadians + " " + err);}
-
-        }
+                // if(isArm) {
+                // System.out.println("Setting motor " + total_output + " " + mMotor.getAppliedOutput() + " " + "modeledPos: " + mModeledPosition + "mRef " + mCurrentReference );
+                // }
+            } else {
+                this.makeModeledPositionsMatchPhysical();
+                stopMotor();
+            }
     }
 
 }

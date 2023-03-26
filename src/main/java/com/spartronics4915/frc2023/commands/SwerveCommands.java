@@ -78,15 +78,15 @@ public class SwerveCommands {
     /**
      * Mainly for debugging, probably shouldn't be used during a match
      */
-    public class ResetOdometry extends InstantCommand {
-        public ResetOdometry() {
+    public class ResetPose extends InstantCommand {
+        public ResetPose() {
 			
 		}
 		
 		@Override
 		public void initialize() {
 			super.initialize();
-            mSwerve.setPose(new Pose2d(0, 0, new Rotation2d(0)));
+            mSwerve.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
 		}
     }
 
@@ -106,7 +106,7 @@ public class SwerveCommands {
 			mSwerve.resetToAbsolute();
             mSwerve.stop();
 			mSwerve.alignModules();
-			mSwerve.setPose(mInitialPose);
+			mSwerve.resetPose(new Pose2d());
 		}
     }
 
@@ -155,7 +155,7 @@ public class SwerveCommands {
                 rotation *= kSlowModeAngularSpeedMultiplier;
             }
             
-            mSwerve.drive(translation, rotation, true);
+            mSwerve.drive(translation, rotation, false);
 
             // if (!mIsSprintMode) {
             //     x1 *= kSlowModeSpeedMultiplier;
@@ -208,7 +208,7 @@ public class SwerveCommands {
             // double 
             
             double vx = mXVelocityPIDController.calculate(mSwerve.getPitch().getRadians());
-            double omega = mRotationPIDController.calculate(mSwerve.getEstimatedYaw().getRadians());
+            double omega = mRotationPIDController.calculate(mSwerve.getYaw().getRadians());
 
             ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vx, 0, omega);
             
@@ -243,7 +243,7 @@ public class SwerveCommands {
 
         @Override
         public void initialize() {
-            var yaw = mSwerve.getEstimatedYaw();
+            var yaw = mSwerve.getYaw();
 
             Rotation2d newYaw = yaw.plus(mDegreeRotate);
             var newCommand = new RotateToYaw(newYaw);
@@ -279,7 +279,7 @@ public class SwerveCommands {
 
         @Override
         public void execute() {
-            double yaw = mSwerve.getEstimatedYaw().getRadians();
+            double yaw = mSwerve.getYaw().getRadians();
             double goal = mDestinationYaw.getRadians();
             var currState = new TrapezoidProfile.State(yaw, mlastVelocity);
             var goalState = new TrapezoidProfile.State(goal, 0);
@@ -304,7 +304,7 @@ public class SwerveCommands {
         }
         @Override
         public boolean isFinished() {
-            double yaw = mSwerve.getEstimatedYaw().getDegrees();
+            double yaw = mSwerve.getYaw().getDegrees();
             double goal = mDestinationYaw.getDegrees();
             boolean positionFine = (Math.abs(yaw - goal) < mYawToleranceDegrees);
             // // boolean velocityFine = (Math.abs(pid.getVelocityError()) < pid.getVelocityTolerance());
@@ -318,12 +318,29 @@ public class SwerveCommands {
 
     public class RotateYaw extends RotateToYaw {
         public RotateYaw(Rotation2d deltaYaw) {
-            super(deltaYaw.plus(mSwerve.getEstimatedYaw()));
+            super(deltaYaw.plus(mSwerve.getYaw()));
         }
 
         public RotateYaw(Rotation2d deltaYaw, PIDWidget widget) {
-            super(deltaYaw.plus(mSwerve.getEstimatedYaw()), widget);
+            super(deltaYaw.plus(mSwerve.getYaw()), widget);
         }
 
+    }
+    public class DriveStraightToPoint extends CommandBase {
+
+        Pose2d mTarget;
+        public DriveStraightToPoint(Pose2d target) {
+
+            mTarget = target;
+
+        }
+
+        @Override
+        public void execute() {
+            Pose2d currPose = mSwerve.getPose();
+            Translation2d translationErrVec = mTarget.getTranslation().minus(currPose.getTranslation());
+            double distToGoal = translationErrVec.getNorm();
+
+        }
     }
 }

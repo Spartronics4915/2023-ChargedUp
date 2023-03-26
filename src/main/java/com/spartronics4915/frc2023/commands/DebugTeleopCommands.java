@@ -77,9 +77,9 @@ public final class DebugTeleopCommands {
             pitchEntry = chassisLayout.add("pitch (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
             rollEntry = chassisLayout.add("roll (deg)", 0)./*withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("Min", -180, "Max", 180)).*/getEntry();
 
-            vxEntry = chassisLayout.add("vx (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            vyEntry = chassisLayout.add("vy (m per s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
-            omegaEntry = chassisLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kDial).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
+            vxEntry = chassisLayout.add("vx (m per s)", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            vyEntry = chassisLayout.add("vy (m per s)", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Min", -5, "Max", 5)).getEntry();
+            omegaEntry = chassisLayout.add("omega (rad/s)", 0).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Min", -12, "Max", 12)).getEntry();
         }
 
         public void update() {
@@ -209,7 +209,8 @@ public final class DebugTeleopCommands {
                     .withProperties(Map.of("Label position", "LEFT"));
             powerPanel = new PowerDistribution(1, ModuleType.kRev);
 
-            totalCurrent = layout.add("totalPower", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+            //totalCurrent = layout.add("totalPower", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+            totalCurrent = layout.add("totalPower", 0).getEntry();
         }
 
         public void update() {
@@ -222,7 +223,7 @@ public final class DebugTeleopCommands {
         private GenericEntry wristLeveledRotation, stateWristLeveledRotation;
         private GenericEntry shoulderRaw,  shoulderNative, shoulderArm, stateShoulderRotation, shoulderRef, pivotSpeed;
         private GenericEntry shoulderArmPlus30Native, shouldArmMinus30Native;
-        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, wristRef, wristSpeed;
+        private GenericEntry wristRaw,  wristNative, wristArm, statewristRotation, wristRef, wristRefTrap, wristErr, wristSpeed;
         private GenericEntry wristArmPlus30Native, wristArmMinus30Native;
         private GenericEntry shoulderArmSpeedOutput;
         private GenericEntry exOutput;
@@ -233,7 +234,7 @@ public final class DebugTeleopCommands {
             ShuffleboardLayout wristLayout = tab.getLayout("Wrist", BuiltInLayouts.kList).withSize(2, 3)
             .withProperties(Map.of("Label position", "LEFT"));
             ShuffleboardLayout combinedLayout = tab.getLayout("COmbined", BuiltInLayouts.kList).withSize(2, 3)
-            .withProperties(Map.of("Label position", "LEFT"));
+            .withProperties(Map.of("Label position", "TOP"));
             // linActDistance = armModule.add("current radius", 0).getEntry();
             // stateRadius = armModule.add("desired radius",0).getEntry();
 
@@ -244,7 +245,6 @@ public final class DebugTeleopCommands {
             wristArmMinus30Native = wristLayout.add("Wrist Native w Arm at -30", 0).getEntry();
             wristArmPlus30Native = wristLayout.add("Wrist Native w Arm at +30", 0).getEntry();
             wristSpeed = wristLayout.add("Wrist Speed Command",0).getEntry();
-            
 
             shoulderRaw = armModule.add("Shoulder (Raw)", 0).getEntry();
             shoulderNative = armModule.add("Shoulder (Native)", 0).getEntry();
@@ -255,7 +255,9 @@ public final class DebugTeleopCommands {
             stateShoulderRotation = armModule.add("desired shoulder angle", 0).getEntry();
             pivotSpeed = armModule.add("pivot speed", 0).getEntry();
 
-            wristRef = combinedLayout.add("Wrist Reference",0).withWidget(BuiltInWidgets.kGraph).getEntry();
+            wristRef = combinedLayout.add("Wrist Reference",0).getEntry();
+            wristRefTrap = combinedLayout.add("Wrist Trapezoid",0).getEntry();
+            wristErr =  combinedLayout.add("Wrist Err",0).withWidget(BuiltInWidgets.kGraph).getEntry();
             shoulderRef = combinedLayout.add("Shoulder Reference", 0).getEntry();
             exOutput = combinedLayout.add("Ex Output", 0).getEntry();
         }
@@ -275,7 +277,9 @@ public final class DebugTeleopCommands {
             wristArmMinus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(-30)).getDegrees());
             wristArmPlus30Native.setDouble(module.getWrist().armToNative(Rotation2d.fromDegrees(30)).getDegrees());
             wristSpeed.setDouble(module.getWrist().getMotor().getAppliedOutput());
-            wristRef.setDouble(Rotation2d.fromRadians(module.getWrist().trapezoidTarget).getDegrees());
+            wristRef.setDouble(module.getWrist().getCurrentReference().getDegrees());
+            wristRefTrap.setDouble(Rotation2d.fromRadians(module.getWrist().trapezoidTarget).getDegrees());
+            wristErr.setDouble(module.getWrist().pidErr);
             } 
 
             shoulderRaw.setDouble(module.getPivot().getRawPosition());
@@ -301,7 +305,7 @@ public final class DebugTeleopCommands {
         IntakeTab(Intake intakeSubsystem) {
             tab = Shuffleboard.getTab("Intake Tab");
             controlLayout = tab.getLayout("Controls", BuiltInLayouts.kList).withSize(2,4).withProperties(Map.of("Label position", "TOP"));
-            currShootSpeedSelector = controlLayout.add("Current Shoot Speed Selector", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 1)).getEntry();
+            currShootSpeedSelector = controlLayout.add("Current Shoot Speed Selector", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 0)).getEntry();
             currShootSpeed = controlLayout.add("Current Shoot Speed", 0).getEntry();
             mIntake = intakeSubsystem;
         }
@@ -421,7 +425,8 @@ public final class DebugTeleopCommands {
         public void initialize() {
 
             mArmTab = useArm ? new ArmTab(mArmSubsystem, mArmCommands) : null;
-            mIntakeTab = useArm ? new IntakeTab(mArmSubsystem.getIntake()) : null;
+            // mIntakeTab = useArm ? new IntakeTab(mArmSubsystem.getIntake()) : null;
+            mIntakeTab = null;
             mSwerveTab = useSwerve ? new SwerveTab(mSwerve, mSwerveCommands) : null;
         }
 
@@ -430,7 +435,7 @@ public final class DebugTeleopCommands {
         public void execute() {
             if (useArm) { 
                 mArmTab.update(); 
-                mIntakeTab.update();
+                // mIntakeTab.update();
             }
             if (useSwerve) { mSwerveTab.update(); }
         }
