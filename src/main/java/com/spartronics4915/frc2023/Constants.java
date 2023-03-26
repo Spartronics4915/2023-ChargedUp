@@ -441,6 +441,18 @@ public final class Constants {
                 new Rotation2d(Math.PI / 4) // 45
         );
 
+        public static final ArmSettingsConstants kPreOverTopPositionConstants = new ArmSettingsConstants(
+            0,
+            new Rotation2d(Math.PI / 30),
+            Rotation2d.fromDegrees(100)
+    );
+
+    public static final ArmSettingsConstants kOverTopStagingPositionConstants = new ArmSettingsConstants(
+        3,
+        Rotation2d.fromDegrees(120),
+        Rotation2d.fromDegrees(100)
+);
+
         // public static final ArmPositionConstants kArmLowConstants = new
         // ArmPositionConstants(
         // 0,

@@ -1,5 +1,7 @@
 package com.spartronics4915.frc2023.commands;
 
+import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
+import com.spartronics4915.frc2023.Constants.Arm.ArmPositionConstants.ArmSettingsConstants;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 // import com.spartronics4915.frc2023.subsystems.Arm.ArmState;
@@ -21,6 +23,7 @@ import static com.spartronics4915.frc2023.Constants.Arm.Auto.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import javax.lang.model.element.Element;
 
@@ -205,5 +208,40 @@ public class ArmCommands {
             return mFinished || (mArm.getWrist().getModeledPosition().getDegrees() < kWristSafeAngle);
         }
 
+    }
+
+    public CommandBase waitPivotPassAngleUp(double angDegrees) {
+
+        return new WaitUntilCommand(()->mArm.getPivot().getModeledPosition().getDegrees() > angDegrees);
+
+    }
+
+    public CommandBase getTuckWristCommand() {
+        // A tucked wrist means that it is turned up high 
+
+        var wrist = mArm.getWrist();
+        Rotation2d tuckAngle = Rotation2d.fromDegrees(105);
+        CommandBase tuckCmd = mArm.runOnce(()->wrist.setArmReference(tuckAngle));
+        BooleanSupplier checkCond = ()->(wrist.getModeledPosition().getDegrees() > 90);
+        CommandBase waitCmd = new WaitUntilCommand(checkCond);
+        return tuckCmd.andThen(waitCmd.withTimeout(2));
+
+    }
+
+    public CommandBase getRaiseToHighConeOverTopCommand() {
+
+        CommandBase seqCmd = new SequentialCommandGroup(
+        new UntuckWristIfNecessary(),
+        // Go to 30 degrees up, no extension
+        getGoToPresetArmStatePivotFirstCommand(ArmState.PRE_OVER_TOP_POSITION, false),
+        // Extend to 3 inches out, don't wait.  This gets the arm out of the sticky zone.
+        mArm.getExtender().setTargetCommandRunOnce(3),
+        // Make sure the wrist is tucked to minimize torsion
+        getTuckWristCommand(),
+        // Now go to high cone spot
+        getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2, true)
+        );
+
+        return seqCmd;
     }
 }
