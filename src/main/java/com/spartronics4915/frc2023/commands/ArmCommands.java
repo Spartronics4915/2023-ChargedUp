@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -85,8 +86,8 @@ public class ArmCommands {
 	public class PieceInteractCommand extends SequentialCommandGroup {
 		public PieceInteractCommand(ArmState armState, IntakeState intakeState) {
 			super(
-				new SetArmPivotWristLocalState(armState),
-				new WaitCommand(kArmStateChangeDuration),
+				getGoToPresetArmStatePivotFirstCommand(armState, true),
+                new WaitCommand(1.25),
 				mIntakeCommands.new SetIntakeState(intakeState),
 				new WaitCommand(kGrabDuration),
 				mIntakeCommands.new SetIntakeState(IntakeState.OFF)
@@ -140,25 +141,35 @@ public class ArmCommands {
         }
     }
 
+    public Command getGoToPresetArmStateSimultaneousCommand(ArmState armState) {
+        var untuckCommand = new UntuckWristIfNecessary().withTimeout(1);
+        var commands = new ParallelCommandGroup(
+            mIntakeCommands.getOutSpeedCommand(armState.outSpeed),
+            new SetArmPivotWristLocalState(armState),
+            mArm.getExtender().setTargetCommandRunOnce(armState.armRadius)
+        );
+        return untuckCommand.andThen(commands);
+    }
+
     public CommandBase getGoToPresetArmStatePivotFirstCommand(ArmState armState, boolean waitForExtender) {
         var untuckCommand = new UntuckWristIfNecessary().withTimeout(1);
         var seqCommands = new SequentialCommandGroup(
             mIntakeCommands.getOutSpeedCommand(armState.outSpeed),
             untuckCommand,
             new SetArmPivotWristLocalState(armState),
-            new WaitForPivotToArrive(armState.armTheta, 5)
+            new WaitForPivotToArrive(armState.armTheta, 5),
+            mArm.getExtender().setTargetCommandRunOnce(armState.armRadius)
         );
 
         if(waitForExtender) {
-            seqCommands = seqCommands.andThen(mArm.getExtender().extendToNInches(armState.armRadius));
-        } else {
-            seqCommands = seqCommands.andThen(new ScheduleCommand(mArm.getExtender().extendToNInches(armState.armRadius)));
-        }
+            seqCommands = seqCommands.andThen(mArm.getExtender().waitForModeledExtenderToArriveCommand().withTimeout(3));
+        } 
         return  seqCommands;
     }
 
     public CommandBase getGoToPresetArmStateExtendFirstCommand(ArmState armState, boolean waitForPivot) {
-        var seqCommands = new SequentialCommandGroup(mArm.getExtender().extendToNInches(armState.armRadius),
+        var seqCommands = new SequentialCommandGroup(mArm.getExtender().setTargetCommandRunOnce(armState.armRadius),
+                                                    mArm.getExtender().waitForModeledExtenderToArriveCommand().withTimeout(3), 
                                                     new SetArmPivotWristLocalState(armState)
         );
 

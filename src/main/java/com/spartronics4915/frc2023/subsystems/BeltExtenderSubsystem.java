@@ -17,13 +17,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class BeltExtenderSubsystem extends SubsystemBase  {
 
     private final int kMotorID;
     private CANSparkMax mMotor;
     public RelativeEncoder mEncoder;
-    private final double kRevPerInch = 24.0;
+    private final double kRevPerInch = 13.25/14.19;
     public SparkMaxPIDController mPIDController;
 
     private DigitalInput mLimitSwitchZero;
@@ -34,7 +35,7 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
     // a large value.
     private final double kPositionPad = 24;
     private final double kMinDist = 0.5;
-    private final double kMaxDist = 10;
+    private final double kMaxDist = 16.5;
     private final double kPosTolerance = 0.2;
     private MotorAbsEncoderComboSubsystem mPivot;
     private TrapezoidProfile.Constraints motionConstraints;
@@ -52,27 +53,24 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
 
-        mMotor.setInverted(true);
-        mMotor.setIdleMode(IdleMode.kBrake);
+        mMotor.setIdleMode(IdleMode.kCoast);
         
-        mMotor.setSmartCurrentLimit(20);
+        mMotor.setSmartCurrentLimit(40);
         
         mPIDController = mMotor.getPIDController();
-        mEncoder.setInverted(true);
         mEncoder.setPositionConversionFactor(1.0/kRevPerInch );// / kRevPerInch);
-        mPIDController.setP(0.00007);
+        mPIDController.setP(1.5);
         mPIDController.setFF(0.0000);
-
         mEncoder.setPosition(kPositionPad);
         mPivot = pivot;
 
         mIsActive = true;
 
-        motionConstraints = new TrapezoidProfile.Constraints(3, 3);
+        motionConstraints = new TrapezoidProfile.Constraints(20, 30);
         currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
         targetState = new TrapezoidProfile.State(currModeledState.position, 0);
 
-        mPIDController.setOutputRange(-0.5, 0.5);
+        mPIDController.setOutputRange(-0.6, 0.6);
         mMotor.burnFlash();
     }
 
@@ -155,7 +153,9 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
 
     public void setZero() {
         mEncoder.setPosition(kPositionPad);
-        currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
+        if(getModeledPosition() < 0) {
+            currModeledState = new TrapezoidProfile.State(kPositionPad, 0);
+        }
     }
 
     public void modifyTarget(double delta) {
@@ -180,6 +180,36 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
 
     }
 
+    public CommandBase setTargetCommandRunOnce(double target) {
+        var command = runOnce(()->setTarget(target));
+
+        return command;
+    }
+
+    public boolean modeledExtenderCloseEnoughToTarget() {
+        return (Math.abs(getModeledPosition() - getTarget()) <= Math.abs(kPosTolerance));
+    }
+
+    public CommandBase waitForModeledExtenderToArriveCommand() {
+
+        // This runs a no-op command and adds an until statement to it.
+        return  this.run(()->{}).until(()->modeledExtenderCloseEnoughToTarget());
+
+    }
+
+    public CommandBase zeroExtenderCommand() {
+        return new CommandBase() {
+            @Override
+            public void execute() {
+                setTarget(-20);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return !mLimitSwitchZero.get();
+            }
+        };
+    }
 
     @Override
     public void periodic() {
@@ -193,8 +223,8 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
           
         final double ticLength = 1. / 50;
         TrapezoidProfile currMotionProfile = new TrapezoidProfile(motionConstraints, targetState, currModeledState);
-        var state = currMotionProfile.calculate(ticLength);
-        mPIDController.setReference(state.position, ControlType.kPosition);
+        currModeledState = currMotionProfile.calculate(ticLength);
+        mPIDController.setReference(currModeledState.position, ControlType.kPosition);
     }
 
 }

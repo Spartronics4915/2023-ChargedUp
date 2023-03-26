@@ -76,7 +76,6 @@ public class RobotContainer {
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     private final Intake mIntake;
-    private final ExtenderCommands mExtenderCommands;
 
     private final IntakeCommands mIntakeCommands;
     
@@ -117,13 +116,11 @@ public class RobotContainer {
         
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
-            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
             mArmCommands = new ArmCommands(mArm, mIntakeCommands);
         } else {
             mArm = null;
-            mExtenderCommands = null;
             mIntake = null;
             mIntakeCommands = null;
             mArmCommands = null;
@@ -161,8 +158,7 @@ public class RobotContainer {
 				"High cube, Balance",
 				(Pose2d initialPose) -> new SequentialCommandGroup(		
 					mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
-                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
-                    new WaitCommand(1),
+                    mArmCommands.getGoToPresetArmStateExtendFirstCommand(ArmState.TUCK_INTERMEDIATE, true),
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
@@ -300,13 +296,14 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
-                // mDriverController.rightBumper() // TODO: remove before comp
-                // .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                mDriverController.rightBumper() // TODO: remove before comp
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
 
                 mDriverController.leftBumper()
-                .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE));
+                .onTrue(mArmCommands.getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE));
  
-                mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
+                // Disabled for now with the belt extender.
+                // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
                 
                 // This is to tuck into stow
                 mDriverController.povDown().onTrue(Commands.runOnce(()->mArm.stopPivot()));
@@ -337,10 +334,10 @@ public class RobotContainer {
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.DOUBLE_SUBSTATION, false));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CUBE_LEVEL_1, false));
                 
                 mOperatorController.x()
-                    .onTrue(mArmCommands.new SetArmPivotWristLocalState(ArmState.CONE_LEVEL_1));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_1, false));
                 
                 mOperatorController.b()
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, false));
@@ -376,11 +373,12 @@ public class RobotContainer {
                 mOperatorController.povDown()
                     .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
+                final double extensionIncrementPerTic = 5. / 50; // 3 inches/sec at 50Hz
                 mOperatorController.povRight()
-                    .whileTrue(mExtenderCommands.new Extend());
+                    .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(extensionIncrementPerTic));
 
                 mOperatorController.povLeft()
-                    .whileTrue(mExtenderCommands.new Retract());
+                .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(-extensionIncrementPerTic));
 
                 mOperatorController.leftBumper()
                     .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
@@ -388,6 +386,10 @@ public class RobotContainer {
                 mOperatorController.rightBumper()
                     .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
                 
+
+                
+                mOperatorController.leftStick()
+                    .onTrue(mArmCommands.getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE));
             }
 
         }
@@ -399,7 +401,7 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
+        return mArm.getExtender().zeroExtenderCommand().andThen(mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected()));
         // return null;
     }
     

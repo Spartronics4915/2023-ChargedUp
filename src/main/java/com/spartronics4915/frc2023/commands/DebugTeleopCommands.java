@@ -5,6 +5,7 @@ import com.spartronics4915.frc2023.subsystems.SwerveModule;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmPosition;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.BeltExtenderSubsystem;
 import com.spartronics4915.frc2023.subsystems.ExtenderSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem;
@@ -186,16 +187,16 @@ public final class DebugTeleopCommands {
             ShuffleboardLayout module = tab.getLayout("Extender", BuiltInLayouts.kList).withSize(2, 3)
                     .withProperties(Map.of("Label position", "LEFT"));
             extenderPos = module.add("ExtenderPos", 0).getEntry();
-            PIDSpeed = module.add("PID Speed", 0).getEntry();
+            PIDSpeed = module.add("PID Speed", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
             targetRef = module.add("Target Reference", 0).getEntry();
-            velocity = module.add("Velocity", 0).withWidget(BuiltInWidgets.kGraph).getEntry();
+            velocity = module.add("Velocity", 0).getEntry();
 
         }
 
-        public void update(ExtenderSubsystem subsystem) {
+        public void update(BeltExtenderSubsystem subsystem) {
             extenderPos.setDouble(subsystem.getPosition());
             PIDSpeed.setDouble(subsystem.getMotor().getAppliedOutput());
-            targetRef.setDouble(subsystem.getReference());
+            targetRef.setDouble(subsystem.getTarget());
             velocity.setDouble(subsystem.mEncoder.getVelocity());
         }
     }
@@ -367,9 +368,9 @@ public final class DebugTeleopCommands {
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getPivot().setArmReference(Rotation2d.fromDegrees(0))).withName("arm 0"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(30))).withName("Wrist +30"));
             elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setArmReference(Rotation2d.fromDegrees(0))).withName("Wrist +0"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startExtending()).withName("Start Extending"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().startRetracting()).withName("Start Retracting"));
-            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Motor"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().setTargetCommandRunOnce(0)).withName("Extender to 0"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().setTargetCommandRunOnce(3)).withName("Extender to 3"));
+            elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getExtender().stopMotor()).withName("Stop Extender"));
 
             // elevatorCommands.add(Commands.runOnce(()->mArmSubsystem.getWrist().setReference(Rotation2d.fromDegrees(40))).withName("Wrist+40"));

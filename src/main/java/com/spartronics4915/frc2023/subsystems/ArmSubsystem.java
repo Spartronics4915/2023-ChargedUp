@@ -46,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
      * Represents the preset values for the arm
      */
     public enum ArmState {
-        TUCK_INTERMEDIATE(kReadyForTuck),
+        TUCK_INTERMEDIATE(kTuck),
         RETRACTED(kRetractedConstants),
         // GRAB_UPRIGHT(kGrabUprightConstants),
         // GRAB_FALLEN(kArmLowConstants),
@@ -113,7 +113,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final MotorAbsEncoderComboSubsystem mWristMotor;
     private final CANSparkMax mPivotFollower;
 
-    private final ExtenderSubsystem mExtenderSubsystem;
+    private final BeltExtenderSubsystem mExtenderSubsystem;
     private final Intake mIntake;
 
     public ArmSubsystem() {
@@ -126,14 +126,16 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
         mPivotFollower.setSmartCurrentLimit(60);
         mPivotFollower.setIdleMode(IdleMode.kBrake);
-        mExtenderSubsystem = new ExtenderSubsystem(mPivotMotor);
+        mExtenderSubsystem = new BeltExtenderSubsystem(mPivotMotor);
 
         mIntake = Intake.getInstance();
         
         if(mWristMotor != null) {
             mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
         }
-        //mPivotMotor.setActive(false);
+        
+        
+        // mPivotMotor.setActive(false);
     }
 
     public void makeModeledPositionsMatchPhysical() {
@@ -144,7 +146,7 @@ public class ArmSubsystem extends SubsystemBase {
         return mIntake;
     }
     
-    public ExtenderSubsystem getExtender() {
+    public BeltExtenderSubsystem getExtender() {
         return mExtenderSubsystem;
     }
     
@@ -194,7 +196,7 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmPosition  getLocalReference() {
         Rotation2d pivotReference = mPivotMotor.getCurrentReferenceArm();
         Rotation2d wristReference = mWristMotor.getCurrentReferenceArm();
-        double extenderReference = mExtenderSubsystem.getReference();
+        double extenderReference = mExtenderSubsystem.getTarget();
 
         return new ArmPosition(extenderReference, pivotReference, wristReference);
 
@@ -269,6 +271,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void clearReference() {
         mPivotMotor.clearReference();
         mWristMotor.clearReference();
+        mExtenderSubsystem.stopExtenderAndMatchTargetToPhysical();
     }
     
     public void stopPivot() {

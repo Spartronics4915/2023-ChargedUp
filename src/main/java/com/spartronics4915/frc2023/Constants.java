@@ -319,7 +319,7 @@ public final class Constants {
     public static final class Arm {
         public static class Auto {
             public static final double kArmStateChangeDuration = 3; // seconds
-            public static final double kGrabDuration = 2; // seconds
+            public static final double kGrabDuration = 0.5; // seconds
         }
 
         public static class PIDConstants {
@@ -399,23 +399,27 @@ public final class Constants {
             return new CANSparkMax(ID, MotorType.kBrushed);
         };
 
+        // For example, with the offset set to 0, the native shoulder coordinates
+        // read 241 with the arm at level.  We want it to read 180, so the
+        // offet is 61.
+
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
                 15, // actual value 15
                 Math.PI * 2, false,
-                0.750, 0, 0, 0.05, // 0.25, ..., 0.04
+                0.5, 0, 0, 0.05, // 0.75, ..., 0.05
                 Math.PI / 4, Math.PI / 3,
-                Rotation2d.fromDegrees(66), 10, false,
+                Rotation2d.fromDegrees(61), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80));
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
                 19,
                 Math.PI * 2, true,
-                0.6, 0, 0, 0.04, // 0.3, ..., 0.03.
+                0.5, 0, 0, 0.04, // 0.6, ..., 0.04.
                 Math.PI/3, Math.PI / 5,
-                Rotation2d.fromDegrees(136), -1, true,
+                Rotation2d.fromDegrees(6), -1, true,
                 MotorType.kBrushed,
-                Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-90));
+                Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90));
 
         public static final int kPivotFollowerID = 16; // actual value: 16
 
@@ -458,35 +462,35 @@ public final class Constants {
         // Rotation2d.fromDegrees(0)
         // );
 
-        public static final ArmSettingsConstants kReadyForTuck = new ArmSettingsConstants(
+        public static final ArmSettingsConstants kTuck = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-25),
-                Rotation2d.fromDegrees(96));
+                Rotation2d.fromDegrees(-22),
+                Rotation2d.fromDegrees(116.5));
 
         public static final ArmSettingsConstants kFloorPositionConstants = new ArmSettingsConstants(
-                0,
-                Rotation2d.fromDegrees(-40),
-                Rotation2d.fromDegrees(32.9));
+                5.2,
+                Rotation2d.fromDegrees(-17.5),
+                Rotation2d.fromDegrees(13.2));
 
         public static final ArmSettingsConstants kDoubleSubstationConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(120.6),
-                Rotation2d.fromDegrees(87.4));
+                Rotation2d.fromDegrees(45.4),
+                Rotation2d.fromDegrees(-29.64));
 
         public static final ArmSettingsConstants kConeLevel1Constants = new ArmSettingsConstants(
-                4,
-                Rotation2d.fromDegrees(12),
-                Rotation2d.fromDegrees(-5));
+            16.4,
+            Rotation2d.fromDegrees(31.3),
+            Rotation2d.fromDegrees(37.1));
 
         public static final ArmSettingsConstants kConeLevel2Constants = new ArmSettingsConstants(
-                9.8,
-                Rotation2d.fromDegrees(135),
-                Rotation2d.fromDegrees(25.9));
+                16.45,
+                Rotation2d.fromDegrees(153.6),
+                Rotation2d.fromDegrees(70.1));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
-                1.25,
-                Rotation2d.fromDegrees(11),
-                Rotation2d.fromDegrees(-16));
+                0,
+                Rotation2d.fromDegrees(21.5),
+                Rotation2d.fromDegrees(-0.5));
 
         public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
                 11,
@@ -494,8 +498,8 @@ public final class Constants {
                 Rotation2d.fromDegrees(-36), -0.24);
 
         public static final ArmSettingsConstants kCubeTopShootConstants = new ArmSettingsConstants(
-                0,
-                Rotation2d.fromDegrees(9.996031),
+                3.25,
+                Rotation2d.fromDegrees(27.5),
                 Rotation2d.fromDegrees(30.441));
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
@@ -522,7 +526,7 @@ public final class Constants {
             public double mOutSpeed;
             public ArmSettingsConstants(double armRadius, Rotation2d armTheta, Rotation2d wristTheta) {
                     mArmPositionConstants = new ArmPositionConstants(armRadius, armTheta, wristTheta);
-                    mOutSpeed = -0.6;
+                    mOutSpeed = 0.6;
                 }
             public ArmSettingsConstants(double armRadius, Rotation2d armTheta, Rotation2d wristTheta, double outSpeed) {
                     mArmPositionConstants = new ArmPositionConstants(armRadius, armTheta, wristTheta);
@@ -538,12 +542,12 @@ public final class Constants {
 
         public static final boolean kIsInverted = false;
 
-        public static final double kOffSpeed = 0.015;
-        public static final double kInSpeed = 0.8;
-        public static final double kShootCubeSpeed = -0.6;
-        public static final double kPlaceCubeSpeed = -0.1; // random placeholder numbers
-        public static final double kPlaceConeSpeed = -0.15;
-        public static final double kDefaultOutSpeed = -0.3;
+        public static final double kOffSpeed = -0.015;
+        public static final double kInSpeed = -0.8;
+        public static final double kShootCubeSpeed = 0.6;
+        public static final double kPlaceCubeSpeed = 0.1; // random placeholder numbers
+        public static final double kPlaceConeSpeed = 0.15;
+        public static final double kDefaultOutSpeed = 0.3;
 
         public static final IntFunction<CANSparkMax> kMotorConstructor = (int ID) -> { return new CANSparkMax(ID, MotorType.kBrushless); };
     }
