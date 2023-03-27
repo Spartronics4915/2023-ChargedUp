@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -118,6 +119,10 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putBoolean("field relative", mIsFieldRelative);
 
         drive(chassisSpeeds, isOpenLoop);
+    }
+
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        drive(chassisSpeeds, false);
     }
 
     /**
@@ -228,7 +233,10 @@ public class Swerve extends SubsystemBase {
      * @return The rate of change of the pitch in rad/s.
      */
     public double getPitchOmega() {
-        return (mLastPitch.minus(mLastLastPitch)).getRadians() / 0.02;
+        // return (mLastPitch.minus(mLastLastPitch)).getRadians() / 0.02;
+        var xyz_dps = new double[3];
+        getIMU().getRawGyro(xyz_dps);
+        return xyz_dps[1] * Math.PI / 180.;
     }
 
     /**
@@ -243,7 +251,7 @@ public class Swerve extends SubsystemBase {
      * Resets the pose estimator to the specified pose. 
      * @param pose The pose to reset the pose estimator to.
      */
-    public void setPose(Pose2d pose) {
+    public void resetPose(Pose2d pose) {
         mPoseEstimator.resetPosition(getYaw(), getPositions(), pose);
     }
 
@@ -352,7 +360,7 @@ public class Swerve extends SubsystemBase {
 		if (vision != null) {
 			mPoseEstimator.addVisionMeasurement(vision.mPose, vision.mTime);
         }
-        mPoseEstimator.update(getYaw(), getPositions());
+        mPoseEstimator.update(((Gyro)mIMU).getRotation2d(), getPositions());
 		SmartDashboard.putString("swervePose", mPoseEstimator.getEstimatedPosition().toString());
     }
 

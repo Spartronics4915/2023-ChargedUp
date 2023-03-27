@@ -78,15 +78,15 @@ public class SwerveCommands {
     /**
      * Mainly for debugging, probably shouldn't be used during a match
      */
-    public class ResetOdometry extends InstantCommand {
-        public ResetOdometry() {
+    public class ResetPose extends InstantCommand {
+        public ResetPose() {
 			
 		}
 		
 		@Override
 		public void initialize() {
 			super.initialize();
-            mSwerve.setPose(new Pose2d(0, 0, new Rotation2d(0)));
+            mSwerve.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
 		}
     }
 
@@ -106,7 +106,7 @@ public class SwerveCommands {
 			mSwerve.resetToAbsolute();
             mSwerve.stop();
 			mSwerve.alignModules();
-			mSwerve.setPose(mInitialPose);
+			mSwerve.resetPose(new Pose2d());
 		}
     }
 
@@ -155,7 +155,7 @@ public class SwerveCommands {
                 rotation *= kSlowModeAngularSpeedMultiplier;
             }
             
-            mSwerve.drive(translation, rotation, true);
+            mSwerve.drive(translation, rotation, false);
 
             // if (!mIsSprintMode) {
             //     x1 *= kSlowModeSpeedMultiplier;
@@ -325,5 +325,22 @@ public class SwerveCommands {
             super(deltaYaw.plus(mSwerve.getYaw()), widget);
         }
 
+    }
+    public class DriveStraightToPoint extends CommandBase {
+
+        Pose2d mTarget;
+        public DriveStraightToPoint(Pose2d target) {
+
+            mTarget = target;
+
+        }
+
+        @Override
+        public void execute() {
+            Pose2d currPose = mSwerve.getPose();
+            Translation2d translationErrVec = mTarget.getTranslation().minus(currPose.getTranslation());
+            double distToGoal = translationErrVec.getNorm();
+
+        }
     }
 }

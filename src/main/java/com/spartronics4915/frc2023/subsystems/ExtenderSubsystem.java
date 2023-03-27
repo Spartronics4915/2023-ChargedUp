@@ -26,14 +26,14 @@ public class ExtenderSubsystem extends SubsystemBase  {
     public double targetReference;
 
     private DigitalInput mLimitSwitchZero;
-
+    private boolean mIsActive;
 
     // This is to work around a bug in the encoder class
     // The RelativeEncoder class cannot be negative. So we have to pad it out to 
     // a large value.
     private final double kPositionPad = 24;
     private final double kMinDist = 0.5;
-    private final double kMaxDist = 12;
+    private final double kMaxDist = 10;
     private final double kPosTolerance = 0.2;
     private MotorAbsEncoderComboSubsystem mPivot;
 
@@ -49,7 +49,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
         //mEncoder = mMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(true);
-        mMotor.setSmartCurrentLimit(60);
+        mMotor.setSmartCurrentLimit(30);
         mPIDController = mMotor.getPIDController();
         mPIDController.setFeedbackDevice(mEncoder);
         mEncoder.setInverted(true);
@@ -61,9 +61,19 @@ public class ExtenderSubsystem extends SubsystemBase  {
         mPivot = pivot;
         targetReference = 0;
 
+        mIsActive = true;
+
         mMotor.burnFlash();
     }
 
+    public boolean isActive() {
+        return mIsActive;
+    }
+
+    public void setIsActive(boolean active) {
+        mIsActive = active;
+    }
+    
     public void setZero() {
         mEncoder.setPosition(kPositionPad);
 
@@ -138,7 +148,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
     }
 
     public CommandBase extendToNInches(double N) {
-        return Commands.runEnd(()->{
+        return runEnd(()->{
             if(getPosition() < N){
                 startExtending();
             }else{
@@ -150,7 +160,7 @@ public class ExtenderSubsystem extends SubsystemBase  {
 
     // Note, you need to set the target first!
     public CommandBase extendToTarget() {
-        return Commands.runEnd(()->{
+        return runEnd(()->{
             if(getPosition() < targetReference){
                 startExtending();
             }else{

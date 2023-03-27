@@ -1,5 +1,6 @@
 package com.spartronics4915.frc2023.subsystems;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.spartronics4915.frc2023.Constants.Intake.*;
@@ -14,6 +15,9 @@ public class Intake extends SubsystemBase {
     public enum IntakeState {
         IN,
         OFF,
+        SHOOT_CUBE,
+        PLACE_CUBE,
+        PLACE_CONE,
         OUT
     }
 
@@ -28,11 +32,11 @@ public class Intake extends SubsystemBase {
         mMotor = kMotorConstructor.apply(kIntakeMotorID);
         mMotor.restoreFactoryDefaults();
         mMotor.setInverted(kIsInverted);
-        mMotor.setIdleMode(IdleMode.kCoast);
+        mMotor.setIdleMode(IdleMode.kBrake);
         mMotor.setSmartCurrentLimit(40);
         mMotor.burnFlash();
         mState = IntakeState.OFF;
-        outSpeed = kOutSpeed;
+        outSpeed = kDefaultOutSpeed;
     }
 
     public double getOutSpeed() {
@@ -42,6 +46,12 @@ public class Intake extends SubsystemBase {
     public void setOutSpeed(double newSpeed) {
         outSpeed = newSpeed;
 
+    }
+
+    public CommandBase setOutSpeedCommand(double newSpeed) {
+
+        return this.runOnce(() -> setOutSpeed(
+                newSpeed));
     }
 
     public static Intake getInstance() {
@@ -61,12 +71,16 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        switch(mState) {
-            case IN: mMotor.set(kInSpeed);
-            break;
-            case OUT: mMotor.set(outSpeed);
-            break;
-            default: mMotor.set(0.01);
+        switch (mState) {
+            case IN:
+                mMotor.set(kInSpeed);
+                break;
+            case OUT:
+                mMotor.set(outSpeed);
+                System.out.println("OutSpeed: " + outSpeed);
+                break;
+            default:
+                mMotor.set(-0.02);
         }
     }
 }
