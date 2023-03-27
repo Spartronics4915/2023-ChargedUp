@@ -4,6 +4,14 @@
 
 package com.spartronics4915.frc2023;
 
+import com.spartronics4915.frc2023.bling.AlternatingColorPattern;
+import com.spartronics4915.frc2023.bling.BlinkingPattern;
+import com.spartronics4915.frc2023.bling.ChaosPattern;
+import com.spartronics4915.frc2023.bling.ChasePattern;
+import com.spartronics4915.frc2023.bling.IntensityPattern;
+import com.spartronics4915.frc2023.bling.RadarPattern;
+import com.spartronics4915.frc2023.bling.RainbowPattern;
+import com.spartronics4915.frc2023.bling.SolidColorPattern;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -11,6 +19,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -34,6 +43,9 @@ public class Robot extends TimedRobot {
     private AddressableLEDBuffer mLEDUnderglowBuffer;
     private int mRainbowFirstPixelHue;
 
+
+
+
     /**
      * This function is run when the robot is first started up and should be used
      * for any
@@ -54,8 +66,45 @@ public class Robot extends TimedRobot {
 
         mLEDUnderglow = new AddressableLED(0);
 
-        mLEDUnderglowBuffer = new AddressableLEDBuffer(120);
-        mLEDUnderglow.setLength(mLEDUnderglowBuffer.getLength());
+        mLEDUnderglowBuffer = new AddressableLEDBuffer(125); //124 maybe??
+
+        var alliance = DriverStation.getAlliance();
+        
+        new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
+
+
+        // if (alliance == Alliance.Red){
+        //     new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
+        // } else if (alliance == Alliance.Blue){
+        //     new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
+        // } else { new RainbowPattern().setLEDs(mLEDUnderglowBuffer);} 
+
+        // new AlternatingColorPattern(
+        //     new Color[]{
+        //         new Color(0, 0, 255),
+        //         new Color(255, 255, 0)
+        //     }).setLEDs(mLEDUnderglowBuffer);
+
+        // new BlinkingPattern(new Color(0, 0, 255), 0.5).setLEDs(mLEDUnderglowBuffer);
+
+        // new ChaosPattern().setLEDs(mLEDUnderglowBuffer);
+
+        // new ChasePattern(
+        //     new Color[]{
+        //         new Color(0, 0, 255),
+        //         new Color(255, 255, 0)
+        //     }, 5).setLEDs(mLEDUnderglowBuffer);
+
+        // new RadarPattern(new Color(0, 0, 255), new Color(255, 255, 0), 10).setLEDs(mLEDUnderglowBuffer);
+
+        // new RainbowPattern().setLEDs(mLEDUnderglowBuffer);
+
+        // new IntensityPattern(new Color(0, 0, 255), 0.5).setLEDs(mLEDUnderglowBuffer);
+
+        // new IntensityPattern(new Color(0, 0, 255), new Color(255, 255, 0), 0.5).setLEDs(mLEDUnderglowBuffer);
+
+
+
         mLEDUnderglow.setData(mLEDUnderglowBuffer);
         mLEDUnderglow.start();
     }
@@ -80,34 +129,12 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-        
-        var alliance = DriverStation.getAlliance();
 
-        if (alliance == Alliance.Red){
-            for (int i = 0; i < mLEDUnderglowBuffer.getLength(); i++)
-                mLEDUnderglowBuffer.setRGB(i, 255, 0, 0);
-        } else if (alliance == Alliance.Blue){
-            for (int i = 0; i < mLEDUnderglowBuffer.getLength(); i++)
-                mLEDUnderglowBuffer.setRGB(i, 0, 0, 255);
-        } else {rainbow();}
 
-    mLEDUnderglow.setData(mLEDUnderglowBuffer);
+    
     }
 
-    private void rainbow() {
-        
-        for (var i = 0; i < mLEDUnderglowBuffer.getLength(); i++) {
-        
-          final var hue = (mRainbowFirstPixelHue + (i * 180 / mLEDUnderglowBuffer.getLength())) % 180;
-          
-          mLEDUnderglowBuffer.setHSV(i, hue, 255, 128);
-        }
-        mRainbowFirstPixelHue += 4;
-        
-        mRainbowFirstPixelHue %= 180;
-      }
-
-
+    
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
     public void disabledInit() {
