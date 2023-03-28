@@ -22,6 +22,8 @@ public final class ChargeStationCommands {
         private final PIDController mVXPID;
         private final ProfiledPIDController mThetaPID;
 
+        private final boolean mBackwards;
+
         public enum ClimbState {
             CLIMB_TO_GRIP, GRIP_TO_PLATFORM, LEVEL_ROBOT_SETUP, LEVEL_ROBOT, STOP, ERROR
         }
@@ -30,20 +32,28 @@ public final class ChargeStationCommands {
         private Timer mCurrStateTimer;
         private String mLogString;
 
+        /**
+         * Defaults to backwards
+         */
         public AutoChargeStationClimb() {
-			mSwerve = Swerve.getInstance();
+			this(true);
+        }
+
+        public AutoChargeStationClimb(boolean backwards) {
+            mBackwards = backwards;
+            mSwerve = Swerve.getInstance();
             addRequirements(mSwerve);
             mLogString = "";
             mCurrState = ClimbState.CLIMB_TO_GRIP;
             mVXPID = new PIDController(
-                    BalanceConstants.XVelocityPID.kP,
-                    BalanceConstants.XVelocityPID.kI,
-                    BalanceConstants.XVelocityPID.kD);
+                BalanceConstants.XVelocityPID.kP,
+                BalanceConstants.XVelocityPID.kI,
+                BalanceConstants.XVelocityPID.kD);
             mThetaPID = new ProfiledPIDController(
-                    BalanceConstants.ThetaPID.kP,
-                    BalanceConstants.ThetaPID.kI,
-                    BalanceConstants.ThetaPID.kD,
-                    new Constraints(kMaxAngularSpeed, kMaxAngularAcceleration));
+                BalanceConstants.ThetaPID.kP,
+                BalanceConstants.ThetaPID.kI,
+                BalanceConstants.ThetaPID.kD,
+                new Constraints(kMaxAngularSpeed, kMaxAngularAcceleration));
         }
 
         /**
@@ -52,6 +62,14 @@ public final class ChargeStationCommands {
         public AutoChargeStationClimb(ClimbState initialState) {
             this();
             mCurrState = initialState;
+        }
+
+        private static double invertIf(boolean condition, double x) {
+            return x * (condition ? -1. : 1.);
+        }
+
+        private double invertIfBackwards(double x) {
+            return invertIf(mBackwards, x);
         }
 
         @Override
@@ -77,7 +95,7 @@ public final class ChargeStationCommands {
 
         @Override
         public void execute() {
-            final double climb_to_grip_speed_m_s = -2.4;
+            final double climb_to_grip_speed_m_s = invertIfBackwards(2.4);
             switch (mCurrState) {
 
                 case CLIMB_TO_GRIP: {
@@ -101,7 +119,7 @@ public final class ChargeStationCommands {
                 }
 
                 case GRIP_TO_PLATFORM: {
-                    final double grip_to_platform_speed_m_s = -2. * 0.3; // 0.1875
+                    final double grip_to_platform_speed_m_s = invertIfBackwards(2. * 0.3); // 0.1875
                     final double grip_to_platform_target_roll_deg = 7;
                     final double grip_to_platform_time_allowed = 5;
                     if (mCurrStateTimer.hasElapsed(grip_to_platform_time_allowed)) {
@@ -140,10 +158,10 @@ public final class ChargeStationCommands {
                     // break;
 
                     final double pitchControlThreshold = 6;
-                    final double vXMetersPerSecond = 0.3;
+                    final double vXAbsMetersPerSecond = 0.3;
 
                     if (Math.abs(mSwerve.getPitch().getDegrees()) > pitchControlThreshold) {
-                        ChassisSpeeds c = new ChassisSpeeds(Math.copySign(vXMetersPerSecond, mSwerve.getPitch().getDegrees()), 0, 0);
+                        ChassisSpeeds c = new ChassisSpeeds(Math.copySign(vXAbsMetersPerSecond, mSwerve.getPitch().getDegrees()), 0, 0);
                         mSwerve.drive(c, false, false);
                     } else {
                         mSwerve.drive(new ChassisSpeeds());
