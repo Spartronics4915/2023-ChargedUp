@@ -60,7 +60,7 @@ public class ArmSubsystem extends SubsystemBase {
         CONE_LEVEL_1(kConeLevel1Constants),
         CONE_LEVEL_2(kConeLevel2Constants),
         CUBE_LEVEL_1(kCubeLevel1Constants),
-        CUBE_LEVEL_2(kCubeLevel2Constants),
+        // CUBE_LEVEL_2(kCubeLevel2Constants),
 
         SHOOT_HIGH_CUBE(kCubeTopShootConstants);
 
