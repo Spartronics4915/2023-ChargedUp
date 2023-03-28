@@ -24,7 +24,7 @@ public class BeltExtenderSubsystem extends SubsystemBase  {
     private final int kMotorID;
     private CANSparkMax mMotor;
     public RelativeEncoder mEncoder;
-    private final double kRevPerInch = 13.25/14.19;
+    private final double kRevPerInch = 13.25/14.19 * (9. / 15.);
     public SparkMaxPIDController mPIDController;
 
     private DigitalInput mLimitSwitchZero;
