@@ -343,7 +343,7 @@ public class RobotContainer {
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, false));
                 
                 mOperatorController.y()
-                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2, false));
+                    .onTrue(mArmCommands.getRaiseToHighConeOverTopCommand());
 
                 /**
                  * Eject game piece		    RT
