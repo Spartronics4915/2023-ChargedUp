@@ -72,10 +72,10 @@ public class MotorAbsEncoderComboSubsystem extends SubsystemBase {
             radianOffset += Math.PI * 2;
         }
         mAbsEncoder.setZeroOffset(radianOffset);
-        if((mAbsEncoder.getPosition() == 0) && MotorConstants.kZeroOffset.getDegrees() > 0) {
+        if(getNativePosition().getDegrees() == 0) {
             mActive = false;
             System.out.println("zero offset not applied, disabling");
-            SmartDashboard.putBoolean("disabled", true);
+            SmartDashboard.putBoolean("arm disabled", true);
         } else mActive = true;
         if (MotorConstants.kInvertMotor) {
             mMotor.setInverted(true);
