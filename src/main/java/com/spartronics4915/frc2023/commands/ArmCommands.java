@@ -10,6 +10,8 @@ import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -182,6 +184,18 @@ public class ArmCommands {
         return  seqCommands;
     }
 
+    public Command getTuckCommand() {
+        return new SequentialCommandGroup(
+            getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE)
+                .alongWith(mArm.getExtender().zeroExtenderCommand()),
+            getGoToPresetArmStateSimultaneousCommand(ArmState.RETRACTED)
+        );
+    }
+
+    public Command getGoToFloorCommand() {
+        return getUntuckArmIfNecessaryCommand()
+            .andThen(getGoToPresetArmStateSimultaneousCommand(ArmState.FLOOR_POS));
+    }
 
     public class UntuckWristIfNecessary extends CommandBase {
 
@@ -208,6 +222,18 @@ public class ArmCommands {
             return mFinished || (mArm.getWrist().getModeledPosition().getDegrees() < kWristSafeAngle);
         }
 
+    }
+
+    public Command getUntuckArmIfNecessaryCommand() {
+        return new ParallelCommandGroup(
+            new UntuckWristIfNecessary(),
+            new ConditionalCommand(
+                mArm.getExtender().zeroExtenderCommand()
+                    .andThen(getGoToPresetArmStatePivotFirstCommand(ArmState.TUCK_INTERMEDIATE, false)),
+                Commands.none(),
+                () -> mArm.getPivot().getArmPosition().getDegrees() < -20
+            )
+        );
     }
 
     public CommandBase waitPivotPassAngleUp(double angDegrees) {

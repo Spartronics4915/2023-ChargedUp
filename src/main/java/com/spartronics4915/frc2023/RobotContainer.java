@@ -297,10 +297,10 @@ public class RobotContainer {
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
                 mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(false));
 
                 mDriverController.leftBumper()
-                .onTrue(mArmCommands.getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE));
+                .onTrue(mArmCommands.getTuckCommand());
  
                 // Disabled for now with the belt extender.
                 // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
@@ -328,10 +328,13 @@ public class RobotContainer {
                     * Extend to High tier - cone		Y   
                     * */
                 mOperatorController.button(kWindowButtonId) //should be window
-                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_POS, false));
+                    .onTrue(mArmCommands.getGoToFloorCommand());
 
                 mOperatorController.button(kMenuButtonId) //should be menu
-                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.DOUBLE_SUBSTATION, false));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FRONT_DOUBLE_SUBSTATION, false));
+
+                mOperatorController.rightStick()
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.BACK_DOUBLE_SUBSTATION, false));
                 
                 mOperatorController.a()
                     .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CUBE_LEVEL_1, false));
@@ -389,7 +392,7 @@ public class RobotContainer {
 
                 
                 mOperatorController.leftStick()
-                    .onTrue(mArmCommands.getGoToPresetArmStateSimultaneousCommand(ArmState.TUCK_INTERMEDIATE));
+                    .onTrue(mArmCommands.getTuckCommand());
             }
 
         }
