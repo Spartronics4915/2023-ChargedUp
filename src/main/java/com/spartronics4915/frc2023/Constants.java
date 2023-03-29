@@ -406,9 +406,9 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
                 15, // actual value 15
                 Math.PI * 2, false,
-                0.5, 0, 0, 0.05, // 0.75, ..., 0.05
+                0.7, 0, 0, 0.05, // 0.75, ..., 0.05
                 Math.PI / 4, Math.PI / 3,
-                Rotation2d.fromDegrees(61), 10, false,
+                Rotation2d.fromDegrees(21), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80));
 
@@ -425,13 +425,13 @@ public final class Constants {
 
         public static final ArmSettingsConstants kRetractedConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-20), // 0
-                Rotation2d.fromDegrees(30) // 0
+                Rotation2d.fromDegrees(-35), // 0
+                Rotation2d.fromDegrees(120) // 0
         );
 
         public static final ArmSettingsConstants kPriorRetracted = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(0), // 0
+                Rotation2d.fromDegrees(-6), // 0
                 Rotation2d.fromDegrees(20) // 0
         );
 
@@ -440,6 +440,18 @@ public final class Constants {
                 new Rotation2d(Math.PI / 4), // 45
                 new Rotation2d(Math.PI / 4) // 45
         );
+
+        public static final ArmSettingsConstants kPreOverTopPositionConstants = new ArmSettingsConstants(
+            0,
+            new Rotation2d(Math.PI / 30),
+            Rotation2d.fromDegrees(100)
+    );
+
+    public static final ArmSettingsConstants kOverTopStagingPositionConstants = new ArmSettingsConstants(
+        3,
+        Rotation2d.fromDegrees(114),
+        Rotation2d.fromDegrees(100)
+);
 
         // public static final ArmPositionConstants kArmLowConstants = new
         // ArmPositionConstants(
@@ -462,45 +474,50 @@ public final class Constants {
         // Rotation2d.fromDegrees(0)
         // );
 
-        public static final ArmSettingsConstants kTuck = new ArmSettingsConstants(
+        public static final ArmSettingsConstants kTuckIntermediate = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-22),
+                Rotation2d.fromDegrees(-26),
                 Rotation2d.fromDegrees(116.5));
 
         public static final ArmSettingsConstants kFloorPositionConstants = new ArmSettingsConstants(
-                5.2,
-                Rotation2d.fromDegrees(-17.5),
+                4.2,
+                Rotation2d.fromDegrees(-26.5),
                 Rotation2d.fromDegrees(13.2));
 
-        public static final ArmSettingsConstants kDoubleSubstationConstants = new ArmSettingsConstants(
+        public static final ArmSettingsConstants kFrontDoubleSubstationConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(45.4),
-                Rotation2d.fromDegrees(-29.64));
+                Rotation2d.fromDegrees(36.3),
+                Rotation2d.fromDegrees(-28));
+
+        public static final ArmSettingsConstants kBackDoubleSubstationConstants = new ArmSettingsConstants(
+            2.18,
+            Rotation2d.fromDegrees(132.9),
+            Rotation2d.fromDegrees(116.14));
 
         public static final ArmSettingsConstants kConeLevel1Constants = new ArmSettingsConstants(
             16.4,
-            Rotation2d.fromDegrees(31.3),
-            Rotation2d.fromDegrees(37.1));
+            Rotation2d.fromDegrees(21.2),
+            Rotation2d.fromDegrees(16));
 
         public static final ArmSettingsConstants kConeLevel2Constants = new ArmSettingsConstants(
                 16.45,
-                Rotation2d.fromDegrees(153.6),
+                Rotation2d.fromDegrees(141.2),
                 Rotation2d.fromDegrees(70.1));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(21.5),
+                Rotation2d.fromDegrees(4),
                 Rotation2d.fromDegrees(-0.5));
 
-        public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
-                11,
-                Rotation2d.fromDegrees(23),
-                Rotation2d.fromDegrees(-36), -0.24);
+        // public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
+        //         11,
+        //         Rotation2d.fromDegrees(23),
+        //         Rotation2d.fromDegrees(-36), -0.24);
 
         public static final ArmSettingsConstants kCubeTopShootConstants = new ArmSettingsConstants(
-                3.25,
-                Rotation2d.fromDegrees(27.5),
-                Rotation2d.fromDegrees(30.441));
+                4.5,
+                Rotation2d.fromDegrees(21.5),
+                Rotation2d.fromDegrees(23.3));
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
         public static final double kArmRetractedPriorWaitDuration = 1; // seconds

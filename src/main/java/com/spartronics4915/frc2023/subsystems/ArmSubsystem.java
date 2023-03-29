@@ -46,7 +46,8 @@ public class ArmSubsystem extends SubsystemBase {
      * Represents the preset values for the arm
      */
     public enum ArmState {
-        TUCK_INTERMEDIATE(kTuck),
+        PRE_OVER_TOP_POSITION(kPreOverTopPositionConstants),
+        TUCK_INTERMEDIATE(kTuckIntermediate),
         RETRACTED(kRetractedConstants),
         // GRAB_UPRIGHT(kGrabUprightConstants),
         // GRAB_FALLEN(kArmLowConstants),
@@ -55,11 +56,12 @@ public class ArmSubsystem extends SubsystemBase {
         // ARM_LEVEL(kArmLevelConstants),
         RETRACTED_PRIOR(kPriorRetracted),
         FLOOR_POS(kFloorPositionConstants),
-        DOUBLE_SUBSTATION(kDoubleSubstationConstants),
+        FRONT_DOUBLE_SUBSTATION(kFrontDoubleSubstationConstants),
+        BACK_DOUBLE_SUBSTATION(kBackDoubleSubstationConstants),
         CONE_LEVEL_1(kConeLevel1Constants),
         CONE_LEVEL_2(kConeLevel2Constants),
         CUBE_LEVEL_1(kCubeLevel1Constants),
-        CUBE_LEVEL_2(kCubeLevel2Constants),
+        // CUBE_LEVEL_2(kCubeLevel2Constants),
 
         SHOOT_HIGH_CUBE(kCubeTopShootConstants);
 
