@@ -66,11 +66,13 @@ public class Robot extends TimedRobot {
 
         mLEDUnderglow = new AddressableLED(0);
 
-        mLEDUnderglowBuffer = new AddressableLEDBuffer(125); //124 maybe??
+        mLEDUnderglowBuffer = new AddressableLEDBuffer(300); 
 
-        var alliance = DriverStation.getAlliance();
+        mLEDUnderglow.setLength(mLEDUnderglowBuffer.getLength());
+
+        // var alliance = DriverStation.getAlliance();
         
-        new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
+        // new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
 
 
         // if (alliance == Alliance.Red){
@@ -78,31 +80,6 @@ public class Robot extends TimedRobot {
         // } else if (alliance == Alliance.Blue){
         //     new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
         // } else { new RainbowPattern().setLEDs(mLEDUnderglowBuffer);} 
-
-        // new AlternatingColorPattern(
-        //     new Color[]{
-        //         new Color(0, 0, 255),
-        //         new Color(255, 255, 0)
-        //     }).setLEDs(mLEDUnderglowBuffer);
-
-        // new BlinkingPattern(new Color(0, 0, 255), 0.5).setLEDs(mLEDUnderglowBuffer);
-
-        // new ChaosPattern().setLEDs(mLEDUnderglowBuffer);
-
-        // new ChasePattern(
-        //     new Color[]{
-        //         new Color(0, 0, 255),
-        //         new Color(255, 255, 0)
-        //     }, 5).setLEDs(mLEDUnderglowBuffer);
-
-        // new RadarPattern(new Color(0, 0, 255), new Color(255, 255, 0), 10).setLEDs(mLEDUnderglowBuffer);
-
-        // new RainbowPattern().setLEDs(mLEDUnderglowBuffer);
-
-        // new IntensityPattern(new Color(0, 0, 255), 0.5).setLEDs(mLEDUnderglowBuffer);
-
-        // new IntensityPattern(new Color(0, 0, 255), new Color(255, 255, 0), 0.5).setLEDs(mLEDUnderglowBuffer);
-
 
 
         mLEDUnderglow.setData(mLEDUnderglowBuffer);
