@@ -24,6 +24,7 @@ import com.spartronics4915.frc2023.Constants.OI;
 import com.spartronics4915.frc2023.bling.CustomLEDPattern;
 
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
+import static com.spartronics4915.frc2023.Constants.Bling.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
@@ -33,6 +34,7 @@ import com.spartronics4915.frc2023.commands.IntakeCommands;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.BlingSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.Swerve;
@@ -71,6 +73,8 @@ public class RobotContainer {
     private final CommandXboxController mOperatorController;
     
     // The robot's subsystems and commands are defined here...
+    private final BlingSubsystem mBlingSubsystem;
+    
     private final Swerve mSwerve;
     private final SwerveCommands mSwerveCommands;
     private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
@@ -85,7 +89,6 @@ public class RobotContainer {
     
 	private final SendableChooser<Pose2d> mInitialPoseSelector = new SendableChooser<>();
 	private final SendableChooser<Function<Pose2d, CommandBase>> mAutoSelector = new SendableChooser<>();
-    private final SendableChooser<CustomLEDPattern> mBlingSelector = new SendableChooser<>();
 	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
@@ -99,6 +102,8 @@ public class RobotContainer {
     public RobotContainer() {
         mDriverController = useJoystick ? new CommandXboxController(kDriverControllerID) : null;
         mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
+
+        mBlingSubsystem = BlingSubsystem.getInstance();
         
         if (useSwerveChassis) {
             mSwerve = Swerve.getInstance();
@@ -131,24 +136,10 @@ public class RobotContainer {
 
         configureAutoSelector();
 		configureInitialPoseSelector();
-        configureBlingSelector();
         
         // Configure the button bindings
         configureButtonBindings();
     }
-
-    private void configureBlingSelector() {
-        for (BlingPattern entry : kBlingPatterns)
-            mBlingSelector.addOption(entry.name, entry.pattern);
-        mBlingSelector.setDefaultOption(
-            kBlingPatterns[kDefaultBlingPatternIndex].name, 
-            kBlingPatterns[kDefaultBlingPatternIndex].pattern);
-        
-        SmartDashboard.putData("Bling", mBlingSelector);
-    }
-
-
-
 
 	private void configureInitialPoseSelector() {
 		for (InitialPose entry : kInitialPoses)

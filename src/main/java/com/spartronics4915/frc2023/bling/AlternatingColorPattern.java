@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.util.Color;
 public class AlternatingColorPattern implements CustomLEDPattern{
 	private Color[] m_colors;
 
-	public AlternatingColorPattern(Color... colors){
+	public AlternatingColorPattern(Color... colors) {
 		super();
 		this.m_colors = colors;
 	}

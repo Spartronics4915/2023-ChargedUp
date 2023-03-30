@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public interface CustomLEDPattern {
     public void setLEDs(AddressableLEDBuffer buffer);
-    default boolean isAnimated(){
+    default boolean isAnimated() {
         return false;
     }
 }

@@ -25,15 +25,17 @@ public class ChaosPattern implements CustomLEDPattern {
 		}
 
 	}
-	private Color randomColorShift(Color aColor){
+	
+	private Color randomColorShift(Color aColor) {
 		return new Color(randomShift(aColor.red),randomShift(aColor.green),randomShift(aColor.blue));
 	}
 
-	private double randomShift(double value){
+	private double randomShift(double value) {
 		double sign = Math.random() >= 0.5 ? 1.0 : -1.0;
 		double amount = Math.random() / 10;
 		return MathUtil.clamp(value + sign * amount, 0, 1);
 	}
+
 	public boolean isAnimated() {
 		return true;
 	}

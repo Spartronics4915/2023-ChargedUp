@@ -4,10 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class RainbowPattern implements CustomLEDPattern{
 	private int mFirstHue = 0;
-	public RainbowPattern(){
-		super();
-		
-	}
+	public RainbowPattern() {}
 
 	@Override
 	public void setLEDs(AddressableLEDBuffer buffer) {
@@ -19,7 +16,7 @@ public class RainbowPattern implements CustomLEDPattern{
 
 		mFirstHue = (mFirstHue + 3) % 180;
 	}
-	public boolean isAnimated(){
+	public boolean isAnimated() {
 		return true;
 	}
 }

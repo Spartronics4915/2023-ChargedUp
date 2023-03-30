@@ -16,7 +16,7 @@ public class BlinkingPattern implements CustomLEDPattern {
 	 * @param onColor color for when the blink is on.
 	 * @param inteval time in seconds between changes.
 	 */
-	public BlinkingPattern(Color onColor, double interval){
+	public BlinkingPattern(Color onColor, double interval) {
 		super();
 		mOnPattern = new SolidColorPattern(onColor);
 		mOffPattern = new SolidColorPattern(Color.kBlack);
@@ -25,17 +25,17 @@ public class BlinkingPattern implements CustomLEDPattern {
 	@Override
 	public void setLEDs(AddressableLEDBuffer buffer) {
 		double timestamp = Timer.getFPGATimestamp();
-		if (timestamp- lastChange > mInterval){
+		if (timestamp- lastChange > mInterval) {
 			on = !on;
 			lastChange = timestamp;
 		}
-		if (on){
+		if (on) {
 			mOnPattern.setLEDs(buffer);
 		} else {
 			mOffPattern.setLEDs(buffer);
 		}
 	}
-	public boolean isAnimated(){
+	public boolean isAnimated() {
 		return true;
 	}
 }

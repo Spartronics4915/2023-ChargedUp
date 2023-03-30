@@ -17,10 +17,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.spartronics4915.frc2023.Constants.Arm.ArmPositionConstants.ArmSettingsConstants;
-import com.spartronics4915.frc2023.bling.AlternatingColorPattern;
-import com.spartronics4915.frc2023.bling.CustomLEDPattern;
-import com.spartronics4915.frc2023.bling.RainbowPattern;
-import com.spartronics4915.frc2023.bling.SolidColorPattern;
+import com.spartronics4915.frc2023.bling.*;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
@@ -197,38 +194,12 @@ public final class Constants {
                 this.pose = pose;
             }
         }
-
-        public static class BlingPattern {
-            public String name;
-            public CustomLEDPattern pattern;
-
-            public BlingPattern(String name, CustomLEDPattern pattern) {
-                this.name = name;
-                this.pattern = pattern;
-            }
-        }
-
+        
         public static final InitialPose[] kInitialPoses = {
-                new InitialPose("Left", new Pose2d(new Translation2d(), new Rotation2d(Math.PI))),
-                new InitialPose("Center", new Pose2d(new Translation2d(), new Rotation2d())),
-                new InitialPose("Right", new Pose2d(new Translation2d(), new Rotation2d()))
+            new InitialPose("Left", new Pose2d(new Translation2d(), new Rotation2d(Math.PI))),
+            new InitialPose("Center", new Pose2d(new Translation2d(), new Rotation2d())),
+            new InitialPose("Right", new Pose2d(new Translation2d(), new Rotation2d()))
         };
-
-        public static final BlingPattern[] kBlingPatterns = {
-            new BlingPattern("AlternatingBlueAndYellow", new AlternatingColorPattern(
-                new Color[]{
-                    new Color(0,0,255),
-                    new Color(0,255,255)
-                })),
-            new BlingPattern("SolidBlue", new SolidColorPattern(new Color(0, 0, 255))),
-            new BlingPattern("SolidYellow", new SolidColorPattern(new Color(0, 255, 255))),
-            new BlingPattern("Rainbow", new RainbowPattern())
-        };
-
-
-        public static final int kDefaultBlingPatternIndex = 0;        
-
-        public static final int kDefaultInitialPoseIndex = 0;
 
         public static final double kMaxSpeed = Units.feetToMeters(14.5);
         public static final double kMaxAngularSpeed = kMaxSpeed / kChassisRadius; // ~11.5 rad/s
@@ -635,5 +606,36 @@ public final class Constants {
 
 		public static final int kDefaultAutoIndex = 3;
 
+    }
+
+    public static final class Bling {
+        public static class BlingPattern {
+            public String name;
+            public CustomLEDPattern pattern;
+
+            public BlingPattern(String name, CustomLEDPattern pattern) {
+                this.name = name;
+                this.pattern = pattern;
+            }
+        }
+
+        public static final BlingPattern[] kBlingPatterns = {
+            new BlingPattern("Match Alliance", new MatchAlliancePattern()),
+            new BlingPattern("AlternatingBlueAndYellow", new AlternatingColorPattern(
+                new Color[]{
+                    new Color(0,0,255),
+                    new Color(0,255,255)
+                })),
+            new BlingPattern("SolidBlue", new SolidColorPattern(new Color(0, 0, 255))),
+            new BlingPattern("SolidYellow", new SolidColorPattern(new Color(0, 255, 255))),
+            new BlingPattern("Rainbow", new RainbowPattern())
+        };
+
+
+        public static final int kDefaultBlingPatternIndex = 0;        
+        public static final int kDefaultInitialPoseIndex = 0;
+
+        public static final int kLEDUnderglowPort = 0; // pwm
+        public static final int kLEDUnderglowBufferLength = 130;
     }
 }

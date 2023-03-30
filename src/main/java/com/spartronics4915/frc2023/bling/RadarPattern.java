@@ -11,11 +11,11 @@ public class RadarPattern implements CustomLEDPattern{
     private int mEyePosition = 0;
     private int mScanDirection = 1;
 
-    public RadarPattern(Color eyeColor, int length){
+    public RadarPattern(Color eyeColor, int length) {
         this(eyeColor, Color.kBlack, length);
     }
 
-    public RadarPattern(Color eyeColor, Color backgroundColor, int length){
+    public RadarPattern(Color eyeColor, Color backgroundColor, int length) {
         super();
         this.mEyeColor = eyeColor;
         this.mBackgroundColor = backgroundColor;
@@ -33,7 +33,7 @@ public class RadarPattern implements CustomLEDPattern{
 
 		for (int index = 0; index < bufferLength; index++) {
 			distanceFromEye = MathUtil.clamp( Math.abs(mEyePosition - index),0,mLength);
-			intensity = 1 - distanceFromEye/mLength;
+			intensity = 1 - distanceFromEye / mLength;
 			red = MathUtil.interpolate(mBackgroundColor.red, mEyeColor.red, intensity);
 			green = MathUtil.interpolate(mBackgroundColor.green, mEyeColor.green, intensity);
 			blue = MathUtil.interpolate(mBackgroundColor.blue, mEyeColor.blue, intensity);

@@ -14,7 +14,7 @@ public class CustomLED implements CustomLEDPattern {
 	private TimerTask task;
 	private int mAnimationDelay = 50;
 
-	public CustomLED(int pwmPort, int length){
+	public CustomLED(int pwmPort, int length) {
 		super();
 		mLED = new AddressableLED(pwmPort);
 		mBuffer = new AddressableLEDBuffer(length);
@@ -23,37 +23,37 @@ public class CustomLED implements CustomLEDPattern {
 		mLED.start();
 	}
 
-	public CustomLED(int pwmPort, int length, int animationSpeed){
+	public CustomLED(int pwmPort, int length, int animationSpeed) {
 		this(pwmPort, length);
 		this.mAnimationDelay = animationSpeed;
 	}
 
-	public AddressableLED getLED(){
+	public AddressableLED getLED() {
 		return mLED;
 	}
 
-	public void setLEDs(AddressableLEDBuffer buffer){
+	public void setLEDs(AddressableLEDBuffer buffer) {
 		this.mBuffer = buffer;
 	}
 
-	public AddressableLEDBuffer getBuffer(){
+	public AddressableLEDBuffer getBuffer() {
 		return mBuffer;
 	}
 
-	public void setBuffer(AddressableLEDBuffer buffer){
+	public void setBuffer(AddressableLEDBuffer buffer) {
 		this.mBuffer = buffer;
 	}
 
-	public void setPattern(CustomLEDPattern pattern){
+	public void setPattern(CustomLEDPattern pattern) {
 		if (pattern != mPattern) {
 			mPattern = pattern;
 			if (task != null) {
 				task.cancel();
 				task = null;
 			}
-			if (pattern.isAnimated()){
-				task = new TimerTask(){
-					public void run(){
+			if (pattern.isAnimated()) {
+				task = new TimerTask() {
+					public void run() {
 						update();
 					}
 				};

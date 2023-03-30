@@ -14,11 +14,11 @@ public class IntensityPattern  implements CustomLEDPattern {
 	 * @param highColor Brightest color
 	 * @param intensity 0..1 with 1 being the color and 0 being black 
 	 */
-	public IntensityPattern(Color highColor, double intensity){
+	public IntensityPattern(Color highColor, double intensity) {
 		this(Color.kBlack,highColor,intensity);
 	}
 
-	public IntensityPattern(Color lowColor, Color highColor, double intensity){
+	public IntensityPattern(Color lowColor, Color highColor, double intensity) {
 		super();
 		this.mHighColor = highColor;
 		this.mLowColor = lowColor;
@@ -28,12 +28,11 @@ public class IntensityPattern  implements CustomLEDPattern {
 	@Override
 	public void setLEDs(AddressableLEDBuffer buffer) {
 		double red = MathUtil.interpolate(mLowColor.red, mHighColor.red, mIntensity);
-		double green =		MathUtil.interpolate(mLowColor.green, mHighColor.green, mIntensity);
-		double blue =		MathUtil.interpolate(mLowColor.blue, mHighColor.blue, mIntensity);
+		double green = MathUtil.interpolate(mLowColor.green, mHighColor.green, mIntensity);
+		double blue = MathUtil.interpolate(mLowColor.blue, mHighColor.blue, mIntensity);
 		for (int index = 0; index < buffer.getLength(); index++){
 			buffer.setLED(index, new Color(red,green,blue));
 		}
-		
 	}
 
 	@Override
