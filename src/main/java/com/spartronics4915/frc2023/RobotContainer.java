@@ -21,6 +21,8 @@ import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
 // import static com.spartronics4915.frc2023.commands.Autos.autoBuilder;
 
 import com.spartronics4915.frc2023.Constants.OI;
+import com.spartronics4915.frc2023.bling.CustomLEDPattern;
+
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
@@ -83,6 +85,7 @@ public class RobotContainer {
     
 	private final SendableChooser<Pose2d> mInitialPoseSelector = new SendableChooser<>();
 	private final SendableChooser<Function<Pose2d, CommandBase>> mAutoSelector = new SendableChooser<>();
+    private final SendableChooser<CustomLEDPattern> mBlingSelector = new SendableChooser<>();
 	private final Command mTeleopInitCommand;
     
     private final boolean useJoystick = true;
@@ -128,10 +131,24 @@ public class RobotContainer {
 
         configureAutoSelector();
 		configureInitialPoseSelector();
+        configureBlingSelector();
         
         // Configure the button bindings
         configureButtonBindings();
     }
+
+    private void configureBlingSelector() {
+        for (BlingPattern entry : kBlingPatterns)
+            mBlingSelector.addOption(entry.name, entry.pattern);
+        mBlingSelector.setDefaultOption(
+            kBlingPatterns[kDefaultBlingPatternIndex].name, 
+            kBlingPatterns[kDefaultBlingPatternIndex].pattern);
+        
+        SmartDashboard.putData("Bling", mBlingSelector);
+    }
+
+
+
 
 	private void configureInitialPoseSelector() {
 		for (InitialPose entry : kInitialPoses)
@@ -139,8 +156,7 @@ public class RobotContainer {
 			
 		mInitialPoseSelector.setDefaultOption(
 			kInitialPoses[kDefaultInitialPoseIndex].name,
-			kInitialPoses[kDefaultInitialPoseIndex].pose
-		);
+			kInitialPoses[kDefaultInitialPoseIndex].pose);
 
 		SmartDashboard.putData("Initial Pose", mInitialPoseSelector);
 	}

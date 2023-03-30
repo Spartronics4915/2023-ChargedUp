@@ -17,6 +17,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.spartronics4915.frc2023.Constants.Arm.ArmPositionConstants.ArmSettingsConstants;
+import com.spartronics4915.frc2023.bling.AlternatingColorPattern;
+import com.spartronics4915.frc2023.bling.CustomLEDPattern;
+import com.spartronics4915.frc2023.bling.RainbowPattern;
+import com.spartronics4915.frc2023.bling.SolidColorPattern;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteAnalogEncoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteCANCoder;
 import com.spartronics4915.frc2023.subsystems.SwerveModule.AbsoluteEncoder;
@@ -27,6 +31,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -193,11 +198,35 @@ public final class Constants {
             }
         }
 
+        public static class BlingPattern {
+            public String name;
+            public CustomLEDPattern pattern;
+
+            public BlingPattern(String name, CustomLEDPattern pattern) {
+                this.name = name;
+                this.pattern = pattern;
+            }
+        }
+
         public static final InitialPose[] kInitialPoses = {
                 new InitialPose("Left", new Pose2d(new Translation2d(), new Rotation2d(Math.PI))),
                 new InitialPose("Center", new Pose2d(new Translation2d(), new Rotation2d())),
                 new InitialPose("Right", new Pose2d(new Translation2d(), new Rotation2d()))
         };
+
+        public static final BlingPattern[] kBlingPatterns = {
+            new BlingPattern("AlternatingBlueAndYellow", new AlternatingColorPattern(
+                new Color[]{
+                    new Color(0,0,255),
+                    new Color(0,255,255)
+                })),
+            new BlingPattern("SolidBlue", new SolidColorPattern(new Color(0, 0, 255))),
+            new BlingPattern("SolidYellow", new SolidColorPattern(new Color(0, 255, 255))),
+            new BlingPattern("Rainbow", new RainbowPattern())
+        };
+
+
+        public static final int kDefaultBlingPatternIndex = 0;        
 
         public static final int kDefaultInitialPoseIndex = 0;
 
