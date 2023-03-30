@@ -60,11 +60,17 @@ public class Intake extends SubsystemBase {
         }
         return mInstance;
     }
-
+    
     public void setState(IntakeState state) {
         mState = state;
     }
-
+    
+    public CommandBase setStateCommand(IntakeState state) {
+        return runOnce(() -> {
+            setState(state);
+        });
+    }
+    
     public IntakeState getState() {
         return mState;
     }

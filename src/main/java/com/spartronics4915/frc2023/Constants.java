@@ -435,17 +435,17 @@ public final class Constants {
         public static final ArmMotorConstants kPivotMotorConstants = new ArmMotorConstants(
                 15, // actual value 15
                 Math.PI * 2, false,
-                0.7, 0, 0, 0.05, // 0.75, ..., 0.05
-                Math.PI / 4, Math.PI / 3,
-                Rotation2d.fromDegrees(21), 10, false,
+                0.7, 0., 0., 0.07, // 1.0, 0., 0.3, 0.13
+                Math.PI / 3, Math.PI / 2,
+                Rotation2d.fromDegrees(200), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80));
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
                 19,
                 Math.PI * 2, true,
-                0.5, 0, 0, 0.04, // 0.6, ..., 0.04.
-                Math.PI/3, Math.PI / 5,
+                0.2, 0, -0.05, 0.04, // 0.7, ..., 0.04.
+                Math.PI / 2., Math.PI,
                 Rotation2d.fromDegrees(6), -1, true,
                 MotorType.kBrushed,
                 Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90));
@@ -454,7 +454,7 @@ public final class Constants {
 
         public static final ArmSettingsConstants kRetractedConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-35), // 0
+                Rotation2d.fromDegrees(-33), // 0
                 Rotation2d.fromDegrees(120) // 0
         );
 
@@ -509,34 +509,39 @@ public final class Constants {
                 Rotation2d.fromDegrees(116.5));
 
         public static final ArmSettingsConstants kFloorPositionConstants = new ArmSettingsConstants(
-                4.2,
-                Rotation2d.fromDegrees(-26.5),
-                Rotation2d.fromDegrees(13.2));
+                5.8,
+                Rotation2d.fromDegrees(-19.5),
+                Rotation2d.fromDegrees(10.7));
 
         public static final ArmSettingsConstants kFrontDoubleSubstationConstants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(36.3),
-                Rotation2d.fromDegrees(-28));
+                Rotation2d.fromDegrees(42),
+                Rotation2d.fromDegrees(-21.5));
 
         public static final ArmSettingsConstants kBackDoubleSubstationConstants = new ArmSettingsConstants(
             2.18,
-            Rotation2d.fromDegrees(132.9),
+            Rotation2d.fromDegrees(133.4),
             Rotation2d.fromDegrees(116.14));
 
         public static final ArmSettingsConstants kConeLevel1Constants = new ArmSettingsConstants(
             16.4,
-            Rotation2d.fromDegrees(21.2),
+            Rotation2d.fromDegrees(35),
             Rotation2d.fromDegrees(16));
 
         public static final ArmSettingsConstants kConeLevel2Constants = new ArmSettingsConstants(
                 16.45,
-                Rotation2d.fromDegrees(141.2),
+                Rotation2d.fromDegrees(142.2),
+                Rotation2d.fromDegrees(70.1));
+
+        public static final ArmSettingsConstants kConeLevel2DunkConstants = new ArmSettingsConstants(
+                16.45,
+                Rotation2d.fromDegrees(145.2),
                 Rotation2d.fromDegrees(70.1));
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(4),
-                Rotation2d.fromDegrees(-0.5));
+                Rotation2d.fromDegrees(10),
+                Rotation2d.fromDegrees(22.6));
 
         // public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
         //         11,
@@ -545,7 +550,7 @@ public final class Constants {
 
         public static final ArmSettingsConstants kCubeTopShootConstants = new ArmSettingsConstants(
                 4.5,
-                Rotation2d.fromDegrees(21.5),
+                Rotation2d.fromDegrees(23.5),
                 Rotation2d.fromDegrees(23.3));
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);

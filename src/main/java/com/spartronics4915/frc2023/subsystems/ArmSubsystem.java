@@ -60,6 +60,7 @@ public class ArmSubsystem extends SubsystemBase {
         BACK_DOUBLE_SUBSTATION(kBackDoubleSubstationConstants),
         CONE_LEVEL_1(kConeLevel1Constants),
         CONE_LEVEL_2(kConeLevel2Constants),
+        CONE_LEVEL_2_DUNK(kConeLevel2DunkConstants),
         CUBE_LEVEL_1(kCubeLevel1Constants),
         // CUBE_LEVEL_2(kCubeLevel2Constants),
 

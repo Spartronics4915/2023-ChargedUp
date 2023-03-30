@@ -217,6 +217,21 @@ public class RobotContainer {
                 )
             ),
             mAutos.new Strategy(
+                "cone high, balance",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.getDunkCommand(),
+                    mArmCommands.getTuckCommand(),
+                    new ChargeStationCommands.AutoChargeStationClimb(false)
+                )
+            ),
+            mAutos.new Strategy(
+                "cone high, do nothing",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.getDunkCommand(),
+                    mArmCommands.getTuckCommand()
+                )
+            ),
+            mAutos.new Strategy(
                 "cube high (test)",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE)
