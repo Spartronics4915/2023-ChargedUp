@@ -3,6 +3,7 @@ package com.spartronics4915.frc2023.commands;
 import com.fasterxml.jackson.databind.ser.std.BooleanSerializer;
 import com.spartronics4915.frc2023.Constants.Arm.ArmPositionConstants.ArmSettingsConstants;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 // import com.spartronics4915.frc2023.subsystems.Arm.ArmState;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
@@ -34,6 +35,7 @@ import static com.spartronics4915.frc2023.Constants.Arm.kArmRetractedPriorWaitDu
 
 public class ArmCommands {
     private final ArmSubsystem mArm;
+    private final Intake mIntake = Intake.getInstance();
 	private final IntakeCommands mIntakeCommands;
     private HashSet<Subsystem> mArmReq;
 
@@ -195,6 +197,27 @@ public class ArmCommands {
     public Command getGoToFloorCommand() {
         return getUntuckArmIfNecessaryCommand()
             .andThen(getGoToPresetArmStateSimultaneousCommand(ArmState.FLOOR_POS));
+    }
+
+    public Command getDunkCommand() {
+        return new SequentialCommandGroup(
+            getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2, true),
+            getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_2_DUNK, true)
+                .alongWith(new SequentialCommandGroup(
+                    new WaitCommand(0.4),
+                    mIntake.setStateCommand(IntakeState.OUT),
+                    new WaitCommand(0.12),
+                    mIntake.setStateCommand(IntakeState.OFF),
+                    new WaitCommand(0.08),
+                    mIntake.setStateCommand(IntakeState.OUT),
+                    new WaitCommand(0.12),
+                    mIntake.setStateCommand(IntakeState.OFF),
+                    new WaitCommand(0.08),
+                    mIntake.setStateCommand(IntakeState.OUT),
+                    new WaitCommand(0.12),
+                    mIntake.setStateCommand(IntakeState.OFF)
+                ))
+        );
     }
 
     public class UntuckWristIfNecessary extends CommandBase {
