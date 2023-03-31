@@ -16,11 +16,11 @@ public class BlingSubsystem extends SubsystemBase {
     private final AddressableLED mLEDUnderglow;
     private final AddressableLEDBuffer mLEDUnderglowBuffer;
     
-    private final AddressableLED mLEDDiagonal;
-    private final AddressableLEDBuffer mLEDDiagonalBuffer;
+    // private final AddressableLED mLEDDiagonal;
+    // private final AddressableLEDBuffer mLEDDiagonalBuffer;
 
-    private final AddressableLED mLEDMast;
-    private final AddressableLEDBuffer mLEDMastBuffer;
+    // private final AddressableLED mLEDMast;
+    // private final AddressableLEDBuffer mLEDMastBuffer;
 
     private final SendableChooser<CustomLEDPattern> mUnderglowPatternSelector;
     private CustomLEDPattern mCurrentUnderglowPattern;
@@ -32,13 +32,13 @@ public class BlingSubsystem extends SubsystemBase {
         mLEDUnderglowBuffer = new AddressableLEDBuffer(kLEDUnderglowBufferLength);
         mLEDUnderglow.setLength(mLEDUnderglowBuffer.getLength());
         
-        mLEDDiagonal = new AddressableLED(kLEDDiagonalPort);
-        mLEDDiagonalBuffer = new AddressableLEDBuffer(kLEDDiagonalBufferLength);
-        mLEDDiagonal.setLength(mLEDDiagonalBuffer.getLength());
+        // mLEDDiagonal = new AddressableLED(kLEDDiagonalPort);
+        // mLEDDiagonalBuffer = new AddressableLEDBuffer(kLEDDiagonalBufferLength);
+        // mLEDDiagonal.setLength(mLEDDiagonalBuffer.getLength());
         
-        mLEDMast = new AddressableLED(kLEDMastPort);
-        mLEDMastBuffer = new AddressableLEDBuffer(kLEDMastBufferLength);
-        mLEDMast.setLength(mLEDMastBuffer.getLength());
+        // mLEDMast = new AddressableLED(kLEDMastPort);
+        // mLEDMastBuffer = new AddressableLEDBuffer(kLEDMastBufferLength);
+        // mLEDMast.setLength(mLEDMastBuffer.getLength());
 
         mUnderglowPatternSelector = new SendableChooser<>();
         configureBlingSelector();
