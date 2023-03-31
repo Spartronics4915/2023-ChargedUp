@@ -63,27 +63,6 @@ public class Robot extends TimedRobot {
         mTestingCommand = mRobotContainer.getTestingCommand();
 
         mRobotContainer.initRobot();
-
-        mLEDUnderglow = new AddressableLED(0);
-
-        mLEDUnderglowBuffer = new AddressableLEDBuffer(300); 
-
-        mLEDUnderglow.setLength(mLEDUnderglowBuffer.getLength());
-
-        // var alliance = DriverStation.getAlliance();
-        
-        // new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
-
-
-        // if (alliance == Alliance.Red){
-        //     new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
-        // } else if (alliance == Alliance.Blue){
-        //     new SolidColorPattern(new Color(0, 0, 255)).setLEDs(mLEDUnderglowBuffer);
-        // } else { new RainbowPattern().setLEDs(mLEDUnderglowBuffer);} 
-
-
-        mLEDUnderglow.setData(mLEDUnderglowBuffer);
-        mLEDUnderglow.start();
     }
 
     /**

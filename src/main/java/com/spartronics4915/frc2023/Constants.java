@@ -624,11 +624,12 @@ public final class Constants {
             new BlingPattern("AlternatingBlueAndYellow", new AlternatingColorPattern(
                 new Color[]{
                     new Color(0,0,255),
-                    new Color(0,255,255)
+                    new Color(255,255,0)
                 })),
             new BlingPattern("SolidBlue", new SolidColorPattern(new Color(0, 0, 255))),
-            new BlingPattern("SolidYellow", new SolidColorPattern(new Color(0, 255, 255))),
-            new BlingPattern("Rainbow", new RainbowPattern())
+            new BlingPattern("SolidYellow", new SolidColorPattern(new Color(255, 255, 0))),
+            new BlingPattern("Rainbow", new RainbowPattern()),
+            new BlingPattern("IntensityPattern", new IntensityPattern(new Color(255, 255, 0), new Color(0, 0, 255)))
         };
 
 
@@ -637,5 +638,11 @@ public final class Constants {
 
         public static final int kLEDUnderglowPort = 0; // pwm
         public static final int kLEDUnderglowBufferLength = 130;
+
+        public static final int kLEDDiagonalPort = 1; // pwm
+        public static final int kLEDDiagonalBufferLength = 40;
+
+        public static final int kLEDMastPort = 2; // pwm
+        public static final int kLEDMastBufferLength = 60;
     }
 }

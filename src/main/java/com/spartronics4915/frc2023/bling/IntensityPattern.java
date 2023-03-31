@@ -9,20 +9,21 @@ public class IntensityPattern  implements CustomLEDPattern {
 	private Color mLowColor;
 	private double mIntensity;
 
+	private double t;
+
 	/**
 	 * 
 	 * @param highColor Brightest color
 	 * @param intensity 0..1 with 1 being the color and 0 being black 
 	 */
-	public IntensityPattern(Color highColor, double intensity) {
-		this(Color.kBlack,highColor,intensity);
+	public IntensityPattern(Color highColor) {
+		this(Color.kBlack,highColor);
 	}
 
-	public IntensityPattern(Color lowColor, Color highColor, double intensity) {
-		super();
+	public IntensityPattern(Color lowColor, Color highColor) {
 		this.mHighColor = highColor;
 		this.mLowColor = lowColor;
-		this.mIntensity = intensity;
+		mIntensity = 0;
 	}
 
 	@Override
@@ -33,6 +34,8 @@ public class IntensityPattern  implements CustomLEDPattern {
 		for (int index = 0; index < buffer.getLength(); index++){
 			buffer.setLED(index, new Color(red,green,blue));
 		}
+		t += 1. / 50.;
+		setIntensity(Math.cos(2 * Math.PI * t));
 	}
 
 	@Override

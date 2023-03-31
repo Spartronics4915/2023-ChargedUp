@@ -45,6 +45,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -55,6 +56,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -95,6 +97,8 @@ public class RobotContainer {
     private final boolean useSwerveChassis = true;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
+
+    private final Trigger mDSAttachedTrigger;
     
     /**
     * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -104,6 +108,7 @@ public class RobotContainer {
         mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
 
         mBlingSubsystem = BlingSubsystem.getInstance();
+        mDSAttachedTrigger = new Trigger(() -> DriverStation.isDSAttached());
         
         if (useSwerveChassis) {
             mSwerve = Swerve.getInstance();
@@ -439,6 +444,7 @@ public class RobotContainer {
     }
     
     public void initRobot() {
+        mBlingSubsystem.startUnderglow();
         Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(useArm, useSwerveChassis, mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
         mSwerve.resetYaw();
