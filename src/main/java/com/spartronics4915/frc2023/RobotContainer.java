@@ -228,6 +228,17 @@ public class RobotContainer {
                 )
             ),
             mAutos.new Strategy(
+                "cone high, leave community",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.getDunkCommand(),
+                    mArmCommands.getTuckCommand(),
+                    new WaitCommand(1),
+                    mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
+                    new WaitCommand(2.5),
+                    mSwerve.driveCommand(new ChassisSpeeds(), false, true)
+                )
+            ),
+            mAutos.new Strategy(
                 "cube high (test)",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE)
