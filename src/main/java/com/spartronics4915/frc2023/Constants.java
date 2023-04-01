@@ -408,9 +408,9 @@ public final class Constants {
                 Math.PI * 2, false,
                 0.7, 0., 0., 0.07, // 1.0, 0., 0.3, 0.13
                 Math.PI / 3, Math.PI / 2,
-                Rotation2d.fromDegrees(175), 10, false,
+                Rotation2d.fromDegrees(166), 10, false,
                 MotorType.kBrushless,
-                Rotation2d.fromDegrees(160), Rotation2d.fromDegrees(-80));
+                Rotation2d.fromDegrees(137), Rotation2d.fromDegrees(-80));
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
                 19,
@@ -485,7 +485,7 @@ public final class Constants {
                 Rotation2d.fromDegrees(10.7));
 
         public static final ArmSettingsConstants kFrontDoubleSubstationConstants = new ArmSettingsConstants(
-                0,
+                2,
                 Rotation2d.fromDegrees(28),
                 Rotation2d.fromDegrees(-26.2));
 
@@ -496,7 +496,7 @@ public final class Constants {
 
         public static final ArmSettingsConstants kConeLevel1Constants = new ArmSettingsConstants(
             16.4,
-            Rotation2d.fromDegrees(14),
+            Rotation2d.fromDegrees(18),
             Rotation2d.fromDegrees(16));
 
         public static final ArmSettingsConstants kConeLevel2Constants = new ArmSettingsConstants(
@@ -511,7 +511,7 @@ public final class Constants {
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(-1.5),
+                Rotation2d.fromDegrees(4),
                 Rotation2d.fromDegrees(22.6));
 
         // public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
@@ -520,8 +520,8 @@ public final class Constants {
         //         Rotation2d.fromDegrees(-36), -0.24);
 
         public static final ArmSettingsConstants kCubeTopShootConstants = new ArmSettingsConstants(
-                4.5,
-                Rotation2d.fromDegrees(9.5),
+                6.5,
+                Rotation2d.fromDegrees(14),
                 Rotation2d.fromDegrees(23.3));
 
         public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
