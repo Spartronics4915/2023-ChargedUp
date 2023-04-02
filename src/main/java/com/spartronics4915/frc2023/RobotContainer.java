@@ -233,7 +233,7 @@ public class RobotContainer {
                     mArmCommands.getDunkCommand(),
                     mArmCommands.getTuckCommand(),
                     new WaitCommand(1),
-                    mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
+                    mSwerve.driveCommand(new ChassisSpeeds(2, 0, 0), false, true),
                     new WaitCommand(2.5),
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
@@ -409,10 +409,10 @@ public class RobotContainer {
                  */
 
                 mOperatorController.povUp()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kArmTransformAmount, Rotation2d.fromDegrees(0)));
 
                 mOperatorController.povDown()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kArmTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
                 final double extensionIncrementPerTic = 5. / 50; // 3 inches/sec at 50Hz
                 mOperatorController.povRight()
@@ -422,10 +422,10 @@ public class RobotContainer {
                 .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(-extensionIncrementPerTic));
 
                 mOperatorController.leftBumper()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kWristTransformAmount));
 
                 mOperatorController.rightBumper()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kWristTransformAmount.unaryMinus()));
                 
 
                 

@@ -408,25 +408,25 @@ public final class Constants {
                 Math.PI * 2, false,
                 0.7, 0., 0., 0.07, // 1.0, 0., 0.3, 0.13
                 Math.PI / 3, Math.PI / 2,
-                Rotation2d.fromDegrees(166), 10, false,
+                Rotation2d.fromDegrees(193), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(137), Rotation2d.fromDegrees(-80));
 
         public static final ArmMotorConstants kWristMotorConstants = new ArmMotorConstants(
                 19,
                 Math.PI * 2, true,
-                0.2, 0, -0.05, 0.04, // 0.7, ..., 0.04.
-                Math.PI / 2., Math.PI,
+                0.4, 0, -0.05, 0.04, // 0.7, ..., 0.04.
+                Math.PI, Math.PI,
                 Rotation2d.fromDegrees(6), -1, true,
                 MotorType.kBrushed,
-                Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90));
+                Rotation2d.fromDegrees(127), Rotation2d.fromDegrees(-90));
 
         public static final int kPivotFollowerID = 16; // actual value: 16
 
         public static final ArmSettingsConstants kRetractedConstants = new ArmSettingsConstants(
                 0,
                 Rotation2d.fromDegrees(-38), // 0
-                Rotation2d.fromDegrees(120) // 0
+                Rotation2d.fromDegrees(124) // 0
         );
 
         public static final ArmSettingsConstants kPriorRetracted = new ArmSettingsConstants(
@@ -524,7 +524,8 @@ public final class Constants {
                 Rotation2d.fromDegrees(14),
                 Rotation2d.fromDegrees(23.3));
 
-        public static final Rotation2d kTransformAmount = Rotation2d.fromDegrees(0.5);
+        public static final Rotation2d kArmTransformAmount = Rotation2d.fromDegrees(0.5);
+        public static final Rotation2d kWristTransformAmount = Rotation2d.fromDegrees(120. / 50.);
         public static final double kArmRetractedPriorWaitDuration = 1; // seconds
 
         // public static final ArmSettingsConstants kConeLevel3Constants = new
