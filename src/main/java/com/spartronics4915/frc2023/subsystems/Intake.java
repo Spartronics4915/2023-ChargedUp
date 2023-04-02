@@ -16,6 +16,7 @@ public class Intake extends SubsystemBase {
         IN,
         OFF,
         SHOOT_CUBE,
+        SHOOT_CUBE_AUTO,
         PLACE_CUBE,
         PLACE_CONE,
         OUT
@@ -75,6 +76,12 @@ public class Intake extends SubsystemBase {
         return mState;
     }
 
+    public CommandBase setSpeedCommand(double speed) {
+        return runOnce(() -> {
+            mMotor.set(speed);
+        });
+    }
+
     @Override
     public void periodic() {
         switch (mState) {
@@ -84,6 +91,9 @@ public class Intake extends SubsystemBase {
             case OUT:
                 mMotor.set(outSpeed);
                 System.out.println("OutSpeed: " + outSpeed);
+                break;
+            case SHOOT_CUBE_AUTO:
+                mMotor.set(0.6);
                 break;
             default:
                 mMotor.set(-0.02);

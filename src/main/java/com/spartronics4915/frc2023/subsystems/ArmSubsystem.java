@@ -56,6 +56,7 @@ public class ArmSubsystem extends SubsystemBase {
         // ARM_LEVEL(kArmLevelConstants),
         RETRACTED_PRIOR(kPriorRetracted),
         FLOOR_POS(kFloorPositionConstants),
+        FLOOR_INTERMEDIATE(kFloorPositionIntermediateConstants),
         FRONT_DOUBLE_SUBSTATION(kFrontDoubleSubstationConstants),
         BACK_DOUBLE_SUBSTATION(kBackDoubleSubstationConstants),
         CONE_LEVEL_1(kConeLevel1Constants),

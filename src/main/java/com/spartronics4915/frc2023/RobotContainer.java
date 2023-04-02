@@ -169,7 +169,10 @@ public class RobotContainer {
             mAutos.new Strategy(
 				"High cube, Balance",
 				(Pose2d initialPose) -> new SequentialCommandGroup(		
-					mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
+					mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, true),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.SHOOT_CUBE_AUTO),
+                    new WaitCommand(0.5),
                     mArmCommands.getGoToPresetArmStateExtendFirstCommand(ArmState.TUCK_INTERMEDIATE, true),
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
@@ -187,7 +190,12 @@ public class RobotContainer {
             mAutos.new Strategy(
                 "high cube, do nothing",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
-                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE)
+                    mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, true),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.SHOOT_CUBE_AUTO),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.OFF),
+                    mArmCommands.getGoToPresetArmStateExtendFirstCommand(ArmState.TUCK_INTERMEDIATE, true)
                 )
             ),
             mAutos.new Strategy(
@@ -204,7 +212,10 @@ public class RobotContainer {
             mAutos.new Strategy(
                 "cube high, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
-                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
+                    mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, true),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.SHOOT_CUBE_AUTO),
+                    new WaitCommand(0.5),
                     mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),

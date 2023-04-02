@@ -408,7 +408,7 @@ public final class Constants {
                 Math.PI * 2, false,
                 0.7, 0., 0., 0.07, // 1.0, 0., 0.3, 0.13
                 Math.PI / 3, Math.PI / 2,
-                Rotation2d.fromDegrees(193), 10, false,
+                Rotation2d.fromDegrees(203.2), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(137), Rotation2d.fromDegrees(-80));
 
@@ -483,6 +483,11 @@ public final class Constants {
                 5.8,
                 Rotation2d.fromDegrees(-30.5),
                 Rotation2d.fromDegrees(10.7));
+        
+        public static final ArmSettingsConstants kFloorPositionIntermediateConstants = new ArmSettingsConstants(
+                0,
+                Rotation2d.fromDegrees(-28.5),
+                Rotation2d.fromDegrees(20.7));
 
         public static final ArmSettingsConstants kFrontDoubleSubstationConstants = new ArmSettingsConstants(
                 2,
@@ -511,7 +516,7 @@ public final class Constants {
 
         public static final ArmSettingsConstants kCubeLevel1Constants = new ArmSettingsConstants(
                 0,
-                Rotation2d.fromDegrees(4),
+                Rotation2d.fromDegrees(2),
                 Rotation2d.fromDegrees(22.6));
 
         // public static final ArmSettingsConstants kCubeLevel2Constants = new ArmSettingsConstants(
