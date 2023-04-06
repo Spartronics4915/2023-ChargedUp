@@ -350,6 +350,12 @@ public class RobotContainer {
 
                 mDriverController.leftBumper()
                 .onTrue(mArmCommands.getTuckCommand());
+
+                mDriverController.x()
+                .onTrue(mBlingSubsystem.setMastPatternCommand(BlingSubsystem.kSolidPurplePattern));
+
+                mDriverController.y()
+                .onTrue(mBlingSubsystem.setMastPatternCommand(BlingSubsystem.kSolidYellowPattern));
  
                 // Disabled for now with the belt extender.
                 // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
@@ -466,7 +472,8 @@ public class RobotContainer {
     }
     
     public void initRobot() {
-        mBlingSubsystem.startUnderglow();
+        // mBlingSubsystem.startUnderglow();
+        mBlingSubsystem.startMast();
         Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(useArm, useSwerveChassis, mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
         mSwerve.resetYaw();
