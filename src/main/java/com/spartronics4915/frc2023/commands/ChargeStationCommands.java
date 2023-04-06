@@ -23,9 +23,19 @@ public final class ChargeStationCommands {
         private final ProfiledPIDController mThetaPID;
 
         private final boolean mBackwards;
+        private final boolean mMobility;
 
         public enum ClimbState {
-            CLIMB_TO_GRIP, GRIP_TO_PLATFORM, LEVEL_ROBOT_SETUP, LEVEL_ROBOT, STOP, ERROR
+            CLIMB_TO_GRIP_M,
+            GO_OVER_PLATFORM,
+            LAND_ON_GROUND,
+            DRIVE_ON_GROUND,
+            CLIMB_TO_GRIP,
+            GRIP_TO_PLATFORM,
+            LEVEL_ROBOT_SETUP,
+            LEVEL_ROBOT,
+            STOP,
+            ERROR
         }
 
         public ClimbState mCurrState, mLastState;
@@ -33,7 +43,7 @@ public final class ChargeStationCommands {
         private String mLogString;
 
         /**
-         * Defaults to backwards
+         * Defaults to backwards and no mobility
          */
         public AutoChargeStationClimb() {
 			this(true);
@@ -41,10 +51,29 @@ public final class ChargeStationCommands {
 
         public AutoChargeStationClimb(boolean backwards) {
             mBackwards = backwards;
+            mMobility = false;
             mSwerve = Swerve.getInstance();
             addRequirements(mSwerve);
             mLogString = "";
             mCurrState = ClimbState.CLIMB_TO_GRIP;
+            mVXPID = new PIDController(
+                BalanceConstants.XVelocityPID.kP,
+                BalanceConstants.XVelocityPID.kI,
+                BalanceConstants.XVelocityPID.kD);
+            mThetaPID = new ProfiledPIDController(
+                BalanceConstants.ThetaPID.kP,
+                BalanceConstants.ThetaPID.kI,
+                BalanceConstants.ThetaPID.kD,
+                new Constraints(kMaxAngularSpeed, kMaxAngularAcceleration));
+        }
+
+        public AutoChargeStationClimb(boolean backwards, boolean mobility) {
+            mBackwards = mobility ? !backwards : backwards;
+            mMobility = mobility;
+            mSwerve = Swerve.getInstance();
+            addRequirements(mSwerve);
+            mLogString = "";
+            mCurrState = ClimbState.CLIMB_TO_GRIP_M;
             mVXPID = new PIDController(
                 BalanceConstants.XVelocityPID.kP,
                 BalanceConstants.XVelocityPID.kI,
@@ -97,6 +126,70 @@ public final class ChargeStationCommands {
         public void execute() {
             final double climb_to_grip_speed_m_s = invertIfBackwards(2.4);
             switch (mCurrState) {
+                case CLIMB_TO_GRIP_M: {
+                    final double targetPitchDegrees = 9;
+                    
+                    if (mCurrStateTimer.hasElapsed(2)) {
+                        mSwerve.stop();
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.ERROR;
+                        mLogString = "CLIMB_TO_GRIP_M timeout";
+                    }
+                    mSwerve.drive(new ChassisSpeeds(-climb_to_grip_speed_m_s, 0, 0), false, false);
+                    if (Math.abs(mSwerve.getPitch().getDegrees()) > targetPitchDegrees) {
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.GO_OVER_PLATFORM;
+                        mCurrStateTimer.reset();
+                        System.out.println("CLIMB_TO_GRIP_M success");
+                    }
+                }
+
+                case GO_OVER_PLATFORM: {
+                    final double overPlatformSpeed = -invertIfBackwards(climb_to_grip_speed_m_s);
+                    final double targetPitchDegrees = invertIfBackwards(-10);
+                    if (mCurrStateTimer.hasElapsed(4)) {
+                        mSwerve.stop();
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.ERROR;
+                        mLogString = "GO_OVER_PLATFORM timeout";
+                    }
+                    mSwerve.drive(new ChassisSpeeds(overPlatformSpeed, 0, 0), false, false);
+                    double p = mSwerve.getPitch().getDegrees();
+                    if (mBackwards ? (p > targetPitchDegrees) : (p < targetPitchDegrees)) {
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.LAND_ON_GROUND;
+                        System.out.println("GO_OVER_PLATFORM success");
+                        mCurrStateTimer.reset();
+                    }
+                }
+
+                case LAND_ON_GROUND: {
+                    final double landOnGroundSpeed = -invertIfBackwards(1);
+                    final double landOnGroundTargetPitchDeg = 1;
+                    if (mCurrStateTimer.hasElapsed(2)) {
+                        mSwerve.stop();
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.ERROR;
+                        mLogString = "LAND_ON_GROUND timeout";
+                    }
+                    mSwerve.drive(new ChassisSpeeds(landOnGroundSpeed, 0, 0));
+                    if (Math.abs(mSwerve.getPitch().getDegrees()) < landOnGroundTargetPitchDeg) {
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.DRIVE_ON_GROUND;
+                        System.out.println("LAND_ON_GROUND success");
+                        mCurrStateTimer.reset();
+                    }
+                }
+
+                case DRIVE_ON_GROUND: {
+                    final double groundSpeed = -invertIfBackwards(1);
+                    mSwerve.drive(new ChassisSpeeds(groundSpeed, 0, 0));
+                    if (mCurrStateTimer.hasElapsed(1)) {
+                        mLastState = mCurrState;
+                        mCurrState = ClimbState.CLIMB_TO_GRIP;
+                        System.out.println("DRIVE_ON_GROUND success");
+                    }
+                }
 
                 case CLIMB_TO_GRIP: {
                     final double climb_to_grip_target_pitch_deg = 9;
