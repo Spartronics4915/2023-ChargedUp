@@ -408,7 +408,7 @@ public final class Constants {
                 Math.PI * 2, false,
                 0.7, 0., 0., 0.07, // 1.0, 0., 0.3, 0.13
                 Math.PI / 3, Math.PI / 2,
-                Rotation2d.fromDegrees(203.2), 10, false,
+                Rotation2d.fromDegrees(287.1), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(137), Rotation2d.fromDegrees(-80));
 
