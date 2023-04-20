@@ -18,7 +18,7 @@ public class AlternatingColorPattern implements CustomLEDPattern{
 	}
 
 	@Override
-	public void setLEDs(AddressableLEDBuffer buffer) {	
+	public void setLEDs(AddressableLEDBuffer buffer, int startIndex, int endIndex) {
 		if (mOffset == mCogSize * mColors.length) {
 			mOffset = 0;
 		}
@@ -26,10 +26,10 @@ public class AlternatingColorPattern implements CustomLEDPattern{
 			mOffset++;
 		};
 		
-		for (int index = 0; index < buffer.getLength(); index++) {
-			for (int i = 0; i < mColors.length; i++) {
-				if ((index + mOffset) % (mCogSize * mColors.length) / mCogSize == i) {
-					buffer.setLED(index, mColors[i]);
+		for (int i = startIndex; i < buffer.getLength() && i < endIndex; i++) {
+			for (int j = 0; j < mColors.length; j++) {
+				if ((i + mOffset) % (mCogSize * mColors.length) / mCogSize == j) {
+					buffer.setLED(i, mColors[j]);
 				}
 			}
 		}	

@@ -135,7 +135,7 @@ public final class ChargeStationCommands {
                         mCurrState = ClimbState.ERROR;
                         mLogString = "CLIMB_TO_GRIP_M timeout";
                     }
-                    mSwerve.drive(new ChassisSpeeds(-climb_to_grip_speed_m_s, 0, 0), false, false);
+                    mSwerve.drive(new ChassisSpeeds(-climb_to_grip_speed_m_s, 0, 0), false, true);
                     if (Math.abs(mSwerve.getPitch().getDegrees()) > targetPitchDegrees) {
                         mLastState = mCurrState;
                         mCurrState = ClimbState.GO_OVER_PLATFORM;

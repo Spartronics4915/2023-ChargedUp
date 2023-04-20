@@ -12,8 +12,8 @@ public class SolidColorPattern implements CustomLEDPattern{
     }
 
     @Override
-    public void setLEDs(AddressableLEDBuffer buffer) {
-        for (int i = 0; i < buffer.getLength(); i++) {
+    public void setLEDs(AddressableLEDBuffer buffer, int startIndex, int endIndex) {
+        for (int i = 0; i < buffer.getLength() && i < endIndex; i++) {
             buffer.setLED(i, mColor);
         }
     }

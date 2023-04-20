@@ -251,7 +251,7 @@ public class ArmCommands {
             new UntuckWristIfNecessary(),
             new ConditionalCommand(
                 mArm.getExtender().zeroExtenderCommand()
-                    .andThen(getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_INTERMEDIATE, false)),
+                    .andThen(getGoToPresetArmStatePivotFirstCommand(ArmState.FLOOR_INTERMEDIATE, true)),
                 Commands.none(),
                 () -> mArm.getPivot().getArmPosition().getDegrees() < -20
             )

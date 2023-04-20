@@ -268,6 +268,12 @@ public class RobotContainer {
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
             ),
+            mAutos.new Strategy(
+                "charge station (b) with mobility (test)",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    new ChargeStationCommands.AutoChargeStationClimb(false, true)
+                )    
+            )
             // mAutos.new Strategy(
             //     "follow test trajectory",
             //     (Pose2d initialPose) -> {
@@ -352,10 +358,10 @@ public class RobotContainer {
                 .onTrue(mArmCommands.getTuckCommand());
 
                 mDriverController.x()
-                .onTrue(mBlingSubsystem.setMastPatternCommand(BlingSubsystem.kSolidPurplePattern));
+                .onTrue(mBlingSubsystem.setUnderglowPatternCommand(BlingSubsystem.kSolidPurplePattern));
 
                 mDriverController.y()
-                .onTrue(mBlingSubsystem.setMastPatternCommand(BlingSubsystem.kSolidYellowPattern));
+                .onTrue(mBlingSubsystem.setUnderglowPatternCommand(BlingSubsystem.kSolidYellowPattern));
  
                 // Disabled for now with the belt extender.
                 // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
@@ -472,8 +478,8 @@ public class RobotContainer {
     }
     
     public void initRobot() {
-        // mBlingSubsystem.startUnderglow();
-        mBlingSubsystem.startMast();
+        mBlingSubsystem.startUnderglow();
+        // mBlingSubsystem.startMast();
         Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(useArm, useSwerveChassis, mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
         mSwerve.resetYaw();

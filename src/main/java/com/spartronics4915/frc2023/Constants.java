@@ -407,8 +407,8 @@ public final class Constants {
                 15, // actual value 15
                 Math.PI * 2, false,
                 0.7, 0., 0., 0.07, // 1.0, 0., 0.3, 0.13
-                Math.PI / 3, Math.PI / 2,
-                Rotation2d.fromDegrees(287.1), 10, false,
+                Math.PI / 2, Math.PI,
+                Rotation2d.fromDegrees(350.4), 10, false,
                 MotorType.kBrushless,
                 Rotation2d.fromDegrees(137), Rotation2d.fromDegrees(-80));
 
@@ -643,7 +643,7 @@ public final class Constants {
         public static final int kDefaultInitialPoseIndex = 0;
 
         public static final int kLEDUnderglowPort = 0; // pwm
-        public static final int kLEDUnderglowBufferLength = 130;
+        public static final int kLEDUnderglowBufferLength = 200;
 
         public static final int kLEDDiagonalPort = 1; // pwm
         public static final int kLEDDiagonalBufferLength = 40;

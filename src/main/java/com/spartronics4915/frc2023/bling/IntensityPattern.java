@@ -27,12 +27,12 @@ public class IntensityPattern  implements CustomLEDPattern {
 	}
 
 	@Override
-	public void setLEDs(AddressableLEDBuffer buffer) {
+	public void setLEDs(AddressableLEDBuffer buffer, int startIndex) {
 		double red = MathUtil.interpolate(mLowColor.red, mHighColor.red, mIntensity);
 		double green = MathUtil.interpolate(mLowColor.green, mHighColor.green, mIntensity);
 		double blue = MathUtil.interpolate(mLowColor.blue, mHighColor.blue, mIntensity);
-		for (int index = 0; index < buffer.getLength(); index++){
-			buffer.setLED(index, new Color(red,green,blue));
+		for (int i = startIndex; i < buffer.getLength(); i++){
+			buffer.setLED(i, new Color(red,green,blue));
 		}
 		t += 1. / 50.;
 		setIntensity(Math.cos(2 * Math.PI * t));
