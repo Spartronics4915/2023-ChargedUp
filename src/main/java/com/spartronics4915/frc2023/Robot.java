@@ -4,9 +4,22 @@
 
 package com.spartronics4915.frc2023;
 
+import com.spartronics4915.frc2023.bling.AlternatingColorPattern;
+import com.spartronics4915.frc2023.bling.BlinkingPattern;
+import com.spartronics4915.frc2023.bling.ChaosPattern;
+import com.spartronics4915.frc2023.bling.ChasePattern;
+import com.spartronics4915.frc2023.bling.IntensityPattern;
+import com.spartronics4915.frc2023.bling.RadarPattern;
+import com.spartronics4915.frc2023.bling.RainbowPattern;
+import com.spartronics4915.frc2023.bling.SolidColorPattern;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -25,6 +38,13 @@ public class Robot extends TimedRobot {
     private Command mAutonomousCommand;
     private Command mTeleopInitCommand;
     private Command mTestingCommand;
+
+    private AddressableLED mLEDUnderglow;
+    private AddressableLEDBuffer mLEDUnderglowBuffer;
+    private int mRainbowFirstPixelHue;
+
+
+
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -65,8 +85,12 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+
+
+    
     }
 
+    
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
     public void disabledInit() {

@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.spartronics4915.frc2023.Constants.Arm.ArmPositionConstants.ArmSettingsConstants;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.subsystems.MotorAbsEncoderComboSubsystem.AngleWithEarthProvider;
 
@@ -45,7 +46,8 @@ public class ArmSubsystem extends SubsystemBase {
      * Represents the preset values for the arm
      */
     public enum ArmState {
-        TUCK_INTERMEDIATE(kReadyForTuck),
+        PRE_OVER_TOP_POSITION(kPreOverTopPositionConstants),
+        TUCK_INTERMEDIATE(kTuckIntermediate),
         RETRACTED(kRetractedConstants),
         // GRAB_UPRIGHT(kGrabUprightConstants),
         // GRAB_FALLEN(kArmLowConstants),
@@ -54,11 +56,14 @@ public class ArmSubsystem extends SubsystemBase {
         // ARM_LEVEL(kArmLevelConstants),
         RETRACTED_PRIOR(kPriorRetracted),
         FLOOR_POS(kFloorPositionConstants),
-        DOUBLE_SUBSTATION(kDoubleSubstationConstants),
+        FLOOR_INTERMEDIATE(kFloorPositionIntermediateConstants),
+        FRONT_DOUBLE_SUBSTATION(kFrontDoubleSubstationConstants),
+        BACK_DOUBLE_SUBSTATION(kBackDoubleSubstationConstants),
         CONE_LEVEL_1(kConeLevel1Constants),
         CONE_LEVEL_2(kConeLevel2Constants),
+        CONE_LEVEL_2_DUNK(kConeLevel2DunkConstants),
         CUBE_LEVEL_1(kCubeLevel1Constants),
-        CUBE_LEVEL_2(kCubeLevel2Constants),
+        // CUBE_LEVEL_2(kCubeLevel2Constants),
 
         SHOOT_HIGH_CUBE(kCubeTopShootConstants);
 
@@ -67,11 +72,14 @@ public class ArmSubsystem extends SubsystemBase {
         public final double armRadius;
         public final Rotation2d armTheta;
         public final Rotation2d wristTheta;
+        public final double outSpeed;
 
-        private ArmState(ArmPositionConstants armPositionConstants) {
+        private ArmState(ArmSettingsConstants armConstants) {
+            var armPositionConstants = armConstants.mArmPositionConstants;
             armRadius = armPositionConstants.armRadius;
             armTheta = armPositionConstants.armTheta;
             wristTheta = armPositionConstants.wristTheta;
+            outSpeed = armConstants.mOutSpeed;
         }
     }
 
@@ -109,7 +117,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final MotorAbsEncoderComboSubsystem mWristMotor;
     private final CANSparkMax mPivotFollower;
 
-    private final ExtenderSubsystem mExtenderSubsystem;
+    private final BeltExtenderSubsystem mExtenderSubsystem;
     private final Intake mIntake;
 
     public ArmSubsystem() {
@@ -122,17 +130,27 @@ public class ArmSubsystem extends SubsystemBase {
         mPivotFollower.follow(mPivotMotor.getMotor(), true);
         mPivotFollower.setSmartCurrentLimit(60);
         mPivotFollower.setIdleMode(IdleMode.kBrake);
-        mExtenderSubsystem = new ExtenderSubsystem(mPivotMotor);
+        mExtenderSubsystem = new BeltExtenderSubsystem(mPivotMotor);
 
         mIntake = Intake.getInstance();
         
         if(mWristMotor != null) {
             mWristMotor.setAngleWithEarthProvider(new WristAngleProvider(mPivotMotor, mWristMotor));
         }
-        // mPivotMotor.setActive(true);
+        
+        
+        // mPivotMotor.setActive(false);
     }
 
-    public ExtenderSubsystem getExtender() {
+    public void makeModeledPositionsMatchPhysical() {
+
+    }
+
+    public Intake getIntake() {
+        return mIntake;
+    }
+    
+    public BeltExtenderSubsystem getExtender() {
         return mExtenderSubsystem;
     }
     
@@ -175,10 +193,14 @@ public class ArmSubsystem extends SubsystemBase {
         );
     }
 
+    public ArmPosition getGlobalPosition () {
+        return localToGlobalPosition(this.getLocalPosition());
+    }
+
     public ArmPosition  getLocalReference() {
         Rotation2d pivotReference = mPivotMotor.getCurrentReferenceArm();
         Rotation2d wristReference = mWristMotor.getCurrentReferenceArm();
-        double extenderReference = mExtenderSubsystem.getReference();
+        double extenderReference = mExtenderSubsystem.getTarget();
 
         return new ArmPosition(extenderReference, pivotReference, wristReference);
 
@@ -210,35 +232,34 @@ public class ArmSubsystem extends SubsystemBase {
 
         return new ArmPosition(newExtension, newPivotAngle, newWristAngle);
     }
+    
 
     // TODO determine zero offsets
     // TODO add extender motor
-    private void setDesiredLocalPosition(ArmPosition state) {
-        // mExtenderSubsystem.extendToNInches(state.armRadius).schedule();
-        mExtenderSubsystem.setTarget(state.armRadius);
-        mPivotMotor.setArmReference(state.armTheta);
-        mWristMotor.setArmReference(state.wristTheta);
+    private void setDesiredLocalPivotWristPosition(Rotation2d armTheta, Rotation2d wristTheta) {
+        mPivotMotor.setArmReference(armTheta);
+        mWristMotor.setArmReference(wristTheta);
     }
 
-    public CommandBase setDesiredLocalStateCommand(ArmPosition state) {
-        return runOnce(() -> setDesiredLocalPosition(state));
-    }
+    // public CommandBase setDesiredLocalStateCommand(ArmPosition state) {
+    //     return runOnce(() -> setDesiredLocalPosition(state));
+    // }
 
-    private void setDesiredGlobalPosition(ArmPosition pos) {
-        setDesiredLocalPosition(globalToLocalState(pos));
-    }
+    // private void setDesiredGlobalPosition(ArmPosition pos) {
+    //     setDesiredLocalPosition(globalToLocalState(pos));
+    // }
 
     public void setDesiredLocalState(ArmState state) {
         // Global state has all of the angles in global coordinates (0 is the horizon)
         mDesiredState = state;
-        setDesiredLocalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+        setDesiredLocalPivotWristPosition(state.armTheta, state.wristTheta);
     }
 
-    public void setDesiredGlobalState(ArmState state) {
-        // Global state has all of the angles in global coordinates (0 is the horizon)
-        mDesiredState = state;
-        setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
-    }
+    // public void setDesiredGlobalState(ArmState state) {
+    //     // Global state has all of the angles in global coordinates (0 is the horizon)
+    //     mDesiredState = state;
+    //     setDesiredGlobalPosition(new ArmPosition(state.armRadius, state.armTheta, state.wristTheta));
+    // }
 
     private Rotation2d getCorrectAngleDEPRECATE(Rotation2d armAngle) {
         // assuming 0 on the arm is straight up
@@ -251,18 +272,25 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
 
+    public void clearReference() {
+        mPivotMotor.clearReference();
+        mWristMotor.clearReference();
+        mExtenderSubsystem.stopExtenderAndMatchTargetToPhysical();
+    }
+    
     public void stopPivot() {
         mPivotMotor.stopMotor();
     }
 
-    public Rotation2d getRef() {
-        return mPivotMotor.getCurrentReference();
-    }
+    // // Probably should remove
+    // public Rotation2d getRef() {
+    //     return mPivotMotor.getCurrentReference();
+    // }
 
     // TODO make a way
     /**
      * this method transform the arm based on its current position
-     * @param exstensionDelta distance in inches to tranform the arm by
+     * @param exstensionDelta distance in inches to tranform the arm by - Extension currently not supported.
      * @param armDelta  amount to rotate the arm by
      * @param wristDelta amount to rotate the wrist by
      */
@@ -272,8 +300,8 @@ public class ArmSubsystem extends SubsystemBase {
             current.armRadius + exstensionDelta, 
             current.armTheta.plus(armDelta),
             current.wristTheta.plus(wristDelta));
-        setDesiredLocalPosition(transformed);
-        System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.armTheta.getDegrees() + " " + wristDelta);
+        setDesiredLocalPivotWristPosition(transformed.armTheta, transformed.wristTheta);
+        System.out.println("Transform Called " + " " + transformed.wristTheta.getDegrees() + " " + transformed.wristTheta.getRadians() + " " + wristDelta);
 
     }
     

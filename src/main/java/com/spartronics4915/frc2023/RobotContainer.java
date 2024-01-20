@@ -9,42 +9,44 @@ import static com.spartronics4915.frc2023.Constants.OI.kOperatorControllerID;
 import static com.spartronics4915.frc2023.Constants.OI.kTriggerDeadband;
 import static com.spartronics4915.frc2023.Constants.OI.kWindowButtonId;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.spartronics4915.frc2023.Constants.Arm;
 
 import static com.spartronics4915.frc2023.Constants.OI.kMenuButtonId;
+// import static com.spartronics4915.frc2023.commands.Autos.autoBuilder;
 
 import com.spartronics4915.frc2023.Constants.OI;
-import com.spartronics4915.frc2023.Constants.Trajectory;
+import com.spartronics4915.frc2023.bling.CustomLEDPattern;
+
 import static com.spartronics4915.frc2023.Constants.Swerve.*;
+import static com.spartronics4915.frc2023.Constants.Bling.*;
 import com.spartronics4915.frc2023.commands.ArmCommands;
 import com.spartronics4915.frc2023.commands.Autos;
 import com.spartronics4915.frc2023.commands.ChargeStationCommands;
-import com.spartronics4915.frc2023.commands.ChargeStationCommands.AutoChargeStationClimb.ClimbState;
 import com.spartronics4915.frc2023.commands.DebugTeleopCommands;
 import com.spartronics4915.frc2023.commands.ExtenderCommands;
 import com.spartronics4915.frc2023.commands.IntakeCommands;
-import com.spartronics4915.frc2023.commands.SimpleAutos;
 import com.spartronics4915.frc2023.commands.SwerveCommands;
 import com.spartronics4915.frc2023.commands.SwerveTrajectoryFollowerCommands;
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem;
+import com.spartronics4915.frc2023.subsystems.BlingSubsystem;
 import com.spartronics4915.frc2023.subsystems.Intake;
 import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 import com.spartronics4915.frc2023.subsystems.Swerve;
-import com.spartronics4915.frc2023.subsystems.Intake.IntakeState;
 
 import com.spartronics4915.frc2023.subsystems.ArmSubsystem.ArmState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,6 +56,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
 * This class is where the bulk of the robot should be declared. Since
@@ -71,16 +74,16 @@ public class RobotContainer {
     private final CommandXboxController mDriverController;
     private final CommandXboxController mOperatorController;
     
-    private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
-    
     // The robot's subsystems and commands are defined here...
+    private final BlingSubsystem mBlingSubsystem;
+    
     private final Swerve mSwerve;
     private final SwerveCommands mSwerveCommands;
+    private final SwerveTrajectoryFollowerCommands mSwerveTrajectoryFollowerCommands;
     
     private final ArmSubsystem mArm;
     private final ArmCommands mArmCommands;
     private final Intake mIntake;
-    private final ExtenderCommands mExtenderCommands;
 
     private final IntakeCommands mIntakeCommands;
     
@@ -94,6 +97,8 @@ public class RobotContainer {
     private final boolean useSwerveChassis = true;
     private final boolean useArm = true;
     // private final Command mTestingCommand;
+
+    private final Trigger mDSAttachedTrigger;
     
     /**
     * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -101,13 +106,16 @@ public class RobotContainer {
     public RobotContainer() {
         mDriverController = useJoystick ? new CommandXboxController(kDriverControllerID) : null;
         mOperatorController = useJoystick ? new CommandXboxController(kOperatorControllerID) : null;
+
+        mBlingSubsystem = BlingSubsystem.getInstance();
+        mDSAttachedTrigger = new Trigger(() -> DriverStation.isDSAttached());
         
         if (useSwerveChassis) {
             mSwerve = Swerve.getInstance();
             mSwerveCommands = new SwerveCommands(mDriverController);
             mSwerve.setDefaultCommand(mSwerveCommands.new TeleopCommand());
-            
             mSwerveTrajectoryFollowerCommands = new SwerveTrajectoryFollowerCommands();
+            
             mAutos = new Autos(mSwerveCommands, mSwerveTrajectoryFollowerCommands);
             
             mTeleopInitCommand = mSwerveCommands.new ResetCommand(new Pose2d()); // remove before comp as pose will be unknown after auto
@@ -121,13 +129,11 @@ public class RobotContainer {
         
         if (useArm) {
             mArm = ArmSubsystem.getInstance();
-            mExtenderCommands = new ExtenderCommands(mArm.getExtender());
             mIntake = Intake.getInstance();
             mIntakeCommands = new IntakeCommands(mIntake);
             mArmCommands = new ArmCommands(mArm, mIntakeCommands);
         } else {
             mArm = null;
-            mExtenderCommands = null;
             mIntake = null;
             mIntakeCommands = null;
             mArmCommands = null;
@@ -146,8 +152,7 @@ public class RobotContainer {
 			
 		mInitialPoseSelector.setDefaultOption(
 			kInitialPoses[kDefaultInitialPoseIndex].name,
-			kInitialPoses[kDefaultInitialPoseIndex].pose
-		);
+			kInitialPoses[kDefaultInitialPoseIndex].pose);
 
 		SmartDashboard.putData("Initial Pose", mInitialPoseSelector);
 	}
@@ -164,48 +169,15 @@ public class RobotContainer {
             mAutos.new Strategy(
 				"High cube, Balance",
 				(Pose2d initialPose) -> new SequentialCommandGroup(		
-					mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
-                    new WaitCommand(1),
+					mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, true),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.SHOOT_CUBE_AUTO),
+                    new WaitCommand(0.5),
+                    mArmCommands.getGoToPresetArmStateExtendFirstCommand(ArmState.TUCK_INTERMEDIATE, true),
 					new ChargeStationCommands.AutoChargeStationClimb()
 				)
 			),
-            // mAutos.new Strategy(
-            //     "Drop, Leave, Pick-up",
-            //     (Pose2d initialPose) -> new SequentialCommandGroup(
-			// 		mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-			// 		mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-			// 			new ArrayList<>(List.of(
-			// 				new PathPoint(initialPose.getTranslation(), new Rotation2d(), initialPose.getRotation()),
-			// 				new PathPoint(initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)), new Rotation2d(), new Rotation2d())
-			// 			))
-			// 		),
-			// 		mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
-            //     )
-            // ),
 			mAutos.new Strategy(
-				"Drop, Leave, Pick-up (do not use)",
-				(Pose2d initialPose) -> new SequentialCommandGroup(
-					mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-					mSwerveTrajectoryFollowerCommands.new FollowStaticTrajectory(
-						new ArrayList<>(List.of(
-							new PathPoint(
-								initialPose.getTranslation(),
-								new Rotation2d(),
-								initialPose.getRotation()
-							),
-							new PathPoint(
-								initialPose.getTranslation().plus(new Translation2d(Trajectory.kBackUpDistance, 0)),
-								new Rotation2d(),
-								new Rotation2d()
-							)
-						))
-					),
-					mArmCommands.new GrabPiece(ArmState.FLOOR_POS)
-				)
-
-			),
-            mAutos.new Strategy(
                 "do nothing",
                 (Pose2d initialPose) -> new CommandBase() {}
             ),
@@ -218,14 +190,19 @@ public class RobotContainer {
             mAutos.new Strategy(
                 "high cube, do nothing",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
-                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE)
+                    mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, true),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.SHOOT_CUBE_AUTO),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.OFF),
+                    mArmCommands.getGoToPresetArmStateExtendFirstCommand(ArmState.TUCK_INTERMEDIATE, true)
                 )
             ),
             mAutos.new Strategy(
                 "place, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
                     new WaitCommand(2.5),
@@ -235,10 +212,39 @@ public class RobotContainer {
             mAutos.new Strategy(
                 "cube high, leave community",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
-                    mArmCommands.new ReleasePiece(ArmState.SHOOT_HIGH_CUBE),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, true),
+                    new WaitCommand(0.5),
+                    mIntake.setStateCommand(IntakeState.SHOOT_CUBE_AUTO),
+                    new WaitCommand(0.5),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-2, 0, 0), false, true),
+                    new WaitCommand(2.5),
+                    mSwerve.driveCommand(new ChassisSpeeds(), false, true)
+                )
+            ),
+            mAutos.new Strategy(
+                "cone high, balance",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.getDunkCommand(),
+                    mArmCommands.getTuckCommand(),
+                    new ChargeStationCommands.AutoChargeStationClimb(false)
+                )
+            ),
+            mAutos.new Strategy(
+                "cone high, do nothing",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.getDunkCommand(),
+                    mArmCommands.getTuckCommand()
+                )
+            ),
+            mAutos.new Strategy(
+                "cone high, leave community",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    mArmCommands.getDunkCommand(),
+                    mArmCommands.getTuckCommand(),
+                    new WaitCommand(1),
+                    mSwerve.driveCommand(new ChassisSpeeds(2, 0, 0), false, true),
                     new WaitCommand(2.5),
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
@@ -253,7 +259,7 @@ public class RobotContainer {
                 "place, move short (test)",
                 (Pose2d initialPose) -> new SequentialCommandGroup(
                     mArmCommands.new ReleasePiece(ArmState.FLOOR_POS),
-                    mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE),
+                    mArmCommands.new SetArmPivotWristLocalState(ArmState.TUCK_INTERMEDIATE),
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(-0.5, 0, 0), false, true),
                     new WaitCommand(2),
@@ -261,22 +267,60 @@ public class RobotContainer {
                     new WaitCommand(1),
                     mSwerve.driveCommand(new ChassisSpeeds(), false, true)
                 )
+            ),
+            mAutos.new Strategy(
+                "charge station (b) with mobility (test)",
+                (Pose2d initialPose) -> new SequentialCommandGroup(
+                    new ChargeStationCommands.AutoChargeStationClimb(false, true)
+                )    
             )
             // mAutos.new Strategy(
-            //     "drop, leave",
-            //     (Pose2d initialPose) -> new SequentialCommandGroup(
-            //         mArmCommands.new 
-            //     )    
+            //     "follow test trajectory",
+            //     (Pose2d initialPose) -> {
+            //         initialPose = new Pose2d();
+            //         var trajectory = PathPlanner.generatePath(
+            //             new PathConstraints(2.5, 2.5), 
+            //             new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
+            //             new PathPoint(new Translation2d(1, 1), new Rotation2d(), Rotation2d.fromDegrees(-90))
+            //         );
+            //         return new SequentialCommandGroup(
+            //             new FollowSingleTrajectoryCommand(trajectory),
+            //             mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+            //         );
+            //     }
+            // ),
+            // mAutos.new Strategy(
+            //     "follow straight 2m test trajectory",
+            //     (Pose2d initialPose) -> {
+            //         initialPose = Swerve.getInstance().getPose();
+            //         var trajectory = PathPlanner.generatePath(
+            //             new PathConstraints(2.5, 2.5),
+            //             new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()),
+            //             new PathPoint(new Translation2d(2, 0), new Rotation2d(), Rotation2d.fromDegrees(90))
+            //         );
+            //         return new SequentialCommandGroup(
+            //             new FollowSingleTrajectoryCommand(trajectory),
+            //             mSwerve.driveCommand(new ChassisSpeeds(), true, true)
+            //         );
+            //     }
+            // ),
+            // mAutos.new Strategy(
+            //     "2-piece test", 
+            //     (Pose2d initialPose) -> autoBuilder.fullAuto(Autos.test2PieceTrajectory)
+            // ),
+            // mAutos.new Strategy(
+            //     "2-piece test, trajectory only",
+            //     (Pose2d initialPose) -> {
+            //         var trajectory = PathPlannerTrajectory.transformTrajectoryForAlliance(k2pTestTraj, Alliance.Red);
+            //         final var startPose = trajectory.getInitialHolonomicPose();
+            //         return new SequentialCommandGroup(
+            //             new InstantCommand(() -> Swerve.getInstance().resetPose(startPose), Swerve.getInstance()),
+            //             new SwerveTrajectoryFollowerCommands.FollowSingleTrajectoryCommand(
+            //                 trajectory
+            //             )
+            //         );
+            //     }
             // )
-			// mAutos.new Strategy(
-			// 	"Move Forward Static (Test)",
-			// 	(Pose2d initialPose) -> mAutos.new MoveForwardCommandFancy()
-			// ),
-			// mAutos.new Strategy(
-			// 	"Move Forward Dynamic (Test)", (Pose2d initialPose) -> new InstantCommand(() -> {
-			// 		mAutos.new MoveForwardCommandDynamic().schedule();
-			// 	})
-			// )
 		};
 		for (Autos.Strategy strat : autoStrategies) {
 			mAutoSelector.addOption(strat.getName(), strat::getCommand);
@@ -301,20 +345,26 @@ public class RobotContainer {
                 .onTrue(mSwerveCommands.new ResetYaw());
                 
                 mDriverController.y()
-                .onTrue(mSwerveCommands.new ResetOdometry());
+                .onTrue(mSwerveCommands.new ResetPose());
                 
                 mDriverController.rightTrigger(kTriggerDeadband)
                 .onTrue(mSwerveCommands.new EnableSprintMode())
                 .onFalse(mSwerveCommands.new DisableSprintMode());
                 
-                // mDriverController.rightBumper() // TODO: remove before comp
-                // .whileTrue(new ChargeStationCommands.AutoChargeStationClimb());
+                mDriverController.rightBumper() // TODO: remove before comp
+                .whileTrue(new ChargeStationCommands.AutoChargeStationClimb(false));
 
                 mDriverController.leftBumper()
-                .onTrue(mArmCommands.new SetArmLocalState(ArmState.TUCK_INTERMEDIATE));
+                .onTrue(mArmCommands.getTuckCommand());
+
+                mDriverController.x()
+                .onTrue(mBlingSubsystem.setUnderglowPatternCommand(BlingSubsystem.kSolidPurplePattern));
+
+                mDriverController.y()
+                .onTrue(mBlingSubsystem.setUnderglowPatternCommand(BlingSubsystem.kSolidYellowPattern));
  
-                mDriverController.rightBumper() // TODO: remove before comp
-                .whileTrue(mArm.getExtender().extendToTarget());
+                // Disabled for now with the belt extender.
+                // mDriverController.rightBumper().whileTrue(mArm.getExtender().extendToTarget());
                 
                 // This is to tuck into stow
                 mDriverController.povDown().onTrue(Commands.runOnce(()->mArm.stopPivot()));
@@ -339,22 +389,25 @@ public class RobotContainer {
                     * Extend to High tier - cone		Y   
                     * */
                 mOperatorController.button(kWindowButtonId) //should be window
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.getGoToFloorCommand());
 
                 mOperatorController.button(kMenuButtonId) //should be menu
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.DOUBLE_SUBSTATION));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.FRONT_DOUBLE_SUBSTATION, false));
+
+                mOperatorController.rightStick()
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.BACK_DOUBLE_SUBSTATION, false));
                 
                 mOperatorController.a()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.FLOOR_POS));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CUBE_LEVEL_1, false));
                 
                 mOperatorController.x()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_1));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.CONE_LEVEL_1, false));
                 
                 mOperatorController.b()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CUBE_LEVEL_2));
+                    .onTrue(mArmCommands.getGoToPresetArmStatePivotFirstCommand(ArmState.SHOOT_HIGH_CUBE, false));
                 
                 mOperatorController.y()
-                    .onTrue(mArmCommands.new SetArmLocalState(ArmState.CONE_LEVEL_2));
+                    .onTrue(mArmCommands.getRaiseToHighConeOverTopCommand());
 
                 /**
                  * Eject game piece		    RT
@@ -379,23 +432,28 @@ public class RobotContainer {
                  */
 
                 mOperatorController.povUp()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount, Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kArmTransformAmount, Rotation2d.fromDegrees(0)));
 
                 mOperatorController.povDown()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Arm.kArmTransformAmount.unaryMinus(), Rotation2d.fromDegrees(0)));
                     
+                final double extensionIncrementPerTic = 5. / 50; // 3 inches/sec at 50Hz
                 mOperatorController.povRight()
-                    .whileTrue(mExtenderCommands.new Extend());
+                    .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(extensionIncrementPerTic));
 
                 mOperatorController.povLeft()
-                    .whileTrue(mExtenderCommands.new Retract());
+                .whileTrue(mArm.getExtender().modifyTargetCommandRepeat(-extensionIncrementPerTic));
 
                 mOperatorController.leftBumper()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kWristTransformAmount));
 
                 mOperatorController.rightBumper()
-                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kTransformAmount.unaryMinus()));
+                    .whileTrue(mArmCommands.new TransformArmState(0, Rotation2d.fromDegrees(0), Arm.kWristTransformAmount.unaryMinus()));
                 
+
+                
+                mOperatorController.leftStick()
+                    .onTrue(mArmCommands.getTuckCommand());
             }
 
         }
@@ -407,7 +465,7 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-        return mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected());
+        return mArm.getExtender().zeroExtenderCommand().andThen(mAutoSelector.getSelected().apply(mInitialPoseSelector.getSelected()));
         // return null;
     }
     
@@ -420,6 +478,8 @@ public class RobotContainer {
     }
     
     public void initRobot() {
+        mBlingSubsystem.startUnderglow();
+        // mBlingSubsystem.startMast();
         Command shuffleboard_update_command = new DebugTeleopCommands.ShuffleboardUpdateCommand(useArm, useSwerveChassis, mArm, mArmCommands, mSwerve, mSwerveCommands);
         shuffleboard_update_command.schedule();
         mSwerve.resetYaw();
@@ -433,6 +493,13 @@ public class RobotContainer {
     public void resetForTeleop() {
         if (mSwerve != null) {
             mSwerve.resetYaw();
+        }
+
+        System.out.println("TeleopInit Called");
+        if(mArm != null) {
+            mArm.clearReference();
+            System.out.println("Reference reset");
+
         }
     }
 

@@ -1,0 +1,104 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.8596603497313524,
+        "y": 4.971920398890743
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.1676052137944977,
+        "y": 4.6841013962358495
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "placeHighConePosition",
+          "ejectCone"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "after",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.5,
+        "y": 4.5864034458368605
+      },
+      "prevControl": {
+        "x": 4.87515224337129,
+        "y": 4.5864034458368605
+      },
+      "nextControl": {
+        "x": 4.87515224337129,
+        "y": 4.5864034458368605
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "disableIntake",
+          "retractIntake"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.8633319397604373,
+        "y": 4.406495534411714
+      },
+      "prevControl": {
+        "x": 3.960901982900129,
+        "y": 5.169948594403034
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": true,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "shootCube"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 3.0,
+  "maxAcceleration": 5.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.23272727272728438,
+      "names": [
+        "deployIntake"
+      ]
+    },
+    {
+      "position": 1.3818181818181172,
+      "names": [
+        "shootCubeHighPosition"
+      ]
+    },
+    {
+      "position": 0.5381818181817831,
+      "names": [
+        "enableIntakeIn"
+      ]
+    }
+  ]
+}
